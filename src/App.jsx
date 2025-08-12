@@ -432,31 +432,17 @@ function App() {
         )}
 
         {activeTab === 'shield' && (
-          <div className="max-w-4xl mx-auto space-y-6">
-            {/* One-Click Protection */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Monitored Chains */}
             <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                  <div>
-                    <CardTitle className="text-white">Cross-Chain Security</CardTitle>
-                    <p className="text-slate-400 mt-1">Enable protection across all supported blockchains</p>
-                  </div>
-                  <Button
-                    onClick={toggleGlobalProtection}
-                    className={`mt-4 md:mt-0 ${
-                      protectedChains.length === CHAINS.length
-                        ? 'bg-red-500 hover:bg-red-600'
-                        : 'bg-blue-600 hover:bg-blue-700'
-                    }`}
-                  >
-                    {protectedChains.length === CHAINS.length
-                      ? 'Disable All Protection'
-                      : 'Enable All Protection'}
-                  </Button>
-                </div>
+                <CardTitle className="text-white flex items-center space-x-2">
+                  <Globe className="w-5 h-5" />
+                  <span>Monitored Chains</span>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   {CHAINS.map((chain) => (
                     <div
                       key={chain.id}
@@ -467,112 +453,139 @@ function App() {
                             : [...prev, chain.id]
                         );
                       }}
-                      className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                      className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
                         protectedChains.includes(chain.id)
                           ? 'border-blue-500 bg-blue-500/10'
                           : 'border-slate-600 hover:border-slate-500 bg-slate-700/30'
                       }`}
                     >
                       <div className="flex flex-col items-center">
-                        <span className="text-2xl mb-2" style={{ color: chain.color }}>{chain.icon}</span>
-                        <h3 className="font-medium text-white text-sm">{chain.name}</h3>
-                        <div className="mt-2 w-6 h-6 rounded-full flex items-center justify-center">
-                          {protectedChains.includes(chain.id) ? (
-                            <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                          ) : (
-                            <div className="w-4 h-4 border-2 border-slate-400 rounded-full"></div>
-                          )}
-                        </div>
+                        <span className="text-xl mb-1" style={{ color: chain.color }}>{chain.icon}</span>
+                        <h3 className="font-medium text-white text-xs">{chain.name}</h3>
                       </div>
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Natural Language Interface */}
-            <Card className="bg-slate-800/50 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center space-x-2">
-                  <Bot className="w-5 h-5" />
-                  <span>AI Command Interface</span>
-                </CardTitle>
-                <p className="text-slate-400">Use natural language to manage protection</p>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col md:flex-row gap-4 mb-4">
-                  <Input
-                    value={nlpCommand}
-                    onChange={(e) => setNlpCommand(e.target.value)}
-                    placeholder="Type your protection command..."
-                    className="flex-1 bg-slate-700 border-slate-600 text-white placeholder-slate-400"
-                    onKeyDown={(e) => e.key === 'Enter' && processCommand()}
-                  />
-                  <Button
-                    onClick={processCommand}
-                    disabled={isProcessing}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    {isProcessing ? 'Processing...' : 'Execute'}
-                  </Button>
+                
+                {/* Risk Matrix */}
+                <div className="mt-6">
+                  <h3 className="text-white font-medium mb-3 flex items-center">
+                    <div className="w-4 h-4 mr-2">📊</div>
+                    Risk Matrix
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white">{mockData.securityOverview.totalThreats}</div>
+                      <div className="text-xs text-slate-400">Total<br/>Threats</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white">{mockData.securityOverview.protectedValue}</div>
+                      <div className="text-xs text-slate-400">Protected<br/>Value</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-red-400">{mockData.securityOverview.critical}</div>
+                      <div className="text-xs text-slate-400">Critical</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-orange-400">{mockData.securityOverview.high}</div>
+                      <div className="text-xs text-slate-400">High</div>
+                    </div>
+                  </div>
                 </div>
                 
-                <div className="text-sm text-slate-400">
-                  <p className="mb-2">Try commands like:</p>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>"Secure my Solana and Polygon wallets"</li>
-                    <li>"Remove Ethereum protection"</li>
-                    <li>"Enable security for all chains"</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* AI Controls */}
-            <Card className="bg-slate-800/50 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center space-x-2">
-                  <Bot className="w-5 h-5" />
-                  <span>AI Controls</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {Object.entries(aiControls).map(([key, value]) => (
-                    <div key={key} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
-                      <span className="text-white capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                      </span>
-                      <Switch
-                        checked={value}
-                        onCheckedChange={(checked) => 
-                          setAiControls(prev => ({ ...prev, [key]: checked }))
-                        }
-                      />
-                    </div>
-                  ))}
-                  <div className="pt-4">
+                {/* AI Controls */}
+                <div className="mt-6">
+                  <h3 className="text-white font-medium mb-3 flex items-center">
+                    <Bot className="w-4 h-4 mr-2" />
+                    AI Controls
+                  </h3>
+                  <div className="space-y-3">
+                    {Object.entries(aiControls).map(([key, value]) => (
+                      <div key={key} className="flex items-center justify-between">
+                        <span className="text-white text-xs capitalize">
+                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                        </span>
+                        <Switch
+                          checked={value}
+                          onCheckedChange={(checked) => 
+                            setAiControls(prev => ({ ...prev, [key]: checked }))
+                          }
+                        />
+                      </div>
+                    ))}
                     <Button
                       onClick={toggleSimulation}
-                      className={`w-full ${
+                      className={`w-full mt-4 ${
                         simulationActive 
                           ? 'bg-red-600 hover:bg-red-700' 
-                          : 'bg-green-600 hover:bg-green-700'
+                          : 'bg-blue-600 hover:bg-blue-700'
                       }`}
+                      size="sm"
                     >
                       {simulationActive ? (
                         <>
-                          <Square className="w-4 h-4 mr-2" />
+                          <Square className="w-3 h-3 mr-2" />
                           Stop Simulation
                         </>
                       ) : (
                         <>
-                          <Play className="w-4 h-4 mr-2" />
+                          <Play className="w-3 h-3 mr-2" />
                           Start Simulation
                         </>
                       )}
                     </Button>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Real-time Threat Stream */}
+            <Card className="lg:col-span-3 bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Real-time Threat Stream</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {threats.length === 0 ? (
+                    <div className="text-center py-8 text-slate-400">
+                      No threats detected. Start simulation to see threat analysis.
+                    </div>
+                  ) : (
+                    threats.map((threat) => (
+                      <div
+                        key={threat.id}
+                        className={`p-3 rounded-lg border-l-4 bg-slate-700/30 ${
+                          threat.severity === 'critical' ? 'border-red-500' :
+                          threat.severity === 'high' ? 'border-orange-500' :
+                          threat.severity === 'medium' ? 'border-yellow-500' : 'border-blue-500'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center space-x-2">
+                            {getStatusIcon(threat.status)}
+                            <h3 className="font-semibold text-white text-sm">{threat.title}</h3>
+                            <Badge variant="outline" className="text-blue-400 border-blue-400 text-xs">
+                              {threat.chain}
+                            </Badge>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-xs px-2 py-1">
+                              Resolve
+                            </Button>
+                            <Button variant="outline" size="sm" className="text-xs px-2 py-1">
+                              Investigate
+                            </Button>
+                          </div>
+                        </div>
+                        <p className="text-slate-300 text-xs">{threat.description}</p>
+                        <span className="text-xs text-slate-400 mt-1 block">
+                          {new Date(threat.timestamp).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
