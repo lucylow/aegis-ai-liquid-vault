@@ -1,6 +1,6 @@
 import { Threat, SecurityOverview, Alert, Transaction } from '../types';
 
-// Mock data for demonstration
+// Enhanced mock data for AEGIS demo
 const MOCK_THREATS: Threat[] = [
   {
     id: 'tx-001',
@@ -123,14 +123,88 @@ const MOCK_THREATS: Threat[] = [
         priority: 'low'
       }
     ]
+  },
+  {
+    id: 'tx-004',
+    chain: 'solana',
+    txHash: '0x8f2e1a7...',
+    from: '0x9c4f8d...',
+    to: '0x3b7a2e...',
+    value: '2500 SOL',
+    type: 'Flash Loan Attack',
+    severity: 88,
+    timestamp: new Date(Date.now() - 5 * 60 * 60000).toISOString(),
+    description: 'Detected potential flash loan attack pattern',
+    aiAnalysis: 'Transaction sequence matches known flash loan attack patterns. 88% confidence based on DeFi protocol analysis.',
+    patterns: [
+      'Flash loan borrowing',
+      'Multiple DEX swaps',
+      'Price manipulation',
+      'Quick repayment'
+    ],
+    riskIndicators: [
+      { name: 'DeFi Risk', value: 88 },
+      { name: 'Price Impact', value: 76 },
+      { name: 'Timing Pattern', value: 82 }
+    ],
+    recommendedActions: [
+      {
+        title: 'Freeze Protocol',
+        description: 'Temporarily freeze affected DeFi protocol',
+        priority: 'critical'
+      },
+      {
+        title: 'Investigate Impact',
+        description: 'Analyze full attack vector and damage',
+        priority: 'high'
+      },
+      {
+        title: 'User Compensation',
+        description: 'Prepare compensation for affected users',
+        priority: 'high'
+      }
+    ]
+  },
+  {
+    id: 'tx-005',
+    chain: 'ethereum',
+    txHash: '0x6d9e4f2...',
+    from: '0x8a1b3c...',
+    to: '0x5f7e9d...',
+    value: '5000 USDC',
+    type: 'MEV Bot',
+    severity: 45,
+    timestamp: new Date(Date.now() - 10 * 60 * 60000).toISOString(),
+    description: 'MEV bot activity detected',
+    aiAnalysis: 'Standard MEV bot activity detected. 45% confidence - this is normal market behavior.',
+    patterns: [
+      'Gas price manipulation',
+      'Mempool monitoring',
+      'Sandwich attacks',
+      'Arbitrage execution'
+    ],
+    riskIndicators: [
+      { name: 'MEV Activity', value: 45 },
+      { name: 'Gas Manipulation', value: 38 },
+      { name: 'Market Impact', value: 42 }
+    ],
+    recommendedActions: [
+      {
+        title: 'Monitor Activity',
+        description: 'Track for excessive MEV impact',
+        priority: 'low'
+      },
+      {
+        title: 'User Education',
+        description: 'Inform users about MEV protection',
+        priority: 'low'
+      }
+    ]
   }
 ];
 
-// Simulate real-time threat detection
-let threatCounter = 4;
-
+// Enhanced security overview with realistic data
 export const fetchSecurityOverview = async (): Promise<SecurityOverview> => {
-  // In real app, this would be an API call
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
@@ -146,12 +220,22 @@ export const fetchSecurityOverview = async (): Promise<SecurityOverview> => {
           { name: 'Solana', status: 'online', threats: 27 },
           { name: 'Polygon', status: 'online', threats: 35 },
           { name: 'Avalanche', status: 'online', threats: 20 }
-        ]
+        ],
+        // Additional metrics for enhanced dashboard
+        totalAssets: 156,
+        activeLoans: 23,
+        liquidationRisk: 'Low',
+        aiConfidence: 94.2,
+        lastUpdate: new Date().toISOString(),
+        marketConditions: 'Stable',
+        volatilityIndex: 28,
+        fearGreedIndex: 65
       });
     }, 500);
   });
 };
 
+// Enhanced recent threats with more variety
 export const fetchRecentThreats = async (): Promise<Threat[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -160,6 +244,7 @@ export const fetchRecentThreats = async (): Promise<Threat[]> => {
   });
 };
 
+// Enhanced system health with detailed chain status
 export const fetchSystemHealth = async () => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -168,17 +253,24 @@ export const fetchSystemHealth = async () => {
         lastIncident: "2023-05-10 08:12:45",
         uptime: "99.98%",
         chains: [
-          { name: "Ethereum", status: "online" },
-          { name: "BSC", status: "online" },
-          { name: "Polygon", status: "online" },
-          { name: "Solana", status: "online" },
-          { name: "Bitcoin", status: "online" },
+          { name: "Ethereum", status: "online", latency: "45ms", tps: 15.2 },
+          { name: "BSC", status: "online", latency: "32ms", tps: 8.7 },
+          { name: "Polygon", status: "online", latency: "28ms", tps: 12.1 },
+          { name: "Solana", status: "online", latency: "18ms", tps: 65.3 },
+          { name: "Bitcoin", status: "online", latency: "120ms", tps: 4.2 },
         ],
+        overallMetrics: {
+          totalTransactions: 2847500,
+          activeUsers: 15420,
+          securityScore: 94.2,
+          responseTime: "1.2s"
+        }
       });
     }, 400);
   });
 };
 
+// Enhanced transactions with realistic data
 export const fetchTransactions = async (): Promise<Transaction[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -215,11 +307,34 @@ export const fetchTransactions = async (): Promise<Transaction[]> => {
           threatType: "Suspicious Contract",
           timestamp: "2023-05-15 11:05:44",
         },
+        {
+          id: "4",
+          hash: "0x8f2e1a7...",
+          chain: "Solana",
+          from: "0x9c4f8d...",
+          to: "0x3b7a2e...",
+          value: "2500 SOL",
+          threatLevel: "high",
+          threatType: "Flash Loan Attack",
+          timestamp: "2023-05-15 10:15:33",
+        },
+        {
+          id: "5",
+          hash: "0x6d9e4f2...",
+          chain: "Ethereum",
+          from: "0x8a1b3c...",
+          to: "0x5f7e9d...",
+          value: "5000 USDC",
+          threatLevel: "low",
+          threatType: "MEV Bot",
+          timestamp: "2023-05-15 09:45:12",
+        }
       ]);
     }, 600);
   });
 };
 
+// Enhanced alerts with detailed information
 export const fetchAlerts = async (): Promise<Alert[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -254,27 +369,52 @@ export const fetchAlerts = async (): Promise<Alert[]> => {
           actionTaken: "Warning issued to user",
           status: "resolved",
         },
+        {
+          id: "A-004",
+          title: "High: Flash Loan Attack",
+          description: "Potential flash loan attack detected on Solana DeFi protocol.",
+          severity: "high",
+          chain: "Solana",
+          detectedAt: "2023-05-15 10:15:33",
+          actionTaken: "Protocol temporarily frozen",
+          status: "investigating",
+        },
+        {
+          id: "A-005",
+          title: "Low: MEV Bot Activity",
+          description: "Increased MEV bot activity detected on Ethereum.",
+          severity: "low",
+          chain: "Ethereum",
+          detectedAt: "2023-05-15 09:45:12",
+          actionTaken: "Monitoring increased",
+          status: "monitoring",
+        }
       ]);
     }, 700);
   });
 };
 
+// Enhanced real-time threat subscription with variety
 export const subscribeToThreats = (callback: (threat: Threat) => void) => {
-  // Simulate real-time threat detection
+  const threatTypes = ['Phishing', 'Rug Pull', 'Flash Loan Attack', 'Suspicious Contract', 'MEV Bot'];
+  const chains = ['ethereum', 'bitcoin', 'solana', 'polygon', 'avalanche'];
+  
   const interval = setInterval(() => {
     const randomThreat = {
       ...MOCK_THREATS[Math.floor(Math.random() * MOCK_THREATS.length)],
-      id: `tx-${threatCounter++}`,
+      id: `tx-${Date.now()}`,
       timestamp: new Date().toISOString(),
-      severity: Math.floor(Math.random() * 40) + 60
+      severity: Math.floor(Math.random() * 40) + 60,
+      type: threatTypes[Math.floor(Math.random() * threatTypes.length)],
+      chain: chains[Math.floor(Math.random() * chains.length)]
     };
     callback(randomThreat);
   }, 15000); // New threat every 15 seconds
   
-  // Return unsubscribe function
   return () => clearInterval(interval);
 };
 
+// Enhanced security actions with realistic responses
 export const executeSecurityAction = async (action: string, threatId: string): Promise<boolean> => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -284,6 +424,7 @@ export const executeSecurityAction = async (action: string, threatId: string): P
   });
 };
 
+// Enhanced settings update with validation
 export const updateSecuritySettings = async (settings: any): Promise<boolean> => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -293,10 +434,65 @@ export const updateSecuritySettings = async (settings: any): Promise<boolean> =>
   });
 };
 
+// Enhanced security report generation
 export const generateSecurityReport = async (timeRange: string): Promise<string> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(`Security report generated for ${timeRange}. Found 142 threats with 12 critical, 24 high, 46 medium, and 60 low severity.`);
+      const report = `Security report generated for ${timeRange}. 
+      
+Key Findings:
+• Total threats: 142 (12 critical, 24 high, 46 medium, 60 low)
+• Protected value: $2.4M across 5 chains
+• AI confidence: 94.2%
+• Response time: 1.2 seconds average
+• Uptime: 99.98%
+
+Recommendations:
+• Enable AI Shield mode for all chains
+• Review critical threat patterns
+• Update security parameters for high-risk assets`;
+      resolve(report);
     }, 2000);
+  });
+};
+
+// New function: Fetch portfolio data
+export const fetchPortfolioData = async () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        totalValue: 2450000,
+        assets: [
+          { chain: 'Bitcoin', asset: 'BTC', amount: 2.5, value: 150000, apy: 0 },
+          { chain: 'Ethereum', asset: 'ETH', amount: 15.2, value: 45000, apy: 0 },
+          { chain: 'Solana', asset: 'SOL', amount: 1200, value: 120000, apy: 8.5 },
+          { chain: 'Polygon', asset: 'MATIC', amount: 50000, value: 50000, apy: 12.2 }
+        ],
+        loans: [
+          { chain: 'Ethereum', asset: 'USDC', amount: 50000, collateral: 150000, ltv: 33.3 },
+          { chain: 'Solana', asset: 'JitoSOL', amount: 25000, collateral: 120000, ltv: 20.8 }
+        ],
+        riskScore: 24,
+        liquidationBuffer: 180000
+      });
+    }, 800);
+  });
+};
+
+// New function: Fetch market data
+export const fetchMarketData = async () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        btcPrice: 60000,
+        ethPrice: 2950,
+        solPrice: 100,
+        maticPrice: 1.0,
+        marketCap: 1250000000000,
+        volume24h: 45000000000,
+        fearGreedIndex: 65,
+        volatilityIndex: 28
+      });
+    }, 600);
   });
 }; 
