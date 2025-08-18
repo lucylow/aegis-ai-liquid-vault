@@ -8,7 +8,7 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import { fetchSecurityOverview, subscribeToThreats } from './services/api';
 import { Threat } from './types';
-import './App.css';
+
 
 function App() {
   const [threats, setThreats] = useState<Threat[]>([]);

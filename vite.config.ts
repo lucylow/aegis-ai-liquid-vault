@@ -24,7 +24,7 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           charts: ['d3'],
-          utils: ['axios', 'ethers'],
+          utils: ['axios'],
         },
       },
     },
