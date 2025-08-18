@@ -1,4 +1,9 @@
-import { Threat, SecurityOverview, Alert, Transaction } from '../types';
+import { 
+  BackendPortfolioResponse, 
+  BackendPositionsResponse, 
+  BackendAIInsightsResponse, 
+  BackendAlertsResponse 
+} from '../types';
 
 const API_BASE_URL = 'http://localhost:3001/api';
 
@@ -34,14 +39,14 @@ async function apiRequest<T>(
 
 // Portfolio API
 export const portfolioAPI = {
-  getOverview: () => apiRequest('/portfolio/overview'),
-  getPositions: () => apiRequest('/portfolio/positions'),
+  getOverview: () => apiRequest<BackendPortfolioResponse>('/portfolio/overview'),
+  getPositions: () => apiRequest<BackendPositionsResponse>('/portfolio/positions'),
 };
 
 // AI API
 export const aiAPI = {
-  getInsights: () => apiRequest('/ai/insights'),
-  getAlerts: () => apiRequest('/ai/alerts'),
+  getInsights: () => apiRequest<BackendAIInsightsResponse>('/ai/insights'),
+  getAlerts: () => apiRequest<BackendAlertsResponse>('/ai/alerts'),
 };
 
 // Notifications API

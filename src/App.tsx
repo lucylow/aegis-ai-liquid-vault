@@ -1,6 +1,179 @@
 import React from 'react';
 import { WalletProvider } from './contexts/WalletContext';
 import WalletConnect from './components/WalletConnect';
+import { usePortfolio } from './hooks/usePortfolio';
+import { useAI } from './hooks/useAI';
+
+// Portfolio Overview Component
+const PortfolioOverview: React.FC = () => {
+  const { portfolio, positions, loading, error } = usePortfolio();
+
+  if (loading) {
+    return (
+      <div className="p-6 bg-white/10 rounded-xl border border-white/20">
+        <div className="flex items-center justify-center h-32">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 bg-red-500/20 rounded-xl border border-red-500/30">
+        <div className="text-red-400 text-center">
+          <p className="font-medium">Error loading portfolio</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!portfolio) {
+    return (
+      <div className="p-6 bg-white/10 rounded-xl border border-white/20">
+        <div className="text-center text-white/60">
+          <p>No portfolio data available</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 bg-white/10 rounded-xl border border-white/20">
+      <h3 className="text-xl font-semibold mb-4">Portfolio Overview</h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="p-4 bg-green-500/20 rounded-lg border border-green-500/30">
+          <div className="text-2xl font-bold text-green-400">${portfolio.totalValue.toLocaleString()}</div>
+          <div className="text-sm text-green-300">Total Value</div>
+        </div>
+        <div className="p-4 bg-blue-500/20 rounded-lg border border-blue-500/30">
+          <div className="text-2xl font-bold text-blue-400">${portfolio.totalPnl.toLocaleString()}</div>
+          <div className="text-sm text-blue-300">Total P&L</div>
+        </div>
+        <div className="p-4 bg-purple-500/20 rounded-lg border border-purple-500/30">
+          <div className="text-2xl font-bold text-purple-400">{portfolio.chains.length}</div>
+          <div className="text-sm text-purple-300">Chains</div>
+        </div>
+      </div>
+      
+      <div className="space-y-3">
+        <h4 className="font-medium text-white/80">Positions</h4>
+        {positions.map((position, index) => (
+          <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                {position.asset.charAt(0)}
+              </div>
+              <div>
+                <div className="font-medium">{position.asset}</div>
+                <div className="text-sm text-white/60">{position.chain}</div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="font-medium">${position.value.toLocaleString()}</div>
+              <div className={`text-sm ${position.pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {position.pnl >= 0 ? '+' : ''}${position.pnl.toLocaleString()}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// AI Insights Component
+const AIInsights: React.FC = () => {
+  const { insights, alerts, loading, error } = useAI();
+
+  if (loading) {
+    return (
+      <div className="p-6 bg-white/10 rounded-xl border border-white/20">
+        <div className="flex items-center justify-center h-32">
+          <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 bg-red-500/20 rounded-xl border border-red-500/30">
+        <div className="text-red-400 text-center">
+          <p className="font-medium">Error loading AI insights</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 bg-white/10 rounded-xl border border-white/20">
+      <h3 className="text-xl font-semibold mb-4">AI Insights & Security</h3>
+      
+      {insights && (
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+            <span className="font-medium">Risk Assessment</span>
+            <span className="ml-auto text-sm bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded">
+              Score: {insights.riskScore}
+            </span>
+          </div>
+          
+          <div className="space-y-2 mb-4">
+            <h4 className="text-sm font-medium text-white/80">Recommendations:</h4>
+            {insights.recommendations.map((rec, index) => (
+              <div key={index} className="text-sm text-white/70 bg-white/5 p-2 rounded">
+                • {rec}
+              </div>
+            ))}
+          </div>
+          
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-white/80">Threats:</h4>
+            {insights.threats.map((threat, index) => (
+              <div key={index} className={`text-sm p-2 rounded ${
+                threat.level === 'high' ? 'bg-red-500/20 text-red-400' :
+                threat.level === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                'bg-green-500/20 text-green-400'
+              }`}>
+                {threat.level.toUpperCase()}: {threat.description}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {alerts.length > 0 && (
+        <div>
+          <h4 className="text-sm font-medium text-white/80 mb-3">Security Alerts:</h4>
+          <div className="space-y-2">
+            {alerts.map((alert, index) => (
+              <div key={index} className={`text-sm p-3 rounded ${
+                alert.type === 'error' ? 'bg-red-500/20 text-red-400' :
+                alert.type === 'warning' ? 'bg-yellow-500/20 text-yellow-400' :
+                alert.type === 'success' ? 'bg-green-500/20 text-green-400' :
+                'bg-blue-500/20 text-blue-400'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${
+                    alert.type === 'error' ? 'bg-red-400' :
+                    alert.type === 'warning' ? 'bg-yellow-400' :
+                    alert.type === 'success' ? 'bg-green-400' :
+                    'bg-blue-400'
+                  }`}></div>
+                  {alert.message}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 function App() {
   return (
@@ -13,7 +186,7 @@ function App() {
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                   <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 14H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                 </div>
                 <h1 className="text-xl font-bold">Aegis AI</h1>
@@ -34,6 +207,12 @@ function App() {
                 Experience the future of AI-powered DeFi security with our advanced multi-agent system. 
                 Monitor threats, manage cross-chain operations, and optimize your portfolio with intelligent automation.
               </p>
+            </div>
+
+            {/* Portfolio and AI Insights Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <PortfolioOverview />
+              <AIInsights />
             </div>
 
             {/* Features Grid */}
