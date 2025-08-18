@@ -19,17 +19,11 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          charts: ['d3'],
-          utils: ['axios'],
-        },
-      },
+      input: path.resolve(__dirname, 'index.html'),
     },
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom', 'd3'],
   },
+  publicDir: 'public',
 })
