@@ -12,18 +12,24 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true,
+    open: false,
     host: true,
+    strictPort: true,
+  },
+  preview: {
+    port: 3000,
+    host: true,
+    strictPort: true,
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: false,
     rollupOptions: {
       input: path.resolve(__dirname, 'index.html'),
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', 'd3'],
+    include: ['react', 'react-dom', 'react-router-dom'],
   },
   publicDir: 'public',
 })
