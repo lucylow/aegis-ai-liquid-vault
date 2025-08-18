@@ -2,111 +2,169 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* Aegis Brand Colors */
-  --background: 220 13% 6%;
-  --foreground: 210 40% 98%;
-  --card: 220 13% 8%;
-  --card-foreground: 210 40% 98%;
-  --popover: 220 13% 8%;
-  --popover-foreground: 210 40% 98%;
-  
-  /* Primary - Aegis Blue */
-  --primary: 221 83% 53%;
-  --primary-foreground: 210 40% 98%;
-  --primary-glow: 221 83% 65%;
-  
-  /* Secondary - Dark Blue */
-  --secondary: 217 33% 18%;
-  --secondary-foreground: 210 40% 98%;
-  
-  /* Muted */
-  --muted: 217 33% 15%;
-  --muted-foreground: 215 20% 65%;
-  
-  /* Accent - Cyan */
-  --accent: 189 85% 55%;
-  --accent-foreground: 220 13% 8%;
-  
-  /* Status Colors */
-  --success: 142 76% 36%;
-  --success-foreground: 210 40% 98%;
-  --warning: 45 93% 47%;
-  --warning-foreground: 220 13% 8%;
-  --destructive: 0 63% 31%;
-  --destructive-foreground: 210 40% 98%;
-  
-  /* UI Elements */
-  --border: 217 33% 15%;
-  --input: 217 33% 12%;
-  --ring: 221 83% 53%;
-  
-  /* Chart Colors */
-  --chart-1: 221 83% 53%;
-  --chart-2: 189 85% 55%;
-  --chart-3: 142 76% 36%;
-  --chart-4: 45 93% 47%;
-  --chart-5: 280 65% 60%;
-  
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-  --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));
-  --gradient-hero: linear-gradient(135deg, hsl(var(--background)), hsl(var(--muted)));
-  
-  /* Shadows */
-  --shadow-glow: 0 0 40px hsl(var(--primary) / 0.3);
-  --shadow-card: 0 10px 30px -10px hsl(var(--primary) / 0.1);
-  
-  /* Animations */
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  --radius: 0.75rem;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-* {
-  border-color: hsl(var(--border));
-}
-
-body {
-  background: var(--gradient-hero);
-  color: hsl(var(--foreground));
-  font-feature-settings: "rlig" 1, "calt" 1;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-}
-
-/* Utility Classes */
-.glow-text {
-  text-shadow: 0 0 20px hsl(var(--primary) / 0.5);
-}
-
-.glow-border {
-  border: 1px solid hsl(var(--primary) / 0.3);
-  box-shadow: 0 0 20px hsl(var(--primary) / 0.1);
-}
-
-.glass-effect {
-  background: hsl(var(--card) / 0.8);
-  backdrop-filter: blur(20px);
-  border: 1px solid hsl(var(--border) / 0.5);
-}
-
-.gradient-primary {
-  background: var(--gradient-primary);
-}
-
-.gradient-accent {
-  background: var(--gradient-accent);
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite alternate;
-}
-
-@keyframes pulse-glow {
-  from {
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
   }
-  to {
-    box-shadow: 0 0 30px hsl(var(--primary) / 0.6);
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+  
+  * {
+    @apply border-gray-200;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200;
+  }
+  
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500;
+  }
+  
+  .btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+  }
+  
+  .btn-warning {
+    @apply bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500;
+  }
+  
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+  
+  .btn-outline {
+    @apply bg-transparent border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-blue-500;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-lg border border-gray-200;
+  }
+  
+  .input {
+    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+  
+  .badge-danger {
+    @apply bg-red-100 text-red-800;
+  }
+  
+  .badge-info {
+    @apply bg-blue-100 text-blue-800;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600;
+  }
+  
+  .shadow-soft {
+    box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  }
+  
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* Loading spinner */
+.spinner {
+  @apply animate-spin rounded-full border-2 border-gray-300 border-t-blue-600;
+}
+
+/* Threat radar specific styles */
+.threat-radar {
+  @apply relative w-full h-96;
+}
+
+.threat-point {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.threat-point:hover {
+  @apply scale-110 shadow-glow;
+}
+
+/* Security status indicators */
+.status-indicator {
+  @apply w-3 h-3 rounded-full;
+}
+
+.status-online {
+  @apply bg-green-500;
+}
+
+.status-degraded {
+  @apply bg-yellow-500;
+}
+
+.status-offline {
+  @apply bg-red-500;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .mobile-hidden {
+    @apply hidden;
+  }
+}
+
+@media (min-width: 1024px) {
+  .desktop-only {
+    @apply block;
   }
 }

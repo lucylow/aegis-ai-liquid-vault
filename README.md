@@ -1,373 +1,351 @@
-# AEGIS AI Liquid Vault
+# 🛡️ AEGIS AI Agent Frontend
 
-AEGIS is an omnichain lending protocol built on ZetaChain that enables cross-chain lending and borrowing using a single universal contract. The protocol leverages ZetaChain's cross-chain messaging (CCM) to manage collateral and loans across multiple blockchains without deploying separate contracts on each chain.
+A comprehensive React-based frontend for the AEGIS AI agent that integrates with blockchain security and cross-chain messaging. Built with modern web technologies and designed for real-time threat monitoring and security operations.
 
-## 🚀 Key Features
+## ✨ Features
 
-### 🔗 **Omnichain Interoperability**
-- Single contract manages lending across all supported chains
-- Native support for Bitcoin and EVM chains
-- Cross-chain collateral and loan management
+### 🔒 **Real-Time Security Dashboard**
+- Live threat monitoring across multiple blockchain networks
+- Interactive threat radar with D3.js visualization
+- Real-time security metrics and system health indicators
+- Cross-chain security status monitoring
 
-### 🤖 **AI-Powered Risk Management**
-- Real-time risk assessment via AI oracle
-- Dynamic interest rates based on asset volatility
-- Automated liquidation triggers
+### 🤖 **AI-Powered Threat Analysis**
+- Gemini AI integration for intelligent threat detection
+- Pattern recognition and risk assessment
+- Automated threat classification and scoring
+- AI-generated security recommendations
 
-### 🎯 **Universal Asset Support**
-- Fungible tokens (ERC-20) across all chains
-- Non-fungible tokens (ERC-721) with cross-chain bridging
-- Native BTC support without wrapping
+### ⛓️ **Cross-Chain Security Operations**
+- Multi-blockchain threat monitoring (Ethereum, Bitcoin, Solana, Polygon, Avalanche)
+- Cross-chain asset freezing and security controls
+- Unified security dashboard for all connected chains
+- Real-time cross-chain threat alerts
 
-### 🛡️ **Security Features**
-- Reentrancy protection
-- Pausable functionality
-- Owner-controlled emergency functions
-- Comprehensive access controls
+### 📊 **Advanced Analytics & Reporting**
+- Interactive data visualizations
+- Threat trend analysis and forecasting
+- Customizable security reports
+- Performance metrics and uptime monitoring
 
-## 🏗️ Project Structure
+### 🔐 **Security & Authentication**
+- Role-based access control
+- Two-factor authentication support
+- Biometric authentication options
+- Comprehensive audit logging
+
+## 🚀 Tech Stack
+
+- **Frontend Framework**: React 18 with TypeScript
+- **Styling**: Tailwind CSS with custom design system
+- **Charts & Visualization**: D3.js for interactive threat radar
+- **State Management**: React Hooks with Context API
+- **Routing**: React Router v6
+- **Build Tool**: Vite with optimized bundling
+- **Blockchain Integration**: Ethers.js for EVM chains
+- **AI Integration**: Gemini API for threat analysis
+- **Cross-Chain**: ZetaChain integration for omnichain operations
+
+## 📁 Project Structure
 
 ```
-aegis-ai-liquid-vault/
-├── contracts/                 # Smart contracts
-│   ├── interfaces/           # Contract interfaces
-│   │   ├── IAIOracle.sol    # AI Oracle interface
-│   │   ├── IUniversalToken.sol # Universal token interface
-│   │   └── IUniversalNFT.sol   # Universal NFT interface
-│   ├── protocol/             # Core protocol contracts
-│   │   ├── AegisUniversalLending.sol # Main protocol contract
-│   │   ├── MockAIOracle.sol  # Mock AI Oracle for testing
-│   │   └── MockUniversalToken.sol # Mock universal tokens
-│   ├── scripts/              # Deployment and utility scripts
-│   │   ├── deploy.ts         # Main deployment script
-│   │   └── demo.ts           # Demo script
-│   ├── test/                 # Test files
-│   │   └── AegisProtocol.test.ts # Comprehensive tests
-│   ├── hardhat.config.ts     # Hardhat configuration
-│   ├── package.json          # Smart contract dependencies
-│   ├── config.example.ts     # Configuration example
-│   └── README.md             # Smart contract documentation
-├── src/                      # Frontend application
-├── public/                   # Static assets
-└── README.md                 # This file
+src/
+├── components/           # Reusable UI components
+│   ├── Dashboard/       # Dashboard-specific components
+│   ├── Transactions/    # Transaction monitoring components
+│   ├── Alerts/         # Security alert components
+│   └── ui/             # Base UI components
+├── pages/               # Main application pages
+│   ├── Dashboard.tsx   # Main security dashboard
+│   ├── Transactions.tsx # Transaction monitoring
+│   ├── ThreatAnalysis.tsx # Detailed threat analysis
+│   └── Settings.tsx    # User preferences and security
+├── services/            # API and external service integrations
+│   └── api.ts          # Main API service layer
+├── types/               # TypeScript type definitions
+├── hooks/               # Custom React hooks
+└── utils/               # Utility functions and helpers
 ```
 
-## 🚀 Quick Start
+## 🛠️ Installation
 
 ### Prerequisites
-- Node.js 18+
-- npm, yarn, or pnpm
-- Hardhat (for smart contracts)
+- Node.js 18+ 
+- npm or yarn
+- Git
 
-### 1. Clone the Repository
+### Setup Instructions
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-org/aegis-ai-agent.git
+   cd aegis-ai-agent
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Environment Configuration**
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Configure your environment variables:
+   ```env
+   VITE_GEMINI_API_KEY=your_gemini_api_key
+   VITE_ZETACHAIN_RPC_URL=your_zetachain_rpc_url
+   VITE_ETHERSCAN_API_KEY=your_etherscan_api_key
+   VITE_ALCHEMY_API_KEY=your_alchemy_api_key
+   ```
+
+4. **Start development server**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+5. **Open your browser**
+   Navigate to `http://localhost:3000`
+
+## 🔧 Development
+
+### Available Scripts
+
 ```bash
-git clone https://github.com/your-username/aegis-ai-liquid-vault.git
-cd aegis-ai-liquid-vault
+# Development
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+npm run lint:fix     # Fix ESLint issues
 ```
 
-### 2. Install Dependencies
-```bash
-# Install frontend dependencies
-npm install
+### Code Quality
 
-# Install smart contract dependencies
-cd contracts
-npm install
-```
+- **TypeScript**: Strict type checking enabled
+- **ESLint**: Code quality and consistency
+- **Prettier**: Code formatting
+- **Tailwind CSS**: Utility-first CSS framework
 
-### 3. Configure Environment
-```bash
-# Copy configuration example
-cp config.example.ts config.ts
+### Component Development
 
-# Edit config.ts with your values
-# - Private key for deployment
-# - ZetaChain API key
-# - RPC URLs
-```
+Components follow a consistent structure:
+- TypeScript interfaces for props
+- Tailwind CSS for styling
+- Responsive design patterns
+- Accessibility considerations
 
-### 4. Compile Smart Contracts
-```bash
-cd contracts
-npm run compile
-```
+## 🎨 Design System
 
-### 5. Run Tests
-```bash
-npm run test
-```
+### Color Palette
+- **Primary**: Blue (#3B82F6) - Main brand color
+- **Success**: Green (#22C55E) - Positive actions
+- **Warning**: Yellow (#F59E0B) - Caution states
+- **Danger**: Red (#EF4444) - Critical alerts
+- **Neutral**: Gray scale for UI elements
 
-### 6. Deploy Contracts
-```bash
-# Local development
-npm run deploy:localnet
+### Typography
+- **Primary Font**: Inter - Modern, readable sans-serif
+- **Monospace**: JetBrains Mono - For code and addresses
 
-# Testnet
-npm run deploy:testnet
+### Components
+- **Cards**: Consistent shadow and border radius
+- **Buttons**: Multiple variants with hover states
+- **Forms**: Accessible input components
+- **Tables**: Responsive data display
 
-# Mainnet
-npm run deploy:mainnet
-```
+## 🔌 API Integration
 
-### 7. Run Demo
-```bash
-npm run demo
-```
+### External Services
 
-### 8. Start Frontend
-```bash
-cd ..
-npm run dev
-```
+1. **Gemini AI API**
+   - Threat pattern analysis
+   - Risk assessment
+   - Security recommendations
 
-## 🔧 Smart Contract Architecture
+2. **ZetaChain**
+   - Cross-chain messaging
+   - Universal contract interactions
+   - Multi-chain asset management
 
-### Core Contracts
+3. **Blockchain RPCs**
+   - Ethereum (Alchemy/Infura)
+   - Bitcoin (BlockCypher)
+   - Solana (QuickNode)
+   - Polygon (Alchemy)
 
-#### `AegisUniversalLending.sol`
-The main protocol contract that handles:
-- Collateral locking and management
-- Loan issuance and tracking
-- Cross-chain operations
-- Risk management integration
-- NFT bridging
+### API Structure
 
-#### `MockAIOracle.sol`
-Mock implementation of the AI oracle for testing:
-- Risk profile management
-- Price feeds
-- Liquidation triggers
+```typescript
+// Example API service
+export const fetchSecurityOverview = async (): Promise<SecurityOverview> => {
+  // Implementation
+};
 
-#### `MockUniversalToken.sol`
-Mock implementation of universal tokens for testing:
-- Cross-chain balance tracking
-- Mint/burn operations
-- Chain-specific supply management
-
-### Key Functions
-
-- **Collateral Management**: Lock fungible and NFT assets
-- **Lending Operations**: Borrow against locked collateral
-- **Risk Management**: AI-powered risk assessment and liquidations
-- **Cross-Chain Operations**: Seamless asset movement across chains
-
-## 🌐 Supported Chains
-
-| Chain | Chain ID | Description |
-|-------|----------|-------------|
-| Ethereum | 1 | Mainnet |
-| Polygon | 137 | Polygon PoS |
-| BSC | 56 | Binance Smart Chain |
-| Arbitrum | 42161 | Arbitrum One |
-| Optimism | 10 | Optimism |
-| ZetaChain Testnet | 7001 | Testnet |
-| ZetaChain Mainnet | 7000 | Mainnet |
-| Localnet | 1337 | Local development |
-
-## 📊 Protocol Parameters
-
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| `BASIS_POINTS` | 10,000 | Basis points for percentage calculations |
-| `MIN_LIQUIDATION_THRESHOLD` | 8,000 | Minimum liquidation threshold (80%) |
-| `MAX_LIQUIDATION_THRESHOLD` | 9,500 | Maximum liquidation threshold (95%) |
-| `LIQUIDATION_PENALTY` | 500 | Liquidation penalty (5%) |
-| `MAX_INTEREST_RATE` | 2,000 | Maximum annual interest rate (20%) |
-
-## 🧪 Testing
-
-The test suite covers:
-- Contract deployment and initialization
-- Collateral management operations
-- Lending and borrowing functionality
-- Risk management and liquidations
-- Cross-chain operations
-- Emergency functions
-- Access control validation
-
-Run tests with:
-```bash
-cd contracts
-npm run test
+export const subscribeToThreats = (callback: (threat: Threat) => void) => {
+  // Real-time subscription
+};
 ```
 
 ## 🚀 Deployment
 
-### Environment Variables
-Create a `.env` file in the contracts directory:
-```env
-PRIVATE_KEY=your_private_key_here
-ZETA_API_KEY=your_zeta_api_key_here
-```
-
-### Network Configuration
-The deployment script automatically detects the network and uses appropriate configurations for:
-- ZetaChain testnet/mainnet
-- Local development networks
-- EVM-compatible chains
-
-## 💻 CLI Usage
-
-The project includes a CLI for interacting with the protocol:
+### Production Build
 
 ```bash
-cd contracts
-
-# Lock collateral
-npm run cli lock-collateral -a 0x... -am 10 -c 1
-
-# Borrow against collateral
-npm run cli borrow -c 1 -t 137 -a 0x... -am 5000
-
-# View positions
-npm run cli positions
-
-# Set risk profile
-npm run cli risk-profile -a 0x... -c 1 -s -l 7500 -t 8500 -v 60
-
-# View protocol info
-npm run cli info
+npm run build
 ```
+
+### Environment Variables
+
+Ensure all required environment variables are set in production:
+- API keys for external services
+- RPC endpoints for blockchain networks
+- Security configuration
+
+### Deployment Platforms
+
+- **Vercel**: Recommended for React applications
+- **Netlify**: Alternative with good CI/CD
+- **AWS S3 + CloudFront**: For enterprise deployments
+- **Docker**: Containerized deployment
 
 ## 🔒 Security Features
 
-### Access Control
-- Owner-only functions for critical operations
-- AI Oracle-only liquidation execution
-- CLI-only functions for administrative operations
+### Authentication & Authorization
+- JWT-based authentication
+- Role-based access control
+- Session management
+- Secure token storage
 
-### Reentrancy Protection
-- All external calls are protected
-- State changes before external calls
-- Comprehensive modifier usage
+### Data Protection
+- HTTPS enforcement
+- XSS protection
+- CSRF tokens
+- Input validation and sanitization
 
-### Emergency Functions
-- Pausable functionality
-- Emergency withdrawals
-- Owner-controlled operations
+### Blockchain Security
+- Multi-signature support
+- Transaction signing verification
+- Address validation
+- Smart contract security checks
 
-## 📈 Risk Management
+## 📱 Responsive Design
 
-### AI Oracle Integration
-- Real-time risk assessment
-- Dynamic interest rate calculation
-- Automated liquidation triggers
-- Volatility-based pricing
+### Breakpoints
+- **Mobile**: 320px - 768px
+- **Tablet**: 768px - 1024px
+- **Desktop**: 1024px+
 
-### Collateral Management
-- Multi-asset support
-- Chain-agnostic operations
-- Real-time value tracking
-- Automated health monitoring
+### Mobile-First Approach
+- Touch-friendly interfaces
+- Optimized navigation
+- Responsive data tables
+- Adaptive layouts
 
-## 🌟 Use Cases
-
-### 1. Cross-Chain Lending
-- Lock ETH on Ethereum, borrow USDC on Polygon
-- Lock BTC on Bitcoin, borrow stablecoins on any EVM chain
-- Seamless asset movement across chains
-
-### 2. NFT-Backed Loans
-- Lock valuable NFTs as collateral
-- Borrow against NFT collections
-- Cross-chain NFT bridging
-
-### 3. Risk-Adjusted Borrowing
-- AI-powered risk assessment
-- Dynamic interest rates
-- Automated liquidation protection
-
-### 4. Institutional DeFi
-- Large-scale cross-chain operations
-- Professional risk management
-- Regulatory compliance features
-
-## 🛠️ Development
-
-### Adding New Features
-1. Fork the repository
-2. Create a feature branch
-3. Implement your changes
-4. Add comprehensive tests
-5. Submit a pull request
-
-### Code Style
-- Follow Solidity style guide
-- Use NatSpec documentation
-- Comprehensive error handling
-- Gas optimization
+## 🧪 Testing
 
 ### Testing Strategy
-- Unit tests for all functions
-- Integration tests for cross-chain operations
-- Fuzzing for edge cases
-- Gas usage optimization
+- **Unit Tests**: Component testing with Jest
+- **Integration Tests**: API integration testing
+- **E2E Tests**: User flow testing with Playwright
+- **Visual Regression**: UI consistency testing
 
-## 📚 Documentation
+### Running Tests
 
-- [Smart Contract Documentation](./contracts/README.md)
-- [API Reference](./docs/api.md)
-- [Deployment Guide](./docs/deployment.md)
-- [Security Audit](./docs/security.md)
+```bash
+npm run test           # Run unit tests
+npm run test:e2e      # Run end-to-end tests
+npm run test:coverage # Generate coverage report
+```
+
+## 📊 Performance
+
+### Optimization Features
+- **Code Splitting**: Route-based code splitting
+- **Lazy Loading**: Component lazy loading
+- **Image Optimization**: WebP format support
+- **Bundle Analysis**: Webpack bundle analyzer
+
+### Monitoring
+- **Core Web Vitals**: Performance metrics
+- **Error Tracking**: Sentry integration
+- **Analytics**: User behavior tracking
+- **Uptime Monitoring**: Service health checks
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
+### Development Workflow
 
-### Development Setup
-1. Install dependencies
-2. Set up environment variables
-3. Run tests
-4. Make your changes
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
+### Code Standards
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+- Follow TypeScript best practices
+- Use Tailwind CSS for styling
+- Write meaningful commit messages
+- Include JSDoc comments for complex functions
+
+### Pull Request Guidelines
+
+- Clear description of changes
+- Screenshots for UI changes
+- Test coverage for new features
+- Update documentation if needed
+
+## 📚 Documentation
+
+### Additional Resources
+
+- [API Documentation](./docs/api.md)
+- [Component Library](./docs/components.md)
+- [Deployment Guide](./docs/deployment.md)
+- [Security Guidelines](./docs/security.md)
+
+### Architecture Diagrams
+
+- System architecture overview
+- Data flow diagrams
+- Component hierarchy
+- API integration patterns
 
 ## 🆘 Support
 
-- **Documentation**: [docs.aegis.finance](https://docs.aegis.finance)
-- **Discord**: [discord.gg/aegis](https://discord.gg/aegis)
-- **Twitter**: [@AegisFinance](https://twitter.com/AegisFinance)
-- **Email**: support@aegis.finance
+### Getting Help
 
-## 🗺️ Roadmap
+- **Documentation**: Check the docs folder
+- **Issues**: GitHub Issues for bug reports
+- **Discussions**: GitHub Discussions for questions
+- **Discord**: Community support channel
 
-### Phase 1: Foundation ✅
-- [x] Core protocol contracts
-- [x] Mock implementations
-- [x] Basic testing framework
-- [x] Deployment scripts
+### Community
 
-### Phase 2: Enhancement 🚧
-- [ ] Real AI Oracle integration
-- [ ] Advanced risk models
-- [ ] Multi-asset collateral pools
-- [ ] Automated market making
+- **Discord Server**: Join our community
+- **GitHub Discussions**: Ask questions
+- **Contributing Guide**: Help improve the project
 
-### Phase 3: Expansion 📋
-- [ ] Governance token implementation
-- [ ] Advanced liquidation strategies
-- [ ] Cross-chain yield farming
-- [ ] Mobile SDK development
+## 📄 License
 
-### Phase 4: Enterprise 📋
-- [ ] Institutional features
-- [ ] Regulatory compliance
-- [ ] Advanced analytics
-- [ ] Multi-language support
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- ZetaChain team for the amazing cross-chain infrastructure
-- OpenZeppelin for secure contract libraries
-- Hardhat team for the development framework
-- All contributors and community members
+- **ZetaChain Team**: For cross-chain infrastructure
+- **Google Gemini**: For AI capabilities
+- **Open Source Community**: For amazing tools and libraries
+- **Security Researchers**: For threat intelligence
 
 ---
 
-**Built with ❤️ by the AEGIS team**
+**Built with ❤️ by the AEGIS Team**
 
-*Empowering the future of cross-chain DeFi*
+*Protecting the future of decentralized finance through intelligent security*
 
