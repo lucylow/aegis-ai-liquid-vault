@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@zetachain/protocol-contracts/contracts/ZetaInteractor.sol";
-import "@zetachain/protocol-contracts/contracts/interfaces/ZetaInterfaces.sol";
+import "@zetachain/protocol-contracts/contracts/zevm/UniversalContract.sol";
+import "@zetachain/protocol-contracts/contracts/zevm/interfaces/IZRC20.sol";
+import "@zetachain/protocol-contracts/contracts/zevm/SystemContract.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "../interfaces/IAIOracle.sol";
@@ -14,16 +13,16 @@ import "../interfaces/IUniversalNFT.sol";
 
 /**
  * @title AegisUniversalLending
- * @dev AEGIS Universal Lending Protocol on ZetaChain
+ * @dev AEGIS Universal Lending Protocol on ZetaChain using Universal Contract pattern
  * 
  * Key Features:
- * 1. Accepts collateral from any chain (including native BTC)
- * 2. Issues loans on any chain
+ * 1. Accepts collateral from any chain (including native BTC) via Universal Contract
+ * 2. Issues loans on any chain using cross-chain messaging
  * 3. Uses AI oracle for risk management and liquidations
  * 4. Cross-chain messaging via ZetaChain CCM
  * 5. Universal Token and NFT support
  */
-contract AegisUniversalLending is ZetaInteractor, ZetaReceiver, Ownable, ReentrancyGuard, Pausable {
+contract AegisUniversalLending is UniversalContract, Ownable, ReentrancyGuard, Pausable {
     using UniversalToken for address;
     
     // ==================== STRUCTS ====================
@@ -38,6 +37,7 @@ contract AegisUniversalLending is ZetaInteractor, ZetaReceiver, Ownable, Reentra
         uint256 lockedTimestamp;
         uint256 lastPriceUpdate;
         uint256 currentValue; // In USD with 8 decimals
+        bytes32 proof; // Cross-chain proof
     }
     
     struct LoanPosition {
@@ -51,6 +51,7 @@ contract AegisUniversalLending is ZetaInteractor, ZetaReceiver, Ownable, Reentra
         uint256 lastInterestAccrual;
         bool liquidated;
         uint256 healthFactor;
+        uint256 totalDebt; // Principal + accrued interest
     }
     
     struct UniversalNFT {
@@ -76,13 +77,14 @@ contract AegisUniversalLending is ZetaInteractor, ZetaReceiver, Ownable, Reentra
     mapping(address => mapping(uint256 => RiskProfile)) public tokenRiskProfiles;
     mapping(address => uint256[]) public userCollaterals;
     mapping(address => uint256[]) public userLoans;
+    mapping(uint256 => address) public crossChainContracts; // Chain ID -> contract address
     
     uint256 public collateralCounter;
     uint256 public loanCounter;
     uint256 public nftCounter;
     
     address public aiOracle;
-    address public localnetConnector;
+    address public priceOracle;
     
     // Protocol parameters
     uint256 public constant BASIS_POINTS = 10000;
@@ -90,6 +92,7 @@ contract AegisUniversalLending is ZetaInteractor, ZetaReceiver, Ownable, Reentra
     uint256 public constant MAX_LIQUIDATION_THRESHOLD = 9500; // 95%
     uint256 public constant LIQUIDATION_PENALTY = 500; // 5%
     uint256 public constant MAX_INTEREST_RATE = 2000; // 20%
+    uint256 public constant PROTOCOL_FEE_RATE = 50; // 0.5%
     
     // Events
     event CollateralLocked(
@@ -98,7 +101,8 @@ contract AegisUniversalLending is ZetaInteractor, ZetaReceiver, Ownable, Reentra
         uint256 chainId,
         address asset,
         uint256 amount,
-        bool isNFT
+        bool isNFT,
+        bytes32 proof
     );
     
     event LoanIssued(
@@ -118,6 +122,12 @@ contract AegisUniversalLending is ZetaInteractor, ZetaReceiver, Ownable, Reentra
         uint256 penalty
     );
     
+    event CrossChainMessageSent(
+        uint256 indexed targetChainId,
+        address indexed targetContract,
+        bytes message
+    );
+    
     event RiskProfileUpdated(
         address indexed asset,
         uint256 indexed chainId,
@@ -132,80 +142,496 @@ contract AegisUniversalLending is ZetaInteractor, ZetaReceiver, Ownable, Reentra
         _;
     }
     
-    modifier onlyCLI() {
-        require(msg.sender == owner() || msg.sender == address(this), "CLI only");
-        _;
-    }
-    
-    modifier onlyLocalnet() {
-        require(msg.sender == localnetConnector, "Localnet only");
+    modifier onlyCrossChainContract(uint256 chainId) {
+        require(msg.sender == crossChainContracts[chainId], "Only cross-chain contract");
         _;
     }
     
     // ==================== CONSTRUCTOR ====================
     
     constructor(
-        address connector,
+        address systemContract,
         address _aiOracle,
-        address _localnetConnector
-    ) ZetaInteractor(connector) {
+        address _priceOracle
+    ) UniversalContract(systemContract) {
         aiOracle = _aiOracle;
-        localnetConnector = _localnetConnector;
+        priceOracle = _priceOracle;
     }
     
-    // ==================== LOCALNET FUNCTIONS ====================
+    // ==================== UNIVERSAL CONTRACT IMPLEMENTATION ====================
     
-    function setupLocalnet(address _localnetConnector) external onlyOwner {
-        localnetConnector = _localnetConnector;
-    }
-    
-    function simulateLocalnetDeposit(
-        address user,
-        address asset,
+    /**
+     * @dev Main entry point for cross-chain calls (Universal Contract pattern)
+     * @param context Message context from ZetaChain
+     * @param zrc20 ZRC-20 token address (if applicable)
+     * @param amount Amount of tokens
+     * @param message Encoded message data
+     */
+    function onCall(
+        MessageContext calldata context,
+        address zrc20,
         uint256 amount,
-        uint256 chainId
-    ) external onlyLocalnet {
-        _lockCollateral(user, asset, amount, 0, chainId, false);
+        bytes calldata message
+    ) external override onlyGateway {
+        // Decode message type and data
+        (bytes4 selector, bytes memory data) = abi.decode(message, (bytes4, bytes));
+        
+        if (selector == this.lockCollateralFromChain.selector) {
+            _lockCollateralFromChain(context, zrc20, amount, data);
+        } else if (selector == this.confirmLoanRepayment.selector) {
+            _confirmLoanRepayment(context, data);
+        } else if (selector == this.confirmCollateralTransfer.selector) {
+            _confirmCollateralTransfer(context, data);
+        } else if (selector == this.handleBitcoinDeposit.selector) {
+            _handleBitcoinDeposit(context, data);
+        }
     }
     
-    // ==================== TOOLKIT FUNCTIONS ====================
+    // ==================== CROSS-CHAIN COLLATERAL MANAGEMENT ====================
     
-    function approveToken(address token, uint256 chainId) external onlyOwner {
-        approvedTokens[token][chainId] = true;
-        emit RiskProfileUpdated(token, chainId, 0, 0);
+    /**
+     * @dev Lock collateral from external chain
+     */
+    function _lockCollateralFromChain(
+        MessageContext calldata context,
+        address zrc20,
+        uint256 amount,
+        bytes memory data
+    ) internal {
+        (address owner, address asset, uint256 tokenId, bool isNFT) = abi.decode(
+            data, 
+            (address, address, uint256, bool)
+        );
+        
+        uint256 collateralId = ++collateralCounter;
+        
+        collaterals[collateralId] = CollateralPosition({
+            owner: owner,
+            chainId: context.chainID,
+            asset: asset,
+            amount: amount,
+            tokenId: tokenId,
+            isNFT: isNFT,
+            lockedTimestamp: block.timestamp,
+            lastPriceUpdate: block.timestamp,
+            currentValue: _getAssetValue(context.chainID, asset, amount),
+            proof: keccak256(abi.encodePacked(context.chainID, asset, amount, block.timestamp))
+        });
+        
+        userCollaterals[owner].push(collateralId);
+        
+        if (isNFT) {
+            universalNFTs[++nftCounter] = UniversalNFT({
+                contractAddress: asset,
+                tokenId: tokenId,
+                originalChainId: context.chainID,
+                isLocked: true
+            });
+        }
+        
+        emit CollateralLocked(
+            collateralId, 
+            owner, 
+            context.chainID, 
+            asset, 
+            amount, 
+            isNFT,
+            collaterals[collateralId].proof
+        );
     }
     
+    /**
+     * @dev Handle native Bitcoin deposits
+     */
+    function _handleBitcoinDeposit(
+        MessageContext calldata context,
+        bytes memory data
+    ) internal {
+        (address owner, bytes memory btcAddress, uint256 amount) = abi.decode(
+            data,
+            (address, bytes, uint256)
+        );
+        
+        uint256 collateralId = ++collateralCounter;
+        
+        collaterals[collateralId] = CollateralPosition({
+            owner: owner,
+            chainId: 18332, // Bitcoin testnet chain ID
+            asset: address(0), // Native BTC marker
+            amount: amount,
+            tokenId: 0,
+            isNFT: false,
+            lockedTimestamp: block.timestamp,
+            lastPriceUpdate: block.timestamp,
+            currentValue: _getAssetValue(18332, address(0), amount),
+            proof: keccak256(abi.encodePacked(btcAddress, amount, block.timestamp))
+        });
+        
+        userCollaterals[owner].push(collateralId);
+        
+        emit CollateralLocked(
+            collateralId,
+            owner,
+            18332,
+            address(0),
+            amount,
+            false,
+            collaterals[collateralId].proof
+        );
+    }
+    
+    // ==================== LENDING OPERATIONS ====================
+    
+    /**
+     * @dev Borrow against collateral with cross-chain minting
+     */
+    function borrowAgainstCollateral(
+        uint256 collateralId,
+        uint256 targetChainId,
+        address debtAsset,
+        uint256 debtAmount
+    ) external nonReentrant whenNotPaused {
+        CollateralPosition storage col = collaterals[collateralId];
+        require(col.owner == msg.sender, "Not collateral owner");
+        require(col.currentValue > 0, "Collateral value not set");
+        
+        // Get AI risk assessment
+        RiskProfile memory risk = _getRiskProfile(col.chainId, col.asset);
+        require(risk.maxLTV > 0, "Risk profile not set");
+        
+        // Calculate max borrow based on LTV
+        uint256 maxBorrow = (col.currentValue * risk.maxLTV) / BASIS_POINTS;
+        require(debtAmount <= maxBorrow, "Exceeds borrowing limit");
+        
+        // Calculate dynamic interest rate
+        uint256 interestRate = _calculateInterestRate(risk.volatilityScore);
+        
+        // Create loan record
+        uint256 loanId = ++loanCounter;
+        loans[loanId] = LoanPosition({
+            owner: msg.sender,
+            collateralId: collateralId,
+            debtChainId: targetChainId,
+            debtAsset: debtAsset,
+            debtAmount: debtAmount,
+            interestRate: interestRate,
+            issuedTimestamp: block.timestamp,
+            lastInterestAccrual: block.timestamp,
+            liquidated: false,
+            healthFactor: _calculateHealthFactor(col.currentValue, debtAmount, risk.liquidationThreshold),
+            totalDebt: debtAmount
+        });
+        
+        userLoans[msg.sender].push(loanId);
+        
+        // Send cross-chain minting message
+        _sendCrossChainMint(targetChainId, msg.sender, debtAsset, debtAmount, loanId);
+        
+        emit LoanIssued(
+            msg.sender, 
+            loanId, 
+            collateralId, 
+            targetChainId, 
+            debtAsset, 
+            debtAmount,
+            interestRate
+        );
+    }
+    
+    /**
+     * @dev Send cross-chain mint message
+     */
+    function _sendCrossChainMint(
+        uint256 targetChainId,
+        address recipient,
+        address debtAsset,
+        uint256 debtAmount,
+        uint256 loanId
+    ) internal {
+        bytes memory message = abi.encodeWithSignature(
+            "mintDebtTokens(address,address,uint256,uint256)",
+            recipient,
+            debtAsset,
+            debtAmount,
+            loanId
+        );
+        
+        // Calculate gas requirements
+        uint256 gasLimit = _estimateGasCost(targetChainId, message.length);
+        
+        // Send through ZetaConnector
+        systemContract.interchainCall(
+            targetChainId,
+            crossChainContracts[targetChainId],
+            gasLimit,
+            message
+        );
+        
+        emit CrossChainMessageSent(targetChainId, crossChainContracts[targetChainId], message);
+    }
+    
+    // ==================== LIQUIDATION SYSTEM ====================
+    
+    /**
+     * @dev Execute AI-driven liquidation
+     */
+    function executeLiquidation(uint256 loanId, uint256 severity) external onlyAIOracle nonReentrant {
+        LoanPosition storage loan = loans[loanId];
+        require(!loan.liquidated, "Already liquidated");
+        
+        CollateralPosition storage col = collaterals[loan.collateralId];
+        require(col.currentValue > 0, "Collateral value not set");
+        
+        // Calculate liquidation amount based on severity
+        uint256 liquidationAmount = (col.amount * severity) / 100;
+        uint256 repaymentAmount = (loan.totalDebt * severity) / 100;
+        
+        // Execute cross-chain liquidation
+        _liquidateCollateralCrossChain(loan.collateralId, liquidationAmount, col.chainId);
+        
+        // Update loan state
+        if (severity >= 100) {
+            loan.liquidated = true;
+            col.currentValue = 0;
+        } else {
+            col.amount -= liquidationAmount;
+            col.currentValue = _getAssetValue(col.chainId, col.asset, col.amount);
+            loan.totalDebt -= repaymentAmount;
+        }
+        
+        emit CollateralLiquidated(loanId, loan.collateralId, msg.sender, severity);
+    }
+    
+    /**
+     * @dev Liquidate collateral on external chain
+     */
+    function _liquidateCollateralCrossChain(
+        uint256 collateralId,
+        uint256 amount,
+        uint256 targetChainId
+    ) internal {
+        bytes memory message = abi.encodeWithSignature(
+            "liquidateCollateral(uint256,uint256,address)",
+            collateralId,
+            amount,
+            msg.sender
+        );
+        
+        systemContract.interchainCall(
+            targetChainId,
+            crossChainContracts[targetChainId],
+            300000, // Gas limit
+            message
+        );
+    }
+    
+    // ==================== CROSS-CHAIN CONFIRMATIONS ====================
+    
+    /**
+     * @dev Confirm loan repayment from external chain
+     */
+    function _confirmLoanRepayment(
+        MessageContext calldata context,
+        bytes memory data
+    ) internal {
+        (uint256 loanId, uint256 repaidAmount) = abi.decode(data, (uint256, uint256));
+        
+        LoanPosition storage loan = loans[loanId];
+        require(loan.owner != address(0), "Loan not found");
+        
+        loan.totalDebt -= repaidAmount;
+        
+        if (loan.totalDebt == 0) {
+            // Loan fully repaid
+            _releaseCollateral(loan.collateralId);
+        }
+    }
+    
+    /**
+     * @dev Confirm collateral transfer from external chain
+     */
+    function _confirmCollateralTransfer(
+        MessageContext calldata context,
+        bytes memory data
+    ) internal {
+        (uint256 collateralId, uint256 newAmount) = abi.decode(data, (uint256, uint256));
+        
+        CollateralPosition storage col = collaterals[collateralId];
+        require(col.owner != address(0), "Collateral not found");
+        
+        col.amount = newAmount;
+        col.currentValue = _getAssetValue(col.chainId, col.asset, newAmount);
+        col.lastPriceUpdate = block.timestamp;
+        
+        // Update health factors for associated loans
+        _updateLoanHealthFactors(collateralId);
+    }
+    
+    // ==================== RISK MANAGEMENT ====================
+    
+    /**
+     * @dev Get risk profile from AI Oracle
+     */
+    function _getRiskProfile(uint256 chainId, address asset) internal returns (RiskProfile memory) {
+        try IAIOracle(aiOracle).getRiskProfile(chainId, asset) returns (
+            uint256 maxLTV,
+            uint256 liquidationThreshold,
+            uint256 volatilityScore
+        ) {
+            // Update stored profile
+            tokenRiskProfiles[asset][chainId] = RiskProfile({
+                maxLTV: maxLTV,
+                liquidationThreshold: liquidationThreshold,
+                volatilityScore: volatilityScore,
+                lastUpdate: block.timestamp
+            });
+            
+            return tokenRiskProfiles[asset][chainId];
+        } catch {
+            // Return stored profile or default
+            RiskProfile storage profile = tokenRiskProfiles[asset][chainId];
+            if (profile.lastUpdate > 0) {
+                return profile;
+            }
+            
+            // Default risk profile
+            return RiskProfile({
+                maxLTV: 7500, // 75%
+                liquidationThreshold: 8500, // 85%
+                volatilityScore: 50, // Medium
+                lastUpdate: block.timestamp
+            });
+        }
+    }
+    
+    /**
+     * @dev Calculate dynamic interest rate
+     */
+    function _calculateInterestRate(uint256 volatilityScore) internal pure returns (uint256) {
+        uint256 baseRate = 500; // 5% base
+        uint256 volatilityAdjustment = (volatilityScore * 150) / 100; // Max 15% additional
+        return baseRate + volatilityAdjustment;
+    }
+    
+    /**
+     * @dev Calculate health factor
+     */
+    function _calculateHealthFactor(
+        uint256 collateralValue,
+        uint256 debtValue,
+        uint256 liquidationThreshold
+    ) internal pure returns (uint256) {
+        if (debtValue == 0) return type(uint256).max;
+        return (collateralValue * liquidationThreshold) / (debtValue * BASIS_POINTS);
+    }
+    
+    // ==================== UTILITY FUNCTIONS ====================
+    
+    /**
+     * @dev Get asset value in USD
+     */
+    function _getAssetValue(
+        uint256 chainId,
+        address asset,
+        uint256 amount
+    ) internal view returns (uint256) {
+        // Implementation would query price oracle
+        // For now, return simplified value
+        if (asset == address(0)) {
+            // BTC: $40,000 per BTC
+            return amount * 40000000000 / 1e8; // 8 decimals
+        }
+        return amount * 1e10; // Simplified 1:1 ratio with 18 decimals
+    }
+    
+    /**
+     * @dev Estimate gas cost for cross-chain operation
+     */
+    function _estimateGasCost(uint256 targetChainId, uint256 messageLength) internal pure returns (uint256) {
+        // Base gas + message size adjustment
+        return 200000 + (messageLength * 100);
+    }
+    
+    /**
+     * @dev Update loan health factors
+     */
+    function _updateLoanHealthFactors(uint256 collateralId) internal {
+        for (uint256 i = 1; i <= loanCounter; i++) {
+            LoanPosition storage loan = loans[i];
+            if (loan.collateralId == collateralId && !loan.liquidated) {
+                CollateralPosition storage col = collaterals[collateralId];
+                RiskProfile storage risk = tokenRiskProfiles[col.asset][col.chainId];
+                
+                loan.healthFactor = _calculateHealthFactor(
+                    col.currentValue,
+                    loan.totalDebt,
+                    risk.liquidationThreshold
+                );
+            }
+        }
+    }
+    
+    /**
+     * @dev Release collateral after loan repayment
+     */
+    function _releaseCollateral(uint256 collateralId) internal {
+        CollateralPosition storage col = collaterals[collateralId];
+        col.currentValue = 0;
+        
+        // Send cross-chain message to release collateral
+        bytes memory message = abi.encodeWithSignature(
+            "releaseCollateral(uint256,address)",
+            collateralId,
+            col.owner
+        );
+        
+        systemContract.interchainCall(
+            col.chainId,
+            crossChainContracts[col.chainId],
+            200000,
+            message
+        );
+    }
+    
+    // ==================== ADMIN FUNCTIONS ====================
+    
+    /**
+     * @dev Set cross-chain contract address
+     */
+    function setCrossChainContract(uint256 chainId, address contractAddress) external onlyOwner {
+        crossChainContracts[chainId] = contractAddress;
+    }
+    
+    /**
+     * @dev Update AI Oracle
+     */
     function setAIOracle(address _aiOracle) external onlyOwner {
         aiOracle = _aiOracle;
     }
     
-    function updateRiskProfile(
-        address asset,
-        uint256 chainId,
-        uint256 maxLTV,
-        uint256 liquidationThreshold,
-        uint256 volatilityScore
-    ) external onlyAIOracle {
-        require(maxLTV <= BASIS_POINTS, "Invalid maxLTV");
-        require(
-            liquidationThreshold >= MIN_LIQUIDATION_THRESHOLD &&
-            liquidationThreshold <= MAX_LIQUIDATION_THRESHOLD,
-            "Invalid liquidation threshold"
-        );
-        require(volatilityScore <= 100, "Invalid volatility score");
-        
-        tokenRiskProfiles[asset][chainId] = RiskProfile({
-            maxLTV: maxLTV,
-            liquidationThreshold: liquidationThreshold,
-            volatilityScore: volatilityScore,
-            lastUpdate: block.timestamp
-        });
-        
-        emit RiskProfileUpdated(asset, chainId, maxLTV, liquidationThreshold);
+    /**
+     * @dev Update price oracle
+     */
+    function setPriceOracle(address _priceOracle) external onlyOwner {
+        priceOracle = _priceOracle;
     }
     
-    // ==================== UNIVERSALKIT INTEGRATION ====================
+    /**
+     * @dev Pause/unpause system
+     */
+    function setPaused(bool _paused) external onlyOwner {
+        if (_paused) {
+            _pause();
+        } else {
+            _unpause();
+        }
+    }
     
+    // ==================== VIEW FUNCTIONS ====================
+    
+    /**
+     * @dev Get user position summary
+     */
     function getUserPosition(address user) external view returns (
         uint256 collateralCount,
         uint256 activeLoans,
@@ -220,7 +646,7 @@ contract AegisUniversalLending is ZetaInteractor, ZetaReceiver, Ownable, Reentra
         
         for (uint256 i = 0; i < userCollateralIds.length; i++) {
             CollateralPosition storage col = collaterals[userCollateralIds[i]];
-            if (col.owner == user) {
+            if (col.owner == user && col.currentValue > 0) {
                 collateralValue += col.currentValue;
             }
         }
@@ -228,7 +654,7 @@ contract AegisUniversalLending is ZetaInteractor, ZetaReceiver, Ownable, Reentra
         for (uint256 i = 0; i < userLoanIds.length; i++) {
             LoanPosition storage loan = loans[userLoanIds[i]];
             if (loan.owner == user && !loan.liquidated) {
-                debtValue += loan.debtAmount;
+                debtValue += loan.totalDebt;
             }
         }
         
@@ -240,310 +666,42 @@ contract AegisUniversalLending is ZetaInteractor, ZetaReceiver, Ownable, Reentra
         );
     }
     
-    // ==================== CORE PROTOCOL FUNCTIONS ====================
-    
-    function lockCollateral(
-        address asset,
-        uint256 amount,
-        uint256 chainId
-    ) external payable nonReentrant whenNotPaused {
-        require(approvedTokens[asset][chainId], "Token not approved");
-        require(amount > 0, "Amount must be greater than 0");
-        
-        _lockCollateral(msg.sender, asset, amount, 0, chainId, false);
-    }
-    
-    function lockNFT(
-        address contractAddress,
-        uint256 tokenId,
-        uint256 chainId
-    ) external nonReentrant whenNotPaused {
-        IERC721 nft = IERC721(contractAddress);
-        require(nft.ownerOf(tokenId) == msg.sender, "Not owner");
-        require(nft.isApprovedForAll(msg.sender, address(this)), "Not approved");
-        
-        nft.transferFrom(msg.sender, address(this), tokenId);
-        
-        _lockCollateral(msg.sender, contractAddress, 1, tokenId, chainId, true);
-    }
-    
-    function _lockCollateral(
-        address user,
-        address asset,
-        uint256 amount,
-        uint256 tokenId,
-        uint256 chainId,
-        bool isNFT
-    ) internal {
-        uint256 collateralId = ++collateralCounter;
-        
-        collaterals[collateralId] = CollateralPosition({
-            owner: user,
-            chainId: chainId,
-            asset: asset,
-            amount: amount,
-            tokenId: tokenId,
-            isNFT: isNFT,
-            lockedTimestamp: block.timestamp,
-            lastPriceUpdate: block.timestamp,
-            currentValue: 0 // Will be updated by AI oracle
-        });
-        
-        userCollaterals[user].push(collateralId);
-        
-        if (isNFT) {
-            universalNFTs[++nftCounter] = UniversalNFT({
-                contractAddress: asset,
-                tokenId: tokenId,
-                originalChainId: chainId,
-                isLocked: true
-            });
-        }
-        
-        emit CollateralLocked(collateralId, user, chainId, asset, amount, isNFT);
-    }
-    
-    function borrowAgainstCollateral(
-        uint256 collateralId,
-        uint256 targetChainId,
-        address debtAsset,
-        uint256 debtAmount
-    ) external nonReentrant whenNotPaused {
-        _borrowAgainstCollateral(collateralId, targetChainId, debtAsset, debtAmount);
-    }
-    
-    function _borrowAgainstCollateral(
-        uint256 collateralId,
-        uint256 targetChainId,
-        address debtAsset,
-        uint256 debtAmount
-    ) internal {
-        CollateralPosition storage col = collaterals[collateralId];
-        require(col.owner == msg.sender, "Not collateral owner");
-        require(!col.isNFT || universalNFTs[collateralId].isLocked, "NFT not locked");
-        
-        // Get risk profile from AI oracle
-        RiskProfile storage riskProfile = tokenRiskProfiles[col.asset][col.chainId];
-        require(riskProfile.maxLTV > 0, "Risk profile not set");
-        
-        // Calculate max borrow based on LTV
-        uint256 maxBorrow = (col.currentValue * riskProfile.maxLTV) / BASIS_POINTS;
-        require(debtAmount <= maxBorrow, "Exceeds borrowing limit");
-        
-        // Create loan record
-        uint256 loanId = ++loanCounter;
-        loans[loanId] = LoanPosition({
-            owner: msg.sender,
-            collateralId: collateralId,
-            debtChainId: targetChainId,
-            debtAsset: debtAsset,
-            debtAmount: debtAmount,
-            interestRate: _calculateInterestRate(riskProfile.volatilityScore),
-            issuedTimestamp: block.timestamp,
-            lastInterestAccrual: block.timestamp,
-            liquidated: false,
-            healthFactor: _calculateHealthFactor(col.currentValue, debtAmount, riskProfile.liquidationThreshold)
-        });
-        
-        userLoans[msg.sender].push(loanId);
-        
-        // Cross-chain minting using Universal Token standard
-        IUniversalToken(debtAsset).mintUniversal(targetChainId, msg.sender, debtAmount);
-        
-        emit LoanIssued(loanId, msg.sender, collateralId, targetChainId, debtAsset, debtAmount, loans[loanId].interestRate);
-    }
-    
-    function _calculateInterestRate(uint256 volatilityScore) internal pure returns (uint256) {
-        // Base rate: 5% + volatility adjustment
-        uint256 baseRate = 500; // 5%
-        uint256 volatilityAdjustment = (volatilityScore * 150) / 100; // Max 15% additional
-        return baseRate + volatilityAdjustment;
-    }
-    
-    function _calculateHealthFactor(
-        uint256 collateralValue,
-        uint256 debtValue,
-        uint256 liquidationThreshold
-    ) internal pure returns (uint256) {
-        if (debtValue == 0) return type(uint256).max;
-        return (collateralValue * liquidationThreshold) / (debtValue * BASIS_POINTS);
-    }
-    
-    // ==================== LIQUIDATION FUNCTIONS ====================
-    
-    function executeLiquidation(uint256 loanId) external onlyAIOracle nonReentrant {
-        LoanPosition storage loan = loans[loanId];
-        require(!loan.liquidated, "Already liquidated");
-        
-        CollateralPosition storage col = collaterals[loan.collateralId];
-        
-        // Calculate liquidation penalty
-        uint256 penalty = (loan.debtAmount * LIQUIDATION_PENALTY) / BASIS_POINTS;
-        
-        // Cross-chain liquidation
-        if (col.isNFT) {
-            _liquidateNFT(col.asset, col.tokenId, col.chainId);
-        } else {
-            _liquidateFungible(col.asset, col.amount, col.chainId);
-        }
-        
-        // Repay debt
-        IUniversalToken(loan.debtAsset).burnUniversal(loan.debtChainId, msg.sender, loan.debtAmount);
-        
-        loan.liquidated = true;
-        
-        emit CollateralLiquidated(loanId, loan.collateralId, msg.sender, penalty);
-    }
-    
-    function _liquidateFungible(
-        address asset,
-        uint256 amount,
-        uint256 chainId
-    ) internal {
-        IUniversalToken(asset).transferUniversal(chainId, address(this), amount);
-    }
-    
-    function _liquidateNFT(
-        address contractAddress,
-        uint256 tokenId,
-        uint256 chainId
-    ) internal {
-        // Universal NFT transfer via ZetaChain CCM
-        bytes memory payload = abi.encodeWithSignature(
-            "transferNFT(address,address,uint256)",
-            address(this),
-            msg.sender,
-            tokenId
-        );
-        
-        zetaConnector.send(
-            ZetaInterfaces.SendInput({
-                destinationChainId: chainId,
-                destinationAddress: contractAddress,
-                gasLimit: 500000,
-                message: payload,
-                zetaValueAndGas: msg.value,
-                zetaParams: abi.encode("NFT_TRANSFER")
-            })
-        );
-    }
-    
-    // ==================== CROSS-CHAIN FUNCTIONS ====================
-    
-    function onZetaMessage(ZetaInterfaces.ZetaMessage calldata zetaMessage)
-        external
-        override
-        onlyZeta
-    {
-        // Handle incoming cross-chain messages
-        bytes4 selector;
-        bytes memory data;
-        (selector, data) = abi.decode(zetaMessage.message, (bytes4, bytes));
-        
-        if (selector == this.completeNFTRedemption.selector) {
-            (address recipient, uint256 nftId) = abi.decode(data, (address, uint256));
-            _completeNFTRedemption(recipient, nftId);
-        } else if (selector == this.updateCollateralValue.selector) {
-            (uint256 collateralId, uint256 newValue) = abi.decode(data, (uint256, uint256));
-            _updateCollateralValue(collateralId, newValue);
-        }
-    }
-    
-    function _completeNFTRedemption(address recipient, uint256 nftId) internal {
-        UniversalNFT storage nft = universalNFTs[nftId];
-        require(nft.contractAddress != address(0), "NFT not found");
-        
-        IERC721(nft.contractAddress).transferFrom(address(this), recipient, nft.tokenId);
-        nft.isLocked = false;
-    }
-    
-    function _updateCollateralValue(uint256 collateralId, uint256 newValue) internal {
-        CollateralPosition storage col = collaterals[collateralId];
-        require(col.owner != address(0), "Collateral not found");
-        
-        col.currentValue = newValue;
-        col.lastPriceUpdate = block.timestamp;
-        
-        // Update health factors for associated loans
-        _updateLoanHealthFactors(collateralId);
-    }
-    
-    function _updateLoanHealthFactors(uint256 collateralId) internal {
-        // Find all loans associated with this collateral
-        for (uint256 i = 1; i <= loanCounter; i++) {
-            LoanPosition storage loan = loans[i];
-            if (loan.collateralId == collateralId && !loan.liquidated) {
-                CollateralPosition storage col = collaterals[collateralId];
-                RiskProfile storage riskProfile = tokenRiskProfiles[col.asset][col.chainId];
-                
-                loan.healthFactor = _calculateHealthFactor(
-                    col.currentValue,
-                    loan.debtAmount,
-                    riskProfile.liquidationThreshold
-                );
-                
-                // Check if liquidation is needed
-                if (loan.healthFactor < BASIS_POINTS) {
-                    IAIOracle(aiOracle).requestLiquidation(address(this), i, 10);
-                }
-            }
-        }
-    }
-    
-    // ==================== CLI FUNCTIONS ====================
-    
-    function cliLockCollateral(
-        address asset,
-        uint256 amount,
-        uint256 tokenId,
-        uint256 chainId,
-        bool isNFT
-    ) external onlyCLI {
-        _lockCollateral(msg.sender, asset, amount, tokenId, chainId, isNFT);
-    }
-    
-    function cliBorrow(
-        uint256 collateralId,
-        uint256 targetChainId,
-        address debtAsset,
-        uint256 debtAmount
-    ) external onlyCLI {
-        _borrowAgainstCollateral(collateralId, targetChainId, debtAsset, debtAmount);
-    }
-    
-    // ==================== UTILITY FUNCTIONS ====================
-    
-    function pause() external onlyOwner {
-        _pause();
-    }
-    
-    function unpause() external onlyOwner {
-        _unpause();
-    }
-    
+    /**
+     * @dev Get collateral details
+     */
     function getCollateral(uint256 collateralId) external view returns (CollateralPosition memory) {
         return collaterals[collateralId];
     }
     
+    /**
+     * @dev Get loan details
+     */
     function getLoan(uint256 loanId) external view returns (LoanPosition memory) {
         return loans[loanId];
     }
     
-    function getUniversalNFT(uint256 nftId) external view returns (UniversalNFT memory) {
-        return universalNFTs[nftId];
-    }
-    
-    function getTokenRiskProfile(address asset, uint256 chainId) external view returns (RiskProfile memory) {
-        return tokenRiskProfiles[asset][chainId];
-    }
-    
-    // ==================== EMERGENCY FUNCTIONS ====================
-    
-    function emergencyWithdraw(address token, uint256 amount) external onlyOwner {
-        IERC20(token).transfer(owner(), amount);
-    }
-    
-    function emergencyWithdrawNFT(address nftContract, uint256 tokenId) external onlyOwner {
-        IERC721(nftContract).transferFrom(address(this), owner(), tokenId);
+    /**
+     * @dev Get protocol statistics
+     */
+    function getProtocolStats() external view returns (
+        uint256 totalCollaterals,
+        uint256 totalLoans,
+        uint256 totalCollateralValue,
+        uint256 totalDebtValue
+    ) {
+        uint256 collateralValue = 0;
+        uint256 debtValue = 0;
+        
+        for (uint256 i = 1; i <= collateralCounter; i++) {
+            collateralValue += collaterals[i].currentValue;
+        }
+        
+        for (uint256 i = 1; i <= loanCounter; i++) {
+            if (!loans[i].liquidated) {
+                debtValue += loans[i].totalDebt;
+            }
+        }
+        
+        return (collateralCounter, loanCounter, collateralValue, debtValue);
     }
 } 
