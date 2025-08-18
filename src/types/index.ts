@@ -107,3 +107,24 @@ export interface APIResponse<T> {
   data: T;
   error?: string;
 }
+
+// Backend API response types (matching actual backend response)
+export interface BackendPortfolioResponse {
+  success: boolean;
+  data: Portfolio;
+}
+
+export interface BackendPositionsResponse {
+  success: boolean;
+  data: Position[];
+}
+
+export interface BackendAIInsightsResponse {
+  success: boolean;
+  data: AIInsight;
+}
+
+export interface BackendAlertsResponse {
+  success: boolean;
+  data: SecurityAlert[];
+}
