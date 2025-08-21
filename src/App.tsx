@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { WalletProvider } from './contexts/WalletContext';
 import Layout from './components/Layout';
+import AppWelcome from './components/AppWelcome';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Deposit from './pages/Deposit';
@@ -10,8 +11,7 @@ import Loans from './pages/Loans';
 import NftCollateral from './pages/NftCollateral';
 import Analytics from './pages/Analytics';
 import Governance from './pages/Governance';
-import GeminiAIDashboard from './components/GeminiAIDashboard';
-import CrossChainLending from './components/CrossChainLending';
+
 import NotFound from './pages/NotFound';
 
 const App = () => {
@@ -24,7 +24,7 @@ const App = () => {
           
           {/* Protected routes with layout wrapper */}
           <Route path="/app" element={<Layout />}>
-            <Route index element={<Navigate to="/app/dashboard" replace />} />
+            <Route index element={<AppWelcome />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="deposit" element={<Deposit />} />
             <Route path="borrow" element={<Borrow />} />
@@ -32,8 +32,7 @@ const App = () => {
             <Route path="nft-collateral" element={<NftCollateral />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="governance" element={<Governance />} />
-            <Route path="ai-dashboard" element={<GeminiAIDashboard />} />
-            <Route path="cross-chain-lending" element={<CrossChainLending />} />
+
           </Route>
           
           {/* Catch all route */}

@@ -1,12 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 
-// Extend Window interface to include ethereum
-declare global {
-  interface Window {
-    ethereum?: any;
-  }
-}
-
 interface WalletContextType {
   address: string | null;
   isConnected: boolean;
@@ -140,19 +133,22 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
 
   // Connect wallet with minimal popup
   const connect = useCallback(async () => {
+    if (!isMetaMaskInstalled()) {
+      setConnectionError('MetaMask is not installed. Please install MetaMask to continue.');
+      return;
+    }
+
     setIsConnecting(true);
     setConnectionError(null);
 
     try {
-      // Check if ethereum is available
-      if (typeof window === 'undefined' || !window.ethereum) {
-        throw new Error('MetaMask is not installed. Please install MetaMask to continue.');
+      const provider = getMetaMaskProvider();
+      if (!provider) {
+        throw new Error('MetaMask provider not found');
       }
 
-      const ethereum = window.ethereum;
-      
       // Request accounts (this will trigger the popup)
-      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
       
       if (accounts && accounts.length > 0) {
         const account = accounts[0];
@@ -160,11 +156,11 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         setIsConnected(true);
         
         // Get chain ID
-        const chainId = await ethereum.request({ method: 'eth_chainId' });
+        const chainId = await provider.request({ method: 'eth_chainId' });
         setChainId(parseInt(chainId, 16));
         
         // Get balance
-        const balance = await ethereum.request({ 
+        const balance = await provider.request({ 
           method: 'eth_getBalance', 
           params: [account, 'latest'] 
         });
@@ -197,7 +193,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     } finally {
       setIsConnecting(false);
     }
-  }, []);
+  }, [isMetaMaskInstalled, getMetaMaskProvider]);
 
   // Disconnect wallet
   const disconnect = useCallback(() => {

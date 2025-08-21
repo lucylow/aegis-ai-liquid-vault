@@ -13,7 +13,10 @@ import {
   Bell,
   CheckCircle,
   XCircle,
-  Info
+  Info,
+  Zap,
+  Brain,
+  RefreshCw
 } from 'lucide-react';
 import { useWallet } from '../contexts/WalletContext';
 
@@ -53,7 +56,7 @@ const Loans = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
-  const [activeTab, setActiveTab] = useState<'loans' | 'notifications' | 'analytics'>('loans');
+  const [activeTab, setActiveTab] = useState<'loans' | 'perpetual' | 'notifications' | 'analytics'>('loans');
 
   // Mock loan data - replace with real API calls
   useEffect(() => {
@@ -275,7 +278,7 @@ const Loans = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Loan Management</h1>
-          <p className="text-gray-300">Monitor and manage your cross-chain loans with AI-powered risk insights</p>
+          <p className="text-gray-300">Reduce debt and improve health across all chains. Monitor loan health and manage repayments with AI-powered risk insights.</p>
         </div>
 
         {/* Navigation Tabs */}
@@ -291,6 +294,19 @@ const Loans = () => {
             <div className="flex items-center justify-center space-x-2">
               <BarChart3 className="w-4 h-4" />
               <span>Active Loans</span>
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab('perpetual')}
+            className={`flex-1 py-2 px-4 rounded-md transition-all ${
+              activeTab === 'perpetual' 
+                ? 'bg-blue-600 text-white shadow-lg' 
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <div className="flex items-center justify-center space-x-2">
+              <Zap className="w-4 h-4" />
+              <span>Perpetual Loans</span>
             </div>
           </button>
           <button
@@ -607,6 +623,101 @@ const Loans = () => {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Perpetual Loans Tab */}
+        {activeTab === 'perpetual' && (
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+            <h2 className="text-2xl font-semibold text-white mb-6 flex items-center space-x-2">
+              <Zap className="w-6 h-6 text-yellow-400" />
+              <span>Perpetual Cross-Chain Loans</span>
+              <Brain className="w-6 h-6 text-purple-400" />
+            </h2>
+            <p className="text-gray-400 mb-6">
+              Unlimited loan terms with AI-powered auto-refinancing across chains. Gemini monitors rates and automatically refinances to cheaper chains.
+            </p>
+            
+            {/* Auto-Refinancing Setup */}
+            <div className="bg-slate-800/50 rounded-lg p-4 mb-6">
+              <h3 className="text-lg font-medium text-white mb-3">Auto-Refinancing Conditions</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                    Rate Difference Threshold
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="0.5"
+                    className="w-full p-2 bg-gray-600 border border-gray-500 rounded text-white"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">% difference to trigger refinancing</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                    Max Gas Fee
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="50"
+                    className="w-full p-2 bg-gray-600 border border-gray-500 rounded text-white"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">USD max for gas costs</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                    Preferred Chains
+                  </label>
+                  <select className="w-full p-2 bg-gray-600 border border-gray-500 rounded text-white">
+                    <option>Ethereum, Solana, Avalanche</option>
+                    <option>Solana, Ethereum, Base</option>
+                    <option>Base, Solana, ZetaChain</option>
+                  </select>
+                </div>
+              </div>
+              <button className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+                <Zap className="w-4 h-4 inline mr-2" />
+                Enable Auto-Refinancing
+              </button>
+            </div>
+
+            {/* Refinancing History */}
+            <div className="space-y-3">
+              <h3 className="text-lg font-medium text-white">Recent Refinancing Events</h3>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-white">ETH Loan Refinanced</p>
+                      <p className="text-sm text-gray-400">Ethereum → Solana (Rate: 4.2% → 3.1%)</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-green-400">$2,100 saved</p>
+                    <p className="text-xs text-gray-400">2 hours ago</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                      <RefreshCw className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-white">SOL Loan Refinanced</p>
+                      <p className="text-sm text-gray-400">Solana → Base (Rate: 5.8% → 4.9%)</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-blue-400">$890 saved</p>
+                    <p className="text-xs text-gray-400">6 hours ago</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

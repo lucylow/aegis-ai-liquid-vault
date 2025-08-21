@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { X, Wallet, ExternalLink, ChevronRight, Globe } from 'lucide-react';
-import { useWalletProviders } from '../hooks/useWalletProviders';
+import { X, Wallet, ExternalLink, ChevronRight, Globe, Brain, Zap } from 'lucide-react';
 import { useWallet } from '../contexts/WalletContext';
-import type { EIP6963ProviderDetail } from '../types/wallet';
-import { SUPPORTED_CHAINS } from '../constants/chains';
+import { useNavigate } from 'react-router-dom';
 
 interface WalletConnectionModalProps {
   isOpen: boolean;
@@ -11,18 +9,18 @@ interface WalletConnectionModalProps {
 }
 
 const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) => {
-  const { providers } = useWalletProviders();
-  const { connect, isConnecting, connectionError, clearError } = useWallet();
-  const [selectedProvider, setSelectedProvider] = useState<EIP6963ProviderDetail | null>(null);
+  const { connect, isConnecting, connectionError, clearError, isMetaMaskInstalled } = useWallet();
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
-  const handleConnect = async (provider: EIP6963ProviderDetail) => {
+  const handleConnect = async () => {
     try {
       clearError();
-      setSelectedProvider(provider);
       await connect();
       onClose();
+      // Navigate to the main app interface after successful connection
+      navigate('/app');
     } catch (error) {
       console.error('Connection failed:', error);
     }
@@ -39,105 +37,100 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
       onClick={handleBackdropClick}
     >
-      <div className="bg-card border border-border rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+      <div className="bg-white border border-gray-300 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
-              <Wallet size={20} className="text-primary" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-foreground">Connect Wallet</h2>
-              <p className="text-sm text-muted-foreground">Choose your preferred wallet</p>
-            </div>
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <Wallet size={20} className="text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Connect Wallet</h2>
+                <p className="text-sm text-gray-600">Choose your preferred wallet</p>
+              </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
-          >
-            <X size={20} className="text-muted-foreground" />
-          </button>
+                      <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X size={20} className="text-gray-600" />
+            </button>
         </div>
 
         {/* Supported Networks */}
         <div className="mb-6">
-          <p className="text-sm font-medium text-foreground mb-3">Supported Networks</p>
+          <p className="text-sm font-medium text-gray-900 mb-3">Supported Networks</p>
           <div className="flex flex-wrap gap-2">
-            {SUPPORTED_CHAINS.slice(0, 4).map((chain) => (
-              <div
-                key={chain.chainId}
-                className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg"
-              >
-                <span className="text-sm">{chain.icon}</span>
-                <span className="text-xs text-muted-foreground">{chain.name}</span>
-              </div>
-            ))}
-            <div className="flex items-center gap-1 px-3 py-1.5 bg-muted rounded-lg">
-              <Globe size={12} className="text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">+more</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg">
+              <span className="text-sm">🔷</span>
+              <span className="text-xs text-gray-600">Ethereum Mainnet</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg">
+              <span className="text-sm">🔺</span>
+              <span className="text-xs text-gray-600">Polygon</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg">
+              <span className="text-sm">🟡</span>
+              <span className="text-xs text-gray-600">Binance Smart Chain</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg">
+              <span className="text-sm">🔵</span>
+              <span className="text-xs text-gray-600">Arbitrum</span>
+            </div>
+            <div className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 rounded-lg">
+              <Globe size={12} className="text-gray-600" />
+              <span className="text-xs text-gray-600">+more</span>
             </div>
           </div>
         </div>
 
         {/* Wallet Options */}
         <div className="space-y-3">
-          {providers.length > 0 ? (
-            providers.map((provider) => (
-              <button
-                key={provider.info.uuid}
-                onClick={() => handleConnect(provider)}
-                disabled={isConnecting && selectedProvider?.info.uuid === provider.info.uuid}
-                className="w-full flex items-center justify-between p-4 border border-border hover:border-primary/50 rounded-xl transition-all hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed group"
-              >
-                <div className="flex items-center gap-3">
-                  <img
-                    src={provider.info.icon}
-                    alt={`${provider.info.name} icon`}
-                    className="w-8 h-8 rounded-lg"
-                  />
-                  <div className="text-left">
-                    <p className="font-medium text-foreground">{provider.info.name}</p>
-                    <p className="text-xs text-muted-foreground">Multi-chain support</p>
-                  </div>
-                </div>
-                <ChevronRight 
-                  size={16} 
-                  className="text-muted-foreground group-hover:text-primary transition-colors" 
-                />
-              </button>
-            ))
-          ) : (
-            <div className="text-center py-8">
-              <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
-                <Wallet size={20} className="text-muted-foreground" />
+          <button
+            onClick={handleConnect}
+            disabled={isConnecting || !isMetaMaskInstalled()}
+            className="w-full flex items-center justify-between p-4 border border-gray-300 hover:border-blue-500 rounded-xl transition-all hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                <span className="text-white text-sm font-bold">🦊</span>
               </div>
-              <p className="font-medium text-foreground mb-2">No Wallets Detected</p>
-              <p className="text-sm text-muted-foreground mb-4">
-                Install a Web3 wallet to get started
-              </p>
+              <div className="text-left">
+                <p className="font-medium text-gray-900">MetaMask</p>
+                <p className="text-xs text-gray-600">Multi-chain support</p>
+              </div>
+            </div>
+            <ChevronRight size={16} className="text-gray-600 group-hover:text-blue-600 transition-colors" />
+          </button>
+
+          {!isMetaMaskInstalled() && (
+            <div className="text-center py-4">
+              <p className="text-gray-600 mb-4">MetaMask not detected</p>
               <a
                 href="https://metamask.io/download/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors"
+                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
               >
-                Install MetaMask
+                <span>Install MetaMask</span>
                 <ExternalLink size={14} />
               </a>
             </div>
           )}
+
+          {isConnecting && (
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
+              <p className="text-gray-600">Connecting...</p>
+            </div>
+          )}
         </div>
 
-        {/* Connection Error */}
-        {connectionError && (
-          <div className="mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-            <p className="text-sm text-destructive">{connectionError}</p>
-          </div>
-        )}
+
 
         {/* Footer */}
-        <div className="mt-6 pt-4 border-t border-border">
-          <p className="text-xs text-muted-foreground text-center">
+        <div className="mt-6 pt-4 border-t border-gray-300">
+          <p className="text-xs text-gray-600 text-center">
             By connecting, you agree to our terms of service
           </p>
         </div>
