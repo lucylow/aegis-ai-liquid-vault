@@ -15,8 +15,7 @@ import {
   Copy,
   Image,
   Zap,
-  Activity,
-  Brain
+  Activity
 } from 'lucide-react';
 import { useWallet } from '../contexts/WalletContext';
 
@@ -45,7 +44,7 @@ interface NFTAsset extends Asset {
 interface Chain {
   id: string;
   name: string;
-  icon: string; // Changed from 'any' to 'string' for emoji icons
+  icon: any;
   color: string;
   status: 'healthy' | 'warning' | 'critical';
   gasPrice: string;
@@ -223,7 +222,7 @@ const Deposit = () => {
     { 
       id: 'bitcoin', 
       name: 'Bitcoin', 
-      icon: '₿', 
+      icon: Globe, 
       color: '#f7931a', 
       status: 'healthy', 
       gasPrice: '1-5 sat/vB', 
@@ -234,7 +233,7 @@ const Deposit = () => {
     { 
       id: 'ethereum', 
       name: 'Ethereum', 
-      icon: '🔷', 
+      icon: Globe, 
       color: '#627eea', 
       status: 'healthy', 
       gasPrice: '15-25 gwei', 
@@ -245,7 +244,7 @@ const Deposit = () => {
     { 
       id: 'solana', 
       name: 'Solana', 
-      icon: '☀️', 
+      icon: Globe, 
       color: '#9945ff', 
       status: 'healthy', 
       gasPrice: '0.000005 SOL', 
@@ -256,7 +255,7 @@ const Deposit = () => {
     { 
       id: 'polygon', 
       name: 'Polygon', 
-      icon: '🔺', 
+      icon: Globe, 
       color: '#8247e5', 
       status: 'warning', 
       gasPrice: '30-50 gwei', 
@@ -267,7 +266,7 @@ const Deposit = () => {
     { 
       id: 'avalanche', 
       name: 'Avalanche', 
-      icon: '❄️', 
+      icon: Globe, 
       color: '#e84142', 
       status: 'healthy', 
       gasPrice: '25-35 gwei', 
@@ -278,7 +277,7 @@ const Deposit = () => {
     { 
       id: 'arbitrum', 
       name: 'Arbitrum', 
-      icon: '🔵', 
+      icon: Globe, 
       color: '#28a0f0', 
       status: 'healthy', 
       gasPrice: '0.1-0.3 gwei', 
@@ -289,7 +288,7 @@ const Deposit = () => {
     { 
       id: 'zetachain', 
       name: 'ZetaChain', 
-      icon: '⚡', 
+      icon: Zap, 
       color: '#00d4aa', 
       status: 'healthy', 
       gasPrice: '0.1 gwei', 
@@ -494,7 +493,7 @@ const Deposit = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Deposit Collateral</h1>
-          <p className="text-gray-400">Lock assets on any chain to borrow across the entire ecosystem. Powered by ZetaChain's omnichain infrastructure.</p>
+          <p className="text-gray-400">Deposit assets across multiple chains to unlock borrowing power</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 p-1 bg-white/10 rounded-lg">
@@ -551,69 +550,6 @@ const Deposit = () => {
               </div>
             </div>
           )}
-
-          {/* Intent-Based Lending & Cross-Chain Selection */}
-          <div className="glass-effect border border-white/10 rounded-xl p-6 mb-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Brain className="w-5 h-5 text-purple-400" />
-              Intent-Based Lending
-              <Zap className="w-5 h-5 text-yellow-400" />
-            </h3>
-            <p className="text-sm text-gray-400 mb-4">
-              Describe your lending goal in natural language. AI will convert it to cross-chain transactions.
-            </p>
-            
-            {/* Intent Input */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                What do you want to do?
-              </label>
-              <textarea
-                placeholder="e.g., 'Borrow ETH against my idle BTC at 70% LTV' or 'Deposit SOL to unlock borrowing power across all chains'"
-                className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 resize-none"
-                rows={3}
-              />
-              <div className="mt-2 flex items-center space-x-2">
-                <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors text-sm">
-                  <Brain className="w-4 h-4 inline mr-2" />
-                  AI Analyze Intent
-                </button>
-                <span className="text-xs text-gray-400">Powered by Gemini 2.5</span>
-              </div>
-            </div>
-
-            <h4 className="text-md font-semibold mb-3 flex items-center space-x-2">
-              <Globe className="w-4 h-4 text-blue-400" />
-              <span>Select Target Chain</span>
-            </h4>
-            <p className="text-sm text-gray-400 mb-4">
-              Choose which blockchain to deposit your collateral on. You can borrow assets on any chain regardless of where you deposit.
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-              {chains.map((chain) => (
-                <button
-                  key={chain.id}
-                  onClick={() => setSelectedChain(chain)}
-                  className={`p-3 rounded-lg border transition-all text-center ${
-                    selectedChain?.id === chain.id
-                      ? 'border-primary bg-primary/20'
-                      : 'border-white/10 bg-white/5 hover:bg-white/10'
-                  }`}
-                >
-                  <div className="text-2xl mb-2">{chain.icon}</div>
-                  <div className="text-sm font-medium">{chain.name}</div>
-                  <div className="text-xs text-gray-400">{chain.id === 'bitcoin' ? 'BTC' : chain.id === 'ethereum' ? 'ETH' : chain.id === 'solana' ? 'SOL' : chain.id === 'polygon' ? 'MATIC' : chain.id === 'avalanche' ? 'AVAX' : chain.id === 'arbitrum' ? 'ARB' : 'ZETA'}</div>
-                  <div className={`text-xs mt-1 px-2 py-1 rounded-full ${
-                    chain.status === 'healthy' ? 'bg-green-500/20 text-green-400' :
-                    chain.status === 'warning' ? 'bg-yellow-500/20 text-yellow-400' :
-                    'bg-red-500/20 text-red-400'
-                  }`}>
-                    {chain.status}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Asset Selection */}
           <div className="glass-effect border border-white/10 rounded-xl p-6">
@@ -691,10 +627,10 @@ const Deposit = () => {
                   >
                     <div className="flex items-center gap-3 mb-2">
                       <div 
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-xl"
+                        className="w-8 h-8 rounded-full flex items-center justify-center"
                         style={{ backgroundColor: `${chain.color}20`, color: chain.color }}
                       >
-                        {chain.icon}
+                        <chain.icon size={20} />
                       </div>
                       <div className="text-left flex-1">
                         <div className="font-medium">{chain.name}</div>
