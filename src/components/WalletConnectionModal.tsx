@@ -20,7 +20,7 @@ interface WalletOption {
 }
 
 const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) => {
-  const { connect, isConnecting, connectionError, clearError, isMetaMaskInstalled } = useWallet();
+  const { connect, isConnecting, connectionError, clearError, isMetaMaskInstalled, enableDemoMode } = useWallet();
   const navigate = useNavigate();
   const [selectedWalletType, setSelectedWalletType] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -442,6 +442,7 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
                 <div className="pt-3 border-t border-gray-600">
                   <button
                     onClick={() => {
+                      enableDemoMode();
                       onClose();
                       navigate('/app');
                     }}

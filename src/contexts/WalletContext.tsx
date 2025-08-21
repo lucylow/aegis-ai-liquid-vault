@@ -8,8 +8,10 @@ interface WalletContextType {
   network: string | null;
   balance: string | null;
   connectionError: string | null;
+  isDemoMode: boolean;
   connect: () => Promise<void>;
   disconnect: () => void;
+  enableDemoMode: () => void;
   isMetaMaskInstalled: () => boolean;
   isMetaMaskUnlocked: () => Promise<boolean>;
   getMetaMaskProvider: () => any;
@@ -41,6 +43,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [network, setNetwork] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   // Check if MetaMask is installed
   const isMetaMaskInstalled = useCallback(() => {
@@ -251,6 +254,16 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
   }, [isConnected, getMetaMaskProvider, getAccountInfo]);
 
+  // Enable demo mode
+  const enableDemoMode = useCallback(() => {
+    setIsDemoMode(true);
+    setAddress('0x742d35Cc6634C0532925a3b8D16C09025A2f3c2E'); // Demo address
+    setChainId(1);
+    setNetwork('Demo Mode');
+    setBalance('1.0000');
+    console.log('Demo mode enabled');
+  }, []);
+
   // Clear error
   const clearError = useCallback(() => {
     setConnectionError(null);
@@ -350,8 +363,10 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     network,
     balance,
     connectionError,
+    isDemoMode,
     connect,
     disconnect,
+    enableDemoMode,
     isMetaMaskInstalled,
     isMetaMaskUnlocked,
     getMetaMaskProvider,

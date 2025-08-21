@@ -28,7 +28,7 @@ const Layout = () => {
   const [hasShownWalletModal, setHasShownWalletModal] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { isConnected, address, network } = useWallet();
+  const { isConnected, address, network, isDemoMode } = useWallet();
 
   const navigation = [
     { name: 'Home', href: '/app', icon: Shield, current: location.pathname === '/app' },
@@ -55,7 +55,7 @@ const Layout = () => {
 
 
 
-  if (!isConnected) {
+  if (!isConnected && !isDemoMode) {
     return (
       <>
         <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center">
