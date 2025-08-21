@@ -267,7 +267,42 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       } else if (accounts[0] !== address) {
         // Account changed
         setAddress(accounts[0]);
-        getAccountInfo();
+        // Call getAccountInfo directly to avoid dependency issues
+        const provider = getMetaMaskProvider();
+        if (provider) {
+          provider.request({ method: 'eth_accounts' }).then((accounts: string[]) => {
+            if (accounts && accounts.length > 0) {
+              const account = accounts[0];
+              setAddress(account);
+              setIsConnected(true);
+              
+              // Get chain ID
+              provider.request({ method: 'eth_chainId' }).then((chainId: string) => {
+                setChainId(parseInt(chainId, 16));
+                
+                // Get balance
+                provider.request({ 
+                  method: 'eth_getBalance', 
+                  params: [account, 'latest'] 
+                }).then((balance: string) => {
+                  setBalance((parseInt(balance, 16) / 1e18).toFixed(4));
+                });
+                
+                // Set network name
+                const networkNames: { [key: number]: string } = {
+                  1: 'Ethereum Mainnet',
+                  137: 'Polygon',
+                  56: 'Binance Smart Chain',
+                  42161: 'Arbitrum',
+                  10: 'Optimism',
+                  8453: 'Base',
+                  59144: 'Linea'
+                };
+                setNetwork(networkNames[parseInt(chainId, 16)] || `Chain ID: ${parseInt(chainId, 16)}`);
+              });
+            }
+          });
+        }
       }
     };
 
@@ -286,7 +321,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         ethereum.removeListener('chainChanged', handleChainChanged);
       };
     }
-  }, [address, disconnect, getAccountInfo]);
+  }, [address, disconnect]); // Removed getAccountInfo dependency
 
   // Auto-connect if MetaMask is already unlocked
   useEffect(() => {
@@ -297,7 +332,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     };
 
     autoConnect();
-  }, [isMetaMaskInstalled, isMetaMaskUnlocked, getAccountInfo]);
+  }, []); // Only run once on mount
 
   // Auto-refresh balance every 30 seconds when connected
   useEffect(() => {

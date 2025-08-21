@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Shield, 
@@ -25,6 +25,7 @@ import { useWallet } from '../contexts/WalletContext';
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
+  const [hasShownWalletModal, setHasShownWalletModal] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { isConnected, address, network } = useWallet();
@@ -45,6 +46,13 @@ const Layout = () => {
     setSidebarOpen(false);
   };
 
+  // Auto-close wallet modal when wallet connects
+  useEffect(() => {
+    if (isConnected && walletModalOpen) {
+      setWalletModalOpen(false);
+    }
+  }, [isConnected, walletModalOpen]);
+
 
 
   if (!isConnected) {
@@ -61,7 +69,10 @@ const Layout = () => {
               lending, borrowing, and DeFi opportunities across multiple blockchains.
             </p>
             <button
-              onClick={() => setWalletModalOpen(true)}
+              onClick={() => {
+                setWalletModalOpen(true);
+                setHasShownWalletModal(true);
+              }}
               className="px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl"
             >
               Connect Wallet
@@ -69,7 +80,7 @@ const Layout = () => {
           </div>
         </div>
         <WalletConnectionModal 
-          isOpen={walletModalOpen} 
+          isOpen={walletModalOpen && !isConnected} 
           onClose={() => setWalletModalOpen(false)} 
         />
       </>
@@ -127,22 +138,38 @@ const Layout = () => {
 
         {/* User section at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
-          <button 
-            onClick={() => setWalletModalOpen(true)}
-            className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-          >
-            <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
-              <Wallet size={16} className="text-white" />
+          {!isConnected ? (
+            <button 
+              onClick={() => setWalletModalOpen(true)}
+              className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+            >
+              <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                <Wallet size={16} className="text-white" />
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-sm font-medium text-white truncate">
+                  Connect Wallet
+                </p>
+                <p className="text-xs text-gray-400 truncate">
+                  Click to connect your wallet
+                </p>
+              </div>
+            </button>
+          ) : (
+            <div className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5">
+              <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                <Wallet size={16} className="text-white" />
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-sm font-medium text-white truncate">
+                  {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Connected Wallet'}
+                </p>
+                <p className="text-xs text-gray-400 truncate">
+                  {network || 'Ethereum'} • Connected
+                </p>
+              </div>
             </div>
-            <div className="flex-1 min-w-0 text-left">
-              <p className="text-sm font-medium text-white truncate">
-                {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Connected Wallet'}
-              </p>
-              <p className="text-xs text-gray-400 truncate">
-                {network || 'Ethereum'} • Click for details
-              </p>
-            </div>
-          </button>
+          )}
         </div>
       </div>
 
