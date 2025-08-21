@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { WalletProvider } from './contexts/WalletContext';
 import Layout from './components/Layout';
+import AppWelcome from './components/AppWelcome';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Deposit from './pages/Deposit';
@@ -23,7 +24,7 @@ const App = () => {
           
           {/* Protected routes with layout wrapper */}
           <Route path="/app" element={<Layout />}>
-            <Route index element={<Navigate to="/app/dashboard" replace />} />
+            <Route index element={<AppWelcome />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="deposit" element={<Deposit />} />
             <Route path="borrow" element={<Borrow />} />
