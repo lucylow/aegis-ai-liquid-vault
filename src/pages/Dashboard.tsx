@@ -148,6 +148,7 @@ export const WalletDashboardPage: React.FC = () => {
   const [connectedWallets, setConnectedWallets] = useState<typeof mockWallets>([]);
   const [selectedWallet, setSelectedWallet] = useState<typeof mockWallets[0] | null>(null);
   const [showWalletModal, setShowWalletModal] = useState(false);
+  const [showWalletsPopup, setShowWalletsPopup] = useState(false);
   const [notifications, setNotifications] = useState(3);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -220,6 +221,13 @@ export const WalletDashboardPage: React.FC = () => {
             <button className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors">
               <RefreshCw className="w-4 h-4" />
               <span>Refresh</span>
+            </button>
+            <button 
+              onClick={() => setShowWalletsPopup(true)}
+              className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors"
+            >
+              <Wallet className="w-4 h-4" />
+              <span>Connected Wallets ({connectedWallets.length})</span>
             </button>
             <button className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors">
               <Plus className="w-4 h-4" />
@@ -408,64 +416,83 @@ export const WalletDashboardPage: React.FC = () => {
           </>
         )}
 
-        {/* Wallet Management Section - Bottom Right */}
-        <div className="fixed bottom-6 right-6 z-40">
-          <div className="bg-gray-800/95 backdrop-blur-md rounded-xl border border-gray-600 shadow-2xl p-4 w-80">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-2">
-                <Wallet className="w-4 h-4 text-blue-400" />
-                <h3 className="text-sm font-semibold text-white">Connected Wallets</h3>
-              </div>
-              <span className="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded-full">
-                {connectedWallets.length} active
-              </span>
-            </div>
-            
-            {/* Connected Wallets List */}
-            <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
-              {connectedWallets.map((wallet) => (
-                <div key={wallet.id} className="flex items-center justify-between p-3 bg-gray-700/60 rounded-lg hover:bg-gray-700/80 transition-colors">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${wallet.color} flex items-center justify-center text-white text-sm font-medium`}>
-                      {wallet.icon}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm font-medium text-white truncate">{wallet.name}</span>
-                        <div className={`w-2 h-2 rounded-full ${getStatusBgColor(wallet.status)} flex-shrink-0`}></div>
-                      </div>
-                      <div className="text-xs text-gray-400 truncate">{wallet.address}</div>
-                      <div className="text-xs text-gray-300">
-                        {wallet.balance.toFixed(4)} {wallet.nativeToken}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col space-y-1 ml-2">
-                    <button className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded transition-colors">
-                      Switch
-                    </button>
-                    <button 
-                      onClick={() => disconnectWallet(wallet.id)}
-                      className="text-xs bg-red-600 hover:bg-red-500 text-white px-2 py-1 rounded transition-colors"
-                    >
-                      Disconnect
-                    </button>
-                  </div>
+
+        {/* Connected Wallets Popup */}
+        {showWalletsPopup && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-gray-800 rounded-2xl p-8 max-w-lg w-full mx-4 max-h-[80vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-2">
+                  <Wallet className="w-6 h-6 text-blue-400" />
+                  <h3 className="text-xl font-bold">Connected Wallets</h3>
+                  <span className="text-sm text-gray-400 bg-gray-700 px-2 py-1 rounded-full">
+                    {connectedWallets.length} active
+                  </span>
                 </div>
-              ))}
+                <button 
+                  onClick={() => setShowWalletsPopup(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              
+              {/* Connected Wallets List */}
+              <div className="space-y-3 mb-6">
+                {connectedWallets.map((wallet) => (
+                  <div key={wallet.id} className="flex items-center justify-between p-4 bg-gray-700/60 rounded-lg hover:bg-gray-700/80 transition-colors">
+                    <div className="flex items-center space-x-4">
+                      <div className={`w-10 h-10 rounded-full bg-gradient-to-r ${wallet.color} flex items-center justify-center text-white text-lg font-medium`}>
+                        {wallet.icon}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-base font-medium text-white truncate">{wallet.name}</span>
+                          <div className={`w-2 h-2 rounded-full ${getStatusBgColor(wallet.status)} flex-shrink-0`}></div>
+                        </div>
+                        <div className="text-sm text-gray-400 truncate">{wallet.address}</div>
+                        <div className="text-sm text-gray-300">
+                          {wallet.balance.toFixed(4)} {wallet.nativeToken}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col space-y-2 ml-4">
+                      <button className="text-sm bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded transition-colors">
+                        Switch
+                      </button>
+                      <button 
+                        onClick={() => disconnectWallet(wallet.id)}
+                        className="text-sm bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded transition-colors"
+                      >
+                        Disconnect
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                
+                {connectedWallets.length === 0 && (
+                  <div className="text-center py-8 text-gray-400">
+                    <Wallet className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No wallets connected</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Add Wallet Button */}
+              <button 
+                onClick={() => {
+                  setShowWalletsPopup(false);
+                  setShowWalletModal(true);
+                }}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 font-medium"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Connect New Wallet</span>
+              </button>
             </div>
-            
-            {/* Add Wallet Button */}
-            <button 
-              onClick={() => setShowWalletModal(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-2.5 px-3 rounded-lg transition-colors flex items-center justify-center space-x-2 font-medium"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Connect New Wallet</span>
-            </button>
           </div>
-        </div>
+        )}
 
         {/* Wallet Connection Modal */}
         {showWalletModal && (
