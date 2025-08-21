@@ -56,7 +56,7 @@ class Config:
         self.chroma_anonymized_telemetry = os.getenv("CHROMA_ANONYMIZED_TELEMETRY", "false").lower() == "true"
         
         # AI model configuration
-        self.gemini_api_key = os.getenv("GEMINI_API_KEY")
+        self.gemini_api_key = os.getenv("GEMINI_API_KEY", "AIzaSyDpmYQsbFIZP7L1ZGSkjOPL3YT2nGTFSBI")
         self.gemini_model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-pro")
         self.gemini_max_tokens = int(os.getenv("GEMINI_MAX_TOKENS", "8192"))
         self.gemini_temperature = float(os.getenv("GEMINI_TEMPERATURE", "0.1"))

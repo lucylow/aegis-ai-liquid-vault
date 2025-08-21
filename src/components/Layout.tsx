@@ -12,7 +12,8 @@ import {
   Menu, 
   X,
   Bell,
-  User
+  User,
+  Brain
 } from 'lucide-react';
 import WalletConnect from './WalletConnect';
 import { useWallet } from '../contexts/WalletContext';
@@ -30,6 +31,7 @@ const Layout = () => {
     { name: 'Loans', href: '/app/loans', icon: FileText, current: location.pathname === '/app/loans' },
     { name: 'NFT Collateral', href: '/app/nft-collateral', icon: TrendingUp, current: location.pathname === '/app/nft-collateral' },
     { name: 'Analytics', href: '/app/analytics', icon: BarChart3, current: location.pathname === '/app/analytics' },
+    { name: 'AI Dashboard', href: '/app/ai-dashboard', icon: Brain, current: location.pathname === '/app/ai-dashboard' },
     { name: 'Governance', href: '/app/governance', icon: Settings, current: location.pathname === '/app/governance' },
   ];
 

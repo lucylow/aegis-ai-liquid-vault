@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     CHROMA_ANONYMIZED_TELEMETRY: bool = Field(default=False, description="ChromaDB telemetry setting")
     
     # AI model configuration
-    GEMINI_API_KEY: str = Field(..., description="Google Gemini API key")
+    GEMINI_API_KEY: str = Field(default="AIzaSyDpmYQsbFIZP7L1ZGSkjOPL3YT2nGTFSBI", description="Google Gemini API key")
     GEMINI_MODEL_NAME: str = Field(default="gemini-2.5-pro", description="Gemini model to use")
     GEMINI_MAX_TOKENS: int = Field(default=8192, description="Maximum tokens for Gemini responses")
     GEMINI_TEMPERATURE: float = Field(default=0.1, description="Gemini response temperature")
