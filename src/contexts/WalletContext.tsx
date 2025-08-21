@@ -34,16 +34,75 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
 
   // Check if MetaMask is installed
   const isMetaMaskInstalled = () => {
-    return typeof window !== 'undefined' && window.ethereum && window.ethereum.isMetaMask;
+    // Check for the real MetaMask specifically
+    const hasEthereum = typeof window !== 'undefined' && window.ethereum;
+    const isRealMetaMask = hasEthereum && window.ethereum.isMetaMask === true;
+    
+    // Additional check to ensure it's not PLUG WALLET or other wallets
+    const isPlugWallet = hasEthereum && (
+      window.ethereum.isPlugWallet || 
+      window.ethereum.isPlug || 
+      window.ethereum.providers?.some((provider: any) => provider.isPlugWallet)
+    );
+    
+    const installed = isRealMetaMask && !isPlugWallet;
+    
+    if (hasEthereum) {
+      console.log('🦊 MetaMask detection:', { 
+        isRealMetaMask,
+        isPlugWallet,
+        installed: installed ? '✅ Found' : '❌ Not found'
+      });
+    }
+    
+    return installed;
+  };
+
+  // Get the correct MetaMask provider
+  const getMetaMaskProvider = () => {
+    if (typeof window === 'undefined') return null;
+    
+    // If there are multiple providers, find MetaMask specifically
+    if (window.ethereum?.providers) {
+      const metaMaskProvider = window.ethereum.providers.find(
+        (provider: any) => provider.isMetaMask === true && !provider.isPlugWallet
+      );
+      return metaMaskProvider || null;
+    }
+    
+    // Single provider case - ensure it's MetaMask
+    if (window.ethereum?.isMetaMask === true && !window.ethereum.isPlugWallet) {
+      return window.ethereum;
+    }
+    
+    return null;
+  };
+
+  // Check if MetaMask is unlocked
+  const isMetaMaskUnlocked = async () => {
+    const provider = getMetaMaskProvider();
+    if (!provider) return false;
+    
+    try {
+      const accounts = await provider.request({ method: 'eth_accounts' });
+      console.log('MetaMask unlock check - accounts:', accounts);
+      return accounts.length > 0;
+    } catch (error) {
+      console.log('MetaMask unlock check - error:', error);
+      return false;
+    }
   };
 
   // Get current account and chain info
   const getAccountInfo = async () => {
     if (!isMetaMaskInstalled()) return;
 
+    const provider = getMetaMaskProvider();
+    if (!provider) return;
+
     try {
-      const accounts = await window.ethereum!.request({ method: 'eth_accounts' });
-      const chainId = await window.ethereum!.request({ method: 'eth_chainId' });
+      const accounts = await provider.request({ method: 'eth_accounts' });
+      const chainId = await provider.request({ method: 'eth_chainId' });
       
       if (accounts.length > 0) {
         setAddress(accounts[0]);
@@ -51,7 +110,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         setChainId(chainId);
         
         // Get balance
-        const balance = await window.ethereum!.request({
+        const balance = await provider.request({
           method: 'eth_getBalance',
           params: [accounts[0], 'latest']
         });
@@ -65,14 +124,29 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
 
   // Connect to MetaMask
   const connect = async () => {
+    console.log('🦊 Attempting to connect to MetaMask...');
+    
     if (!isMetaMaskInstalled()) {
-      alert('MetaMask is not installed. Please install MetaMask to use this app.');
+      alert('🦊 MetaMask is not installed.\n\nPlease install MetaMask from https://metamask.io and refresh the page.');
+      return;
+    }
+
+    const provider = getMetaMaskProvider();
+    if (!provider) {
+      alert('🦊 MetaMask provider not found.\n\nPlease ensure MetaMask is properly installed and refresh the page.');
+      return;
+    }
+
+    // Check if MetaMask is unlocked
+    const unlocked = await isMetaMaskUnlocked();
+    if (!unlocked) {
+      alert('🔒 Please unlock your MetaMask wallet and try again.');
       return;
     }
 
     setIsConnecting(true);
     try {
-      const accounts = await window.ethereum!.request({
+      const accounts = await provider.request({
         method: 'eth_requestAccounts'
       });
       
@@ -80,23 +154,31 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         setAddress(accounts[0]);
         setIsConnected(true);
         
-        const chainId = await window.ethereum!.request({ method: 'eth_chainId' });
+        const chainId = await provider.request({ method: 'eth_chainId' });
         setChainId(chainId);
         
         // Get balance
-        const balance = await window.ethereum!.request({
+        const balance = await provider.request({
           method: 'eth_getBalance',
           params: [accounts[0], 'latest']
         });
         const balanceInEth = (parseInt(balance, 16) / 10**18).toFixed(4);
         setBalance(balanceInEth);
+        
+        console.log('✅ Successfully connected to MetaMask!', { 
+          address: accounts[0].substring(0, 6) + '...' + accounts[0].substring(38), 
+          chainId, 
+          balance: balanceInEth 
+        });
       }
     } catch (error: any) {
-      console.error('Error connecting to MetaMask:', error);
+      console.error('❌ MetaMask connection error:', error);
       if (error.code === 4001) {
-        alert('Please connect your MetaMask wallet to continue.');
+        alert('🚫 Connection rejected.\n\nPlease approve the connection request in MetaMask to continue.');
+      } else if (error.code === -32002) {
+        alert('⏳ Connection request pending.\n\nPlease check your MetaMask extension and approve the pending request.');
       } else {
-        alert('Failed to connect to MetaMask. Please try again.');
+        alert('❌ Failed to connect to MetaMask.\n\nPlease try again or refresh the page.');
       }
     } finally {
       setIsConnecting(false);
@@ -115,8 +197,11 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const switchNetwork = async (targetChainId: string) => {
     if (!isMetaMaskInstalled()) return;
 
+    const provider = getMetaMaskProvider();
+    if (!provider) return;
+
     try {
-      await window.ethereum!.request({
+      await provider.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: targetChainId }],
       });
@@ -134,6 +219,9 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   useEffect(() => {
     if (!isMetaMaskInstalled()) return;
 
+    const provider = getMetaMaskProvider();
+    if (!provider) return;
+
     const handleAccountsChanged = (accounts: string[]) => {
       if (accounts.length === 0) {
         disconnect();
@@ -150,15 +238,15 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       }
     };
 
-    window.ethereum!.on('accountsChanged', handleAccountsChanged);
-    window.ethereum!.on('chainChanged', handleChainChanged);
+    provider.on('accountsChanged', handleAccountsChanged);
+    provider.on('chainChanged', handleChainChanged);
 
     // Get initial account info
     getAccountInfo();
 
     return () => {
-      window.ethereum!.removeListener('accountsChanged', handleAccountsChanged);
-      window.ethereum!.removeListener('chainChanged', handleChainChanged);
+      provider.removeListener('accountsChanged', handleAccountsChanged);
+      provider.removeListener('chainChanged', handleChainChanged);
     };
   }, [address]);
 

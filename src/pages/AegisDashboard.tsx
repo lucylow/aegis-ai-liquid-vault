@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, Bitcoin, Coins, Network, Activity, AlertTriangle, Bot, Play, Square } from 'lucide-react';
+import WalletConnect from '../components/WalletConnect';
 
 interface ThreatItem {
   id: string;
@@ -169,10 +170,7 @@ export default function AegisDashboard() {
             </div>
           </div>
           <div className="flex gap-4">
-            <button className="px-4 py-2 rounded-full border border-primary text-primary hover:bg-primary hover:text-white transition-all flex items-center gap-2">
-              <Bitcoin size={16} />
-              Connect Wallet
-            </button>
+            <WalletConnect />
             <button className="px-4 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-all flex items-center gap-2">
               <AlertTriangle size={16} />
               Alerts <span className="ml-1 bg-warning text-warning-foreground px-2 py-1 rounded-full text-xs">3</span>

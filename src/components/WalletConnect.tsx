@@ -1,8 +1,9 @@
 import React from 'react';
 import { useWallet } from '../contexts/WalletContext';
+import { Wallet, ExternalLink } from 'lucide-react';
 
 const WalletConnect: React.FC = () => {
-  const { address, isConnected, isConnecting, balance, chainId, connect, disconnect } = useWallet();
+  const { address, isConnected, isConnecting, balance, chainId, connect, disconnect, switchNetwork } = useWallet();
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -33,11 +34,20 @@ const WalletConnect: React.FC = () => {
           <div className="text-sm text-white/80">
             {formatAddress(address)}
           </div>
-          {chainId && (
-            <div className="text-xs text-white/60">
-              {getNetworkName(chainId)}
-            </div>
-          )}
+        {chainId && (
+          <div className="text-xs text-white/60 flex items-center gap-2">
+            <span>{getNetworkName(chainId)}</span>
+            <button
+              onClick={() => {
+                const newChainId = chainId === '0x1' ? '0x89' : '0x1';
+                switchNetwork(newChainId);
+              }}
+              className="text-blue-400 hover:text-blue-300 text-xs underline"
+            >
+              Switch Network
+            </button>
+          </div>
+        )}
         </div>
         
         {balance && (
@@ -69,12 +79,25 @@ const WalletConnect: React.FC = () => {
         <div className="text-sm text-white/80">
           Connect your MetaMask wallet to continue
         </div>
+        <div className="text-xs text-white/60 mt-1">
+          <span className="text-yellow-400">⚠️ Only MetaMask is supported</span>
+        </div>
+        <div className="text-xs text-white/60 mt-1">
+          Don't have MetaMask? <a 
+            href="https://metamask.io/download/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:text-blue-300 underline flex items-center gap-1"
+          >
+            Download here <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
       </div>
       
       <button
         onClick={connect}
         disabled={isConnecting}
-        className="px-6 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+        className="px-6 py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
       >
         {isConnecting ? (
           <>
@@ -83,10 +106,8 @@ const WalletConnect: React.FC = () => {
           </>
         ) : (
           <>
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 14H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            Connect Wallet
+            <Wallet className="w-4 h-4" />
+            Connect MetaMask
           </>
         )}
       </button>
