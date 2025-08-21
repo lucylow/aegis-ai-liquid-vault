@@ -16,6 +16,7 @@ interface WalletContextType {
   getAccountInfo: () => Promise<void>;
   refreshBalance: () => Promise<void>;
   switchNetwork: (chainId: number) => Promise<void>;
+  clearError: () => void;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -106,7 +107,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           method: 'eth_getBalance', 
           params: [account, 'latest'] 
         });
-        setBalance(parseFloat(parseInt(balance, 16) / 1e18).toFixed(4));
+        setBalance((parseInt(balance, 16) / 1e18).toFixed(4));
         
         // Set network name
         const networkNames: { [key: number]: string } = {
@@ -163,7 +164,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           method: 'eth_getBalance', 
           params: [account, 'latest'] 
         });
-        setBalance(parseFloat(parseInt(balance, 16) / 1e18).toFixed(4));
+        setBalance((parseInt(balance, 16) / 1e18).toFixed(4));
         
         // Set network name
         const networkNames: { [key: number]: string } = {
@@ -217,7 +218,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         method: 'eth_getBalance', 
         params: [address, 'latest'] 
       });
-      setBalance(parseFloat(parseInt(balance, 16) / 1e18).toFixed(4));
+      setBalance((parseInt(balance, 16) / 1e18).toFixed(4));
     } catch (error) {
       console.error('Error refreshing balance:', error);
     }
@@ -249,6 +250,11 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       }
     }
   }, [isConnected, getMetaMaskProvider, getAccountInfo]);
+
+  // Clear error
+  const clearError = useCallback(() => {
+    setConnectionError(null);
+  }, []);
 
   // Listen for account changes
   useEffect(() => {
@@ -317,6 +323,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     getAccountInfo,
     refreshBalance,
     switchNetwork,
+    clearError,
   };
 
   return (
