@@ -313,48 +313,22 @@ export default function AegisDashboard() {
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {threats.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    No threats detected. Click "Start Simulation" to begin monitoring.
+                    <AlertTriangle size={48} className="mx-auto mb-4 text-gray-600" />
+                    <h3 className="text-lg font-medium mb-2">No threats detected</h3>
+                    <p className="text-sm">Click "Start Simulation" to begin advanced AI monitoring</p>
                   </div>
                 ) : (
-                  threats.map((threat) => (
-                    <div
-                      key={threat.id}
-                      className={`p-4 rounded-lg border-l-4 bg-white/5 ${
-                        threat.severity === 'critical' ? 'border-l-red-500' :
-                        threat.severity === 'high' ? 'border-l-orange-500' :
-                        threat.severity === 'medium' ? 'border-l-yellow-500' :
-                        'border-l-blue-500'
-                      } ${threat.status === 'active' ? 'animate-pulse' : ''}`}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle size={16} />
-                          <span className="font-medium">{threat.title}</span>
-                          <span className="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">{threat.chain}</span>
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(threat.timestamp).toLocaleTimeString()}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-3">{threat.description}</p>
-                      {threat.status === 'active' && (
-                        <div className="flex gap-2">
-                          <button onClick={() => resolveThreat(threat.id)} className="px-3 py-1 bg-primary text-white rounded text-sm hover:bg-primary/90">
-                            Resolve
-                          </button>
-                          <button onClick={() => investigateThreat(threat.id)} className="px-3 py-1 border border-primary text-primary rounded text-sm hover:bg-primary/10">
-                            Investigate
-                          </button>
-                        </div>
-                      )}
-                      {threat.status === 'resolved' && (
-                        <span className="text-sm text-green-400">✓ Resolved</span>
-                      )}
-                      {threat.status === 'investigating' && (
-                        <span className="text-sm text-yellow-400">🔍 Investigating...</span>
-                      )}
-                    </div>
-                  ))
+                  threats
+                    .filter(threat => threatFilter === 'all' || threat.severity === threatFilter)
+                    .map((threat) => (
+                      <ThreatCard
+                        key={threat.id}
+                        threat={threat}
+                        onResolve={resolveThreat}
+                        onInvestigate={investigateThreat}
+                        onViewDetails={viewThreatDetails}
+                      />
+                    ))
                 )}
               </div>
             </div>
