@@ -333,7 +333,7 @@ const LandingPage = () => {
                     
                     {/* Hackathon Highlight Box */}
                     <div className="bg-orange-900/20 p-4 rounded-lg border border-orange-500/30">
-                      <p className="text-orange-200 text-sm font-semibold mb-2">🎯 Hackathon Highlight:</p>
+                      
                       <div className="grid grid-cols-3 gap-2 text-xs text-orange-200">
                         <div className="flex items-center gap-1">
                           <span>⚡</span>
