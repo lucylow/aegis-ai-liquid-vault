@@ -11,6 +11,7 @@ import Loans from './pages/Loans';
 import NftCollateral from './pages/NftCollateral';
 import Analytics from './pages/Analytics';
 import Governance from './pages/Governance';
+import HowAegisWorks from './pages/HowAegisWorks';
 
 import NotFound from './pages/NotFound';
 
@@ -25,6 +26,7 @@ const App = () => {
           {/* Protected routes with layout wrapper */}
           <Route path="/app" element={<Layout />}>
             <Route index element={<AppWelcome />} />
+            <Route path="how-it-works" element={<HowAegisWorks />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="deposit" element={<Deposit />} />
             <Route path="borrow" element={<Borrow />} />
