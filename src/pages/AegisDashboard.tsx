@@ -4,10 +4,14 @@ import WalletConnect from '../components/WalletConnect';
 import ThreatCard from '../components/ThreatCard';
 import DashboardWidget from '../components/DashboardWidget';
 import NotificationToast, { Notification } from '../components/NotificationToast';
+import ThreatDetailsModal from '../components/ThreatDetailsModal';
+import AssetMonitor from '../components/AssetMonitor';
 import { ThreatItem, RiskMetrics } from '../types/threats';
 import { ThreatDetectionService } from '../services/threatDetectionService';
+import { useWallet } from '../contexts/WalletContext';
 
 export default function AegisDashboard() {
+  const { address, isConnected } = useWallet();
   const [threats, setThreats] = useState<ThreatItem[]>([]);
   const [isSimulationRunning, setIsSimulationRunning] = useState(false);
   const [selectedChain, setSelectedChain] = useState('bitcoin');
@@ -144,6 +148,10 @@ export default function AegisDashboard() {
     addMessage(`📊 Viewing detailed analysis for: ${threat.title}`, 'system');
   };
 
+  const closeThreatDetails = () => {
+    setSelectedThreat(null);
+  };
+
   const handleSendMessage = () => {
     if (inputValue.trim()) {
       addMessage(inputValue, 'user');
@@ -210,6 +218,17 @@ export default function AegisDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-darker to-dark text-white">
+      {/* Notification System */}
+      <div className="fixed top-4 right-4 z-50 space-y-3 max-w-sm">
+        {notifications.map(notification => (
+          <NotificationToast
+            key={notification.id}
+            notification={notification}
+            onDismiss={dismissNotification}
+          />
+        ))}
+      </div>
+
       <div className="max-w-7xl mx-auto p-5">
         {/* Header */}
         <header className="flex justify-between items-center p-5 border-b border-white/10 mb-6">
@@ -265,23 +284,56 @@ export default function AegisDashboard() {
                 Risk Matrix
               </h3>
               <div className="grid grid-cols-2 gap-3">
-                <div className="text-center p-3 bg-white/5 rounded-lg">
-                  <div className="text-xl font-bold">{riskMetrics.totalThreats}</div>
-                  <div className="text-xs text-muted-foreground">Total Threats</div>
-                </div>
-                <div className="text-center p-3 bg-white/5 rounded-lg">
-                  <div className="text-xl font-bold">{riskMetrics.protectedValue}</div>
-                  <div className="text-xs text-muted-foreground">Protected Value</div>
-                </div>
-                <div className="text-center p-3 bg-white/5 rounded-lg">
-                  <div className="text-xl font-bold text-red-400">{riskMetrics.critical}</div>
-                  <div className="text-xs text-muted-foreground">Critical</div>
-                </div>
-                <div className="text-center p-3 bg-white/5 rounded-lg">
-                  <div className="text-xl font-bold text-orange-400">{riskMetrics.high}</div>
-                  <div className="text-xs text-muted-foreground">High</div>
-                </div>
+                <DashboardWidget
+                  title="Total Threats"
+                  value={riskMetrics.totalThreats}
+                  icon={AlertTriangle}
+                  color="#f59e0b"
+                  trend={riskMetrics.totalThreats > 0 ? { value: 12, isPositive: false } : undefined}
+                />
+                <DashboardWidget
+                  title="Protected Value"
+                  value={riskMetrics.protectedValue}
+                  icon={Shield}
+                  color="#10b981"
+                />
+                <DashboardWidget
+                  title="Critical"
+                  value={riskMetrics.critical}
+                  icon={AlertTriangle}
+                  color="#ef4444"
+                  trend={riskMetrics.critical > 0 ? { value: 25, isPositive: false } : undefined}
+                />
+                <DashboardWidget
+                  title="High Risk"
+                  value={riskMetrics.high}
+                  icon={Activity}
+                  color="#f97316"
+                  trend={riskMetrics.high > 0 ? { value: 8, isPositive: false } : undefined}
+                />
               </div>
+              
+              {/* Additional Risk Metrics */}
+              {riskMetrics.totalThreats > 0 && (
+                <div className="mt-4 p-3 bg-white/5 rounded-lg">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400">Average Risk Score:</span>
+                    <span className={`font-bold ${
+                      riskMetrics.averageRiskScore > 80 ? 'text-red-400' :
+                      riskMetrics.averageRiskScore > 60 ? 'text-orange-400' :
+                      'text-yellow-400'
+                    }`}>
+                      {riskMetrics.averageRiskScore}/100
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm mt-2">
+                    <span className="text-gray-400">Last Updated:</span>
+                    <span className="text-white">
+                      {new Date(riskMetrics.lastUpdated).toLocaleTimeString()}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="glass-effect border border-white/10 rounded-xl p-6">
@@ -308,8 +360,26 @@ export default function AegisDashboard() {
           {/* Main Content */}
           <div className="lg:col-span-2">
             <div className="glass-effect border border-white/10 rounded-xl p-6 mb-6">
-              <h2 className="text-xl font-bold mb-2">Real-time Threat Stream</h2>
-              <p className="text-sm text-muted-foreground mb-4">Live monitoring of cross-chain activities</p>
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h2 className="text-xl font-bold mb-1">Real-time Threat Stream</h2>
+                  <p className="text-sm text-muted-foreground">Live monitoring of cross-chain activities</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Filter size={16} className="text-gray-400" />
+                  <select
+                    value={threatFilter}
+                    onChange={(e) => setThreatFilter(e.target.value as any)}
+                    className="px-3 py-1 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="all">All Threats</option>
+                    <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                  </select>
+                </div>
+              </div>
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {threats.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
@@ -333,36 +403,7 @@ export default function AegisDashboard() {
               </div>
             </div>
 
-            <div className="glass-effect border border-white/10 rounded-xl p-6">
-              <h2 className="text-xl font-bold mb-2">Protected Assets Overview</h2>
-              <p className="text-sm text-muted-foreground mb-4">Value and threat exposure</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {assets.map((asset, index) => (
-                  <div key={index} className="p-4 bg-white/5 rounded-lg">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center" 
-                           style={{ backgroundColor: `${asset.color}20`, color: asset.color }}>
-                        <asset.icon size={20} />
-                      </div>
-                      <div>
-                        <div className="font-medium">{asset.name}</div>
-                        <div className="text-sm text-muted-foreground">{asset.threat} Threat</div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <div className="font-medium">{asset.value}</div>
-                        <div className="text-xs text-muted-foreground">Current Value</div>
-                      </div>
-                      <div>
-                        <div className="font-medium">{(Math.random() * 0.1 + 0.9).toFixed(2)}%</div>
-                        <div className="text-xs text-muted-foreground">LTV Impact</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <AssetMonitor connectedWallet={isConnected ? address : undefined} />
           </div>
 
           {/* AI Copilot */}
@@ -413,6 +454,15 @@ export default function AegisDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Threat Details Modal */}
+      <ThreatDetailsModal
+        threat={selectedThreat}
+        isOpen={selectedThreat !== null}
+        onClose={closeThreatDetails}
+        onResolve={resolveThreat}
+        onInvestigate={investigateThreat}
+      />
     </div>
   );
 }
