@@ -26,7 +26,7 @@ const Layout = () => {
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { isConnected, address, balance, network, disconnect, switchNetwork, chainId } = useWallet();
+  const { isConnected, address, network } = useWallet();
 
   const navigation = [
     { name: 'Home', href: '/app', icon: Shield, current: location.pathname === '/app' },
@@ -44,41 +44,7 @@ const Layout = () => {
     setSidebarOpen(false);
   };
 
-  const getWalletType = () => {
-    // This would typically detect the actual wallet type
-    // For now, we'll show MetaMask as default
-    return 'MetaMask';
-  };
 
-  const getNativeCurrencySymbol = () => {
-    if (!network) return 'ETH';
-    switch (network.toLowerCase()) {
-      case 'polygon':
-        return 'MATIC';
-      case 'bsc':
-      case 'binance smart chain':
-        return 'BNB';
-      case 'arbitrum':
-        return 'ETH';
-      case 'optimism':
-        return 'ETH';
-      case 'base':
-        return 'ETH';
-      default:
-        return 'ETH';
-    }
-  };
-
-  const handleNetworkSwitch = async () => {
-    try {
-      // Switch to a different network (example: Polygon)
-      const targetChainId = chainId === 1 ? 137 : 1; // Toggle between Ethereum and Polygon
-      await switchNetwork(targetChainId);
-    } catch (error) {
-      console.error('Failed to switch network:', error);
-      alert('Network switching failed. Please try again.');
-    }
-  };
 
   if (!isConnected) {
     return (
@@ -160,76 +126,22 @@ const Layout = () => {
 
         {/* User section at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
-          <div className="space-y-3">
-            {/* Wallet Connection Status */}
-            <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
-                  <Wallet size={16} className="text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white">Connected Wallet</p>
-                  <p className="text-xs text-green-400 flex items-center gap-1">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    Active Connection
-                  </p>
-                </div>
-              </div>
-              
-              {/* Wallet Details */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-400">Type:</span>
-                  <span className="text-white font-medium">{getWalletType()}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-400">Network:</span>
-                  <span className="text-blue-400 font-medium">
-                    {network || 'Ethereum'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-400">Address:</span>
-                  <span className="text-white font-mono text-xs">
-                    {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Connecting...'}
-                  </span>
-                </div>
-                {balance && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-400">Balance:</span>
-                    <span className="text-green-400 font-medium">
-                      {parseFloat(balance).toFixed(4)} {getNativeCurrencySymbol()}
-                    </span>
-                  </div>
-                )}
-              </div>
+          <button 
+            onClick={() => setWalletModalOpen(true)}
+            className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+          >
+            <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+              <Wallet size={16} className="text-white" />
             </div>
-
-            {/* Quick Actions */}
-            <div className="space-y-2">
-              <button 
-                onClick={handleNetworkSwitch}
-                className="w-full px-3 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/30 rounded-lg text-xs text-primary font-medium transition-colors"
-              >
-                Switch Network
-              </button>
-              <button 
-                onClick={disconnect}
-                className="w-full px-3 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-xs text-red-400 font-medium transition-colors"
-              >
-                Disconnect
-              </button>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-sm font-medium text-white truncate">
+                {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Connected Wallet'}
+              </p>
+              <p className="text-xs text-gray-400 truncate">
+                {network || 'Ethereum'} • Click for details
+              </p>
             </div>
-
-            {/* Connection Info */}
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-                <span>🔒 Secure</span>
-                <span>•</span>
-                <span>🌐 Multi-Chain</span>
-              </div>
-            </div>
-          </div>
+          </button>
         </div>
       </div>
 
