@@ -410,130 +410,135 @@ const Loans = () => {
             </div>
 
             {/* Loan Management Panel */}
-            {selectedLoanId && (
-              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold text-white">
-                    Manage Loan: {selectedLoanId}
-                  </h3>
-                  <button
-                    onClick={() => setSelectedLoanId(null)}
-                    className="text-gray-400 hover:text-white"
-                  >
-                    <XCircle className="w-5 h-5" />
-                  </button>
-                </div>
+            {selectedLoanId && (() => {
+              const selectedLoan = loans.find(l => l.id === selectedLoanId);
+              if (!selectedLoan) return null;
+              
+              return (
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-semibold text-white">
+                      Manage Loan: {selectedLoanId}
+                    </h3>
+                    <button
+                      onClick={() => setSelectedLoanId(null)}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      <XCircle className="w-5 h-5" />
+                    </button>
+                  </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Add Collateral */}
-                  <div className="bg-slate-800/50 rounded-lg p-4">
-                    <h4 className="text-lg font-medium text-white mb-4 flex items-center">
-                      <Plus className="w-5 h-5 mr-2 text-green-400" />
-                      Add Collateral
-                    </h4>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-1">Amount (USDC)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={collateralAmount}
-                          onChange={(e) => setCollateralAmount(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="0.00"
-                        />
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Add Collateral */}
+                    <div className="bg-slate-800/50 rounded-lg p-4">
+                      <h4 className="text-lg font-medium text-white mb-4 flex items-center">
+                        <Plus className="w-5 h-5 mr-2 text-green-400" />
+                        Add Collateral
+                      </h4>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm text-gray-300 mb-1">Amount (USDC)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={collateralAmount}
+                            onChange={(e) => setCollateralAmount(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <button
+                          onClick={handleAddCollateral}
+                          disabled={isLoading || !collateralAmount}
+                          className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white py-2 px-4 rounded-md transition-colors flex items-center justify-center"
+                        >
+                          {isLoading ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          ) : (
+                            <>
+                              <Plus className="w-4 h-4 mr-2" />
+                              Add Collateral
+                            </>
+                          )}
+                        </button>
                       </div>
-                      <button
-                        onClick={handleAddCollateral}
-                        disabled={isLoading || !collateralAmount}
-                        className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white py-2 px-4 rounded-md transition-colors flex items-center justify-center"
-                      >
-                        {isLoading ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        ) : (
-                          <>
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add Collateral
-                          </>
-                        )}
-                      </button>
+                    </div>
+
+                    {/* Repay Loan */}
+                    <div className="bg-slate-800/50 rounded-lg p-4">
+                      <h4 className="text-lg font-medium text-white mb-4 flex items-center">
+                        <Minus className="w-5 h-5 mr-2 text-blue-400" />
+                        Repay Loan
+                      </h4>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm text-gray-300 mb-1">Amount (USDC)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={repayAmount}
+                            onChange={(e) => setRepayAmount(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <button
+                          onClick={handleRepay}
+                          disabled={isLoading || !repayAmount}
+                          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white py-2 px-4 rounded-md transition-colors flex items-center justify-center"
+                        >
+                          {isLoading ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          ) : (
+                            <>
+                              <Minus className="w-4 h-4 mr-2" />
+                              Repay
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Repay Loan */}
-                  <div className="bg-slate-800/50 rounded-lg p-4">
-                    <h4 className="text-lg font-medium text-white mb-4 flex items-center">
-                      <Minus className="w-5 h-5 mr-2 text-blue-400" />
-                      Repay Loan
-                    </h4>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-1">Amount (USDC)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={repayAmount}
-                          onChange={(e) => setRepayAmount(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="0.00"
-                        />
+                  {/* Loan Analytics */}
+                  <div className="mt-6">
+                    <button
+                      onClick={() => setShowAnalytics(!showAnalytics)}
+                      className="flex items-center text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      {showAnalytics ? 'Hide' : 'Show'} Detailed Analytics
+                    </button>
+                    
+                    {showAnalytics && (
+                      <div className="mt-4 bg-slate-800/50 rounded-lg p-4">
+                        <h4 className="text-lg font-medium text-white mb-4">Loan Analytics</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <div className="text-gray-400">LTV Ratio</div>
+                            <div className="text-white font-medium">{selectedLoan.loanToValue}%</div>
+                          </div>
+                          <div>
+                            <div className="text-gray-400">Margin Call</div>
+                            <div className="text-white font-medium">{selectedLoan.marginCallThreshold}%</div>
+                          </div>
+                          <div>
+                            <div className="text-gray-400">Liquidation</div>
+                            <div className="text-white font-medium">{selectedLoan.liquidationThreshold}%</div>
+                          </div>
+                          <div>
+                            <div className="text-gray-400">Total Interest Paid</div>
+                            <div className="text-white font-medium">${selectedLoan.totalInterestPaid.toFixed(2)}</div>
+                          </div>
+                        </div>
                       </div>
-                      <button
-                        onClick={handleRepay}
-                        disabled={isLoading || !repayAmount}
-                        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white py-2 px-4 rounded-md transition-colors flex items-center justify-center"
-                      >
-                        {isLoading ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        ) : (
-                          <>
-                            <Minus className="w-4 h-4 mr-2" />
-                            Repay
-                          </>
-                        )}
-                      </button>
-                    </div>
+                    )}
                   </div>
                 </div>
-
-                {/* Loan Analytics */}
-                <div className="mt-6">
-                  <button
-                    onClick={() => setShowAnalytics(!showAnalytics)}
-                    className="flex items-center text-blue-400 hover:text-blue-300 transition-colors"
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    {showAnalytics ? 'Hide' : 'Show'} Detailed Analytics
-                  </button>
-                  
-                  {showAnalytics && (
-                    <div className="mt-4 bg-slate-800/50 rounded-lg p-4">
-                      <h4 className="text-lg font-medium text-white mb-4">Loan Analytics</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <div className="text-gray-400">LTV Ratio</div>
-                          <div className="text-white font-medium">{loan.loanToValue}%</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-400">Margin Call</div>
-                          <div className="text-white font-medium">{loan.marginCallThreshold}%</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-400">Liquidation</div>
-                          <div className="text-white font-medium">{loan.liquidationThreshold}%</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-400">Total Interest Paid</div>
-                          <div className="text-white font-medium">${loan.totalInterestPaid.toFixed(2)}</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
         )}
 
