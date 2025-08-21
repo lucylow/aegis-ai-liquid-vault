@@ -26,7 +26,10 @@ import {
   DollarSign,
   Clock,
   Target,
-  Globe
+  Globe,
+  PieChart,
+  Eye,
+  Image
 } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
 
@@ -398,41 +401,82 @@ export const WalletDashboardPage: React.FC = () => {
               </div>
             </section>
 
-            {/* Cross-Chain Summary */}
-            <section className="mb-8">
-              <h2 className="text-2xl font-bold mb-6 flex items-center space-x-2">
-                <Globe className="w-6 h-6 text-purple-500" />
-                <span>Cross-Chain Activity</span>
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-xl p-6 border border-purple-500/30">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <Coins className="w-6 h-6 text-purple-400" />
-                    <h3 className="text-lg font-semibold">Chains Active</h3>
-                  </div>
-                  <p className="text-3xl font-bold text-purple-400">5</p>
-                  <p className="text-sm text-gray-400 mt-2">Ethereum, Bitcoin, Solana, Avalanche, ZetaChain</p>
-                </div>
-                
-                <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl p-6 border border-green-500/30">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <TrendingUp className="w-6 h-6 text-green-400" />
-                    <h3 className="text-lg font-semibold">Cross-Chain Loans</h3>
-                  </div>
-                  <p className="text-3xl font-bold text-green-400">3</p>
-                  <p className="text-sm text-gray-400 mt-2">Active across multiple chains</p>
-                </div>
-                
-                <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-6 border border-blue-500/30">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <Shield className="w-6 h-6 text-blue-400" />
-                    <h3 className="text-lg font-semibold">Omnichain Security</h3>
-                  </div>
-                  <p className="text-3xl font-bold text-blue-400">100%</p>
-                  <p className="text-sm text-gray-400 mt-2">Protected by ZetaChain</p>
-                </div>
-              </div>
-            </section>
+                  {/* AI-Optimized Omnichain Money Market */}
+      <section className="mb-8">
+        <h2 className="text-2xl font-bold mb-6 flex items-center space-x-2">
+          <Brain className="w-6 h-6 text-purple-500" />
+          <span>AI-Optimized Omnichain Money Market</span>
+          <Zap className="w-6 h-6 text-yellow-500" />
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+          <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-xl p-6 border border-purple-500/30">
+            <div className="flex items-center space-x-3 mb-3">
+              <Coins className="w-6 h-6 text-purple-400" />
+              <h3 className="text-lg font-semibold">Native BTC/ETH/SOL</h3>
+            </div>
+            <p className="text-3xl font-bold text-purple-400">3</p>
+            <p className="text-sm text-gray-400 mt-2">Native assets supported</p>
+          </div>
+          
+          <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl p-6 border border-green-500/30">
+            <div className="flex items-center space-x-3 mb-3">
+              <TrendingUp className="w-6 h-6 text-green-400" />
+              <h3 className="text-lg font-semibold">Dynamic LTV</h3>
+            </div>
+            <p className="text-3xl font-bold text-green-400">75%</p>
+            <p className="text-sm text-gray-400 mt-2">AI-optimized ratios</p>
+          </div>
+          
+          <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-6 border border-blue-500/30">
+            <div className="flex items-center space-x-3 mb-3">
+              <Shield className="w-6 h-6 text-blue-400" />
+              <h3 className="text-lg font-semibold">Risk Score</h3>
+            </div>
+            <p className="text-3xl font-bold text-blue-400">4.2/10</p>
+            <p className="text-sm text-gray-400 mt-2">AI-calculated risk</p>
+          </div>
+
+          <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-sm rounded-xl p-6 border border-orange-500/30">
+            <div className="flex items-center space-x-3 mb-3">
+              <Globe className="w-6 h-6 text-orange-400" />
+              <h3 className="text-lg font-semibold">Active Chains</h3>
+            </div>
+            <p className="text-3xl font-bold text-orange-400">5</p>
+            <p className="text-sm text-gray-400 mt-2">Cross-chain liquidity</p>
+          </div>
+        </div>
+
+        {/* AI Risk Analysis Widget */}
+        <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm rounded-xl border border-purple-500/30 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-semibold flex items-center space-x-2">
+              <Brain className="w-5 h-5 text-purple-400" />
+              <span>Real-Time AI Risk Analysis</span>
+            </h3>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-sm text-green-400">Live</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <p className="text-sm text-gray-400 mb-2">Collateral Volatility</p>
+              <p className="text-2xl font-bold text-blue-400">8.5%</p>
+              <p className="text-xs text-gray-500">30-day average</p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-gray-400 mb-2">Optimal Interest Rate</p>
+              <p className="text-2xl font-bold text-green-400">4.2%</p>
+              <p className="text-xs text-gray-500">AI-optimized</p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-gray-400 mb-2">Liquidation Threshold</p>
+              <p className="text-2xl font-bold text-orange-400">75%</p>
+              <p className="text-xs text-gray-500">Dynamic adjustment</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
             {/* Recent Activity */}
             <section className="mb-8">
@@ -484,6 +528,17 @@ export const WalletDashboardPage: React.FC = () => {
           <AIRiskTab />
         )}
 
+        {activeTab === 'portfolio' && (
+          <PortfolioTab />
+        )}
+
+        {activeTab === 'activity' && (
+          <ActivityTab />
+        )}
+
+        {activeTab === 'settings' && (
+          <SettingsTab />
+        )}
 
         {/* Connected Wallets Popup */}
         {showWalletsPopup && (
@@ -1265,6 +1320,85 @@ const AIRiskTab: React.FC = () => {
         </div>
       )}
 
+      {/* Disaster-Proof Vaults Control Panel */}
+      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm rounded-xl border border-blue-500/30 p-6 mb-6">
+        <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
+          <Shield className="w-5 h-5 text-blue-400" />
+          <span>Disaster-Proof Vaults</span>
+          <Brain className="w-5 h-5 text-purple-400" />
+        </h3>
+        <p className="text-sm text-gray-400 mb-4">
+          AI predicts chain congestion and fees, automatically moving collateral to safer chains before adverse events.
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="bg-gray-700/30 rounded-lg p-4">
+            <h4 className="font-medium mb-2">Current Status</h4>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span>Ethereum</span>
+                <span className="text-green-400">Safe</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span>Solana</span>
+                <span className="text-yellow-400">Warning</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span>Base</span>
+                <span className="text-green-400">Safe</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gray-700/30 rounded-lg p-4">
+            <h4 className="font-medium mb-2">AI Predictions</h4>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span>Gas Fee Trend</span>
+                <span className="text-orange-400">↗️ Rising</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span>Congestion Risk</span>
+                <span className="text-yellow-400">Medium</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span>Next Migration</span>
+                <span className="text-blue-400">2 hours</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gray-700/30 rounded-lg p-4">
+            <h4 className="font-medium mb-2">Migration History</h4>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span>Last Move</span>
+                <span className="text-green-400">$12,500</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span>Gas Saved</span>
+                <span className="text-green-400">$89</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span>Total Saved</span>
+                <span className="text-green-400">$2,340</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex items-center space-x-4">
+          <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+            <Shield className="w-4 h-4 inline mr-2" />
+            Trigger Migration
+          </button>
+          <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+            <Brain className="w-4 h-4 inline mr-2" />
+            AI Analysis
+          </button>
+        </div>
+      </div>
+
       {/* Risk Alerts */}
       <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700">
         <div className="p-6 border-b border-gray-700">
@@ -1329,6 +1463,721 @@ const AIRiskTab: React.FC = () => {
               <span>Refresh Risk Assessment</span>
             </>
           )}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Portfolio Tab Component
+const PortfolioTab: React.FC = () => {
+  const [selectedTimeframe, setSelectedTimeframe] = useState<'1d' | '1w' | '1m' | '3m' | '1y'>('1m');
+  const [showAllocation, setShowAllocation] = useState<boolean | 'nft'>(true);
+
+  const portfolioData = {
+    totalValue: 11500,
+    change24h: 2.3,
+    change7d: -1.2,
+    change30d: 8.5,
+    assets: [
+      { symbol: 'ETH', value: 5000, change24h: 3.2, allocation: 43.5, chain: 'Ethereum' },
+      { symbol: 'BTC', value: 3000, change24h: 1.8, allocation: 26.1, chain: 'Bitcoin' },
+      { symbol: 'SOL', value: 2000, change24h: 5.7, allocation: 17.4, chain: 'Solana' },
+      { symbol: 'AVAX', value: 1500, change24h: -2.1, allocation: 13.0, chain: 'Avalanche' }
+    ],
+    chains: [
+      { name: 'Ethereum', value: 6500, allocation: 56.5, color: '#627eea' },
+      { name: 'Bitcoin', value: 3000, allocation: 26.1, color: '#f7931a' },
+      { name: 'Solana', value: 2000, allocation: 17.4, color: '#9945ff' }
+    ]
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <div className="flex items-center justify-center space-x-3">
+          <TrendingUp className="w-8 h-8 text-green-500" />
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            Portfolio Analytics
+          </h2>
+          <BarChart3 className="w-8 h-8 text-blue-500" />
+        </div>
+        <p className="text-gray-400 max-w-2xl mx-auto">
+          Track your cross-chain portfolio performance, asset allocation, and historical trends
+        </p>
+      </div>
+
+      {/* Portfolio Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-6 border border-blue-500/30">
+          <div className="flex items-center justify-between mb-4">
+            <DollarSign className="w-8 h-8 text-blue-400" />
+            <span className={`text-sm ${portfolioData.change24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {portfolioData.change24h >= 0 ? '+' : ''}{portfolioData.change24h}%
+            </span>
+          </div>
+          <h3 className="text-sm text-gray-400 mb-2">Total Portfolio Value</h3>
+          <p className="text-2xl font-bold">${portfolioData.totalValue.toLocaleString()}</p>
+        </div>
+        
+        <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl p-6 border border-green-500/30">
+          <div className="flex items-center justify-between mb-4">
+            <TrendingUp className="w-8 h-8 text-green-400" />
+            <span className={`text-sm ${portfolioData.change7d >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {portfolioData.change7d >= 0 ? '+' : ''}{portfolioData.change7d}%
+            </span>
+          </div>
+          <h3 className="text-sm text-gray-400 mb-2">7-Day Change</h3>
+          <p className="text-2xl font-bold">{portfolioData.change7d >= 0 ? '+' : ''}{portfolioData.change7d}%</p>
+        </div>
+        
+        <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-xl p-6 border border-purple-500/30">
+          <div className="flex items-center justify-between mb-4">
+            <BarChart3 className="w-8 h-8 text-purple-400" />
+            <span className={`text-sm ${portfolioData.change30d >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {portfolioData.change30d >= 0 ? '+' : ''}{portfolioData.change30d}%
+            </span>
+          </div>
+          <h3 className="text-sm text-gray-400 mb-2">30-Day Change</h3>
+          <p className="text-2xl font-bold">{portfolioData.change30d >= 0 ? '+' : ''}{portfolioData.change30d}%</p>
+        </div>
+        
+        <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-sm rounded-xl p-6 border border-orange-500/30">
+          <div className="flex items-center justify-between mb-4">
+            <Globe className="w-8 h-8 text-orange-400" />
+            <span className="text-sm text-orange-400">Active</span>
+          </div>
+          <h3 className="text-sm text-gray-400 mb-2">Active Chains</h3>
+          <p className="text-2xl font-bold">{portfolioData.chains.length}</p>
+        </div>
+      </div>
+
+              {/* Asset Allocation & NFT Collateral Fusion */}
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700">
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold flex items-center space-x-2">
+                <PieChart className="w-5 h-5 text-purple-400" />
+                <span>Asset Allocation</span>
+                <span className="text-sm text-purple-400">+ NFT Fusion</span>
+              </h3>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setShowAllocation(true)}
+                  className={`px-3 py-1 rounded-md text-sm transition-colors ${
+                    showAllocation ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Assets
+                </button>
+                <button
+                  onClick={() => setShowAllocation(false)}
+                  className={`px-3 py-1 rounded-md text-sm transition-colors ${
+                    !showAllocation ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Chains
+                </button>
+                <button
+                  onClick={() => setShowAllocation('nft')}
+                  className={`px-3 py-1 rounded-md text-sm transition-colors ${
+                    showAllocation === 'nft' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  NFTs
+                </button>
+              </div>
+            </div>
+          </div>
+        <div className="p-6">
+          {showAllocation ? (
+            <div className="space-y-4">
+              {portfolioData.assets.map((asset, index) => (
+                <div key={asset.symbol} className="flex items-center justify-between p-4 bg-gray-700/30 rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-lg font-medium">
+                      {asset.symbol}
+                    </div>
+                    <div>
+                      <div className="font-medium">{asset.symbol}</div>
+                      <div className="text-sm text-gray-400">{asset.chain}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-medium">${asset.value.toLocaleString()}</div>
+                    <div className={`text-sm ${asset.change24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {asset.change24h >= 0 ? '+' : ''}{asset.change24h}%
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-gray-400">Allocation</div>
+                    <div className="font-medium">{asset.allocation}%</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : showAllocation === 'nft' ? (
+            <div className="space-y-4">
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Image className="w-8 h-8 text-purple-400" />
+                </div>
+                <h4 className="text-lg font-medium mb-2">NFT Collateral Fusion</h4>
+                <p className="text-sm text-gray-400 mb-4">
+                  Lock NFTs on one chain, borrow against them on another
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gray-700/30 rounded-lg p-4">
+                    <h5 className="font-medium mb-2">Locked NFTs</h5>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span>Bored Ape #1234</span>
+                        <span className="text-purple-400">$45,000</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span>Doodle #5678</span>
+                        <span className="text-purple-400">$12,500</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gray-700/30 rounded-lg p-4">
+                    <h5 className="font-medium mb-2">Borrowing Power</h5>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span>Available</span>
+                        <span className="text-green-400">$28,875</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span>Used</span>
+                        <span className="text-blue-400">$15,200</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+                  <Globe className="w-4 h-4 inline mr-2" />
+                  Bridge NFT to Another Chain
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {portfolioData.chains.map((chain, index) => (
+                <div key={chain.name} className="flex items-center justify-between p-4 bg-gray-700/30 rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div 
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-medium"
+                      style={{ backgroundColor: `${chain.color}20`, color: chain.color }}
+                    >
+                      {chain.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="font-medium">{chain.name}</div>
+                      <div className="text-sm text-gray-400">Blockchain</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-medium">${chain.value.toLocaleString()}</div>
+                    <div className="text-sm text-gray-400">Value</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-gray-400">Allocation</div>
+                    <div className="font-medium">{chain.allocation}%</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Activity Tab Component
+const ActivityTab: React.FC = () => {
+  const [selectedFilter, setSelectedFilter] = useState<'all' | 'deposits' | 'borrows' | 'repayments' | 'liquidations'>('all');
+  const [selectedTimeframe, setSelectedTimeframe] = useState<'1d' | '7d' | '30d' | 'all'>('7d');
+
+  const activities = [
+    {
+      id: '1',
+      type: 'deposit',
+      asset: 'ETH',
+      amount: 2.5,
+      usdValue: 8000,
+      chain: 'Ethereum',
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+      status: 'confirmed',
+      txHash: '0x1234...5678'
+    },
+    {
+      id: '2',
+      type: 'borrow',
+      asset: 'USDC',
+      amount: 5000,
+      usdValue: 5000,
+      chain: 'Avalanche',
+      timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
+      status: 'confirmed',
+      txHash: '0xabcd...efgh'
+    },
+    {
+      id: '3',
+      type: 'repayment',
+      asset: 'ZETA',
+      amount: 1000,
+      usdValue: 2500,
+      chain: 'ZetaChain',
+      timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000),
+      status: 'confirmed',
+      txHash: '0x9876...5432'
+    },
+    {
+      id: '4',
+      type: 'liquidation_warning',
+      asset: 'SOL',
+      amount: 25,
+      usdValue: 1800,
+      chain: 'Solana',
+      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
+      status: 'warning',
+      txHash: '0xdef0...1234'
+    }
+  ];
+
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'deposit': return <Coins className="w-5 h-5 text-green-400" />;
+      case 'borrow': return <TrendingUp className="w-5 h-5 text-blue-400" />;
+      case 'repayment': return <CheckCircle className="w-5 h-5 text-purple-400" />;
+      case 'liquidation_warning': return <AlertTriangle className="w-5 h-5 text-orange-400" />;
+      default: return <Activity className="w-5 h-5 text-gray-400" />;
+    }
+  };
+
+  const getActivityColor = (type: string) => {
+    switch (type) {
+      case 'deposit': return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'borrow': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      case 'repayment': return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+      case 'liquidation_warning': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    }
+  };
+
+  const filteredActivities = activities.filter(activity => {
+    if (selectedFilter !== 'all' && activity.type !== selectedFilter) return false;
+    if (selectedTimeframe === '1d') return activity.timestamp > new Date(Date.now() - 24 * 60 * 60 * 1000);
+    if (selectedTimeframe === '7d') return activity.timestamp > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    if (selectedTimeframe === '30d') return activity.timestamp > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    return true;
+  });
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <div className="flex items-center justify-center space-x-3">
+          <Activity className="w-8 h-8 text-blue-500" />
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Activity Feed
+          </h2>
+          <Clock className="w-8 h-8 text-purple-500" />
+        </div>
+        <p className="text-gray-400 max-w-2xl mx-auto">
+          Monitor your cross-chain transactions, loan activities, and portfolio changes
+        </p>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6">
+        <div className="flex flex-wrap items-center gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-2">Filter by Type</label>
+            <select
+              value={selectedFilter}
+              onChange={(e) => setSelectedFilter(e.target.value as any)}
+              className="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
+            >
+              <option value="all">All Activities</option>
+              <option value="deposits">Deposits</option>
+              <option value="borrows">Borrows</option>
+              <option value="repayments">Repayments</option>
+              <option value="liquidations">Liquidations</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-2">Timeframe</label>
+            <select
+              value={selectedTimeframe}
+              onChange={(e) => setSelectedTimeframe(e.target.value as any)}
+              className="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
+            >
+              <option value="1d">Last 24 Hours</option>
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Activity List */}
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700">
+        <div className="p-6 border-b border-gray-700">
+          <h3 className="text-xl font-semibold flex items-center space-x-2">
+            <Activity className="w-5 h-5 text-blue-400" />
+            <span>Recent Activities</span>
+          </h3>
+        </div>
+        <div className="p-6">
+          {filteredActivities.length === 0 ? (
+            <div className="text-center py-12 text-gray-400">
+              <Activity className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p className="text-lg">No activities found</p>
+              <p className="text-sm">Try adjusting your filters or timeframe</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredActivities.map((activity) => (
+                <div key={activity.id} className={`p-4 rounded-lg border ${getActivityColor(activity.type)}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center">
+                        {getActivityIcon(activity.type)}
+                      </div>
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium capitalize">{activity.type.replace('_', ' ')}</span>
+                          <span className="text-sm opacity-80">{activity.amount} {activity.asset}</span>
+                          <span className="text-xs bg-gray-600 px-2 py-1 rounded">on {activity.chain}</span>
+                        </div>
+                        <div className="text-sm opacity-80 mt-1">
+                          {activity.timestamp.toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">${activity.usdValue.toLocaleString()}</p>
+                      <button className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+                        View TX
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Settings Tab Component
+const SettingsTab: React.FC = () => {
+  const [notifications, setNotifications] = useState({
+    email: true,
+    push: true,
+    sms: false,
+    liquidationWarnings: true,
+    priceAlerts: true,
+    weeklyReports: false
+  });
+  const [riskPreferences, setRiskPreferences] = useState({
+    maxLTV: 75,
+    liquidationThreshold: 80,
+    riskTolerance: 'moderate'
+  });
+  const [displaySettings, setDisplaySettings] = useState({
+    theme: 'dark',
+    currency: 'USD',
+    language: 'en',
+    timezone: 'UTC'
+  });
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <div className="flex items-center justify-center space-x-3">
+          <Settings className="w-8 h-8 text-gray-500" />
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-600 to-blue-600 bg-clip-text text-transparent">
+            Settings & Preferences
+          </h2>
+          <Shield className="w-8 h-8 text-blue-500" />
+        </div>
+        <p className="text-gray-400 max-w-2xl mx-auto">
+          Customize your experience, manage notifications, and configure risk preferences
+        </p>
+      </div>
+
+      {/* Notifications */}
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700">
+        <div className="p-6 border-b border-gray-700">
+          <h3 className="text-xl font-semibold flex items-center space-x-2">
+            <Bell className="w-5 h-5 text-blue-400" />
+            <span>Notification Preferences</span>
+          </h3>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-300">Communication Channels</h4>
+              <div className="space-y-3">
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={notifications.email}
+                    onChange={(e) => setNotifications(prev => ({ ...prev, email: e.target.checked }))}
+                    className="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500"
+                  />
+                  <span className="text-sm">Email Notifications</span>
+                </label>
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={notifications.push}
+                    onChange={(e) => setNotifications(prev => ({ ...prev, push: e.target.checked }))}
+                    className="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500"
+                  />
+                  <span className="text-sm">Push Notifications</span>
+                </label>
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={notifications.sms}
+                    onChange={(e) => setNotifications(prev => ({ ...prev, sms: e.target.checked }))}
+                    className="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500"
+                  />
+                  <span className="text-sm">SMS Alerts</span>
+                </label>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-300">Alert Types</h4>
+              <div className="space-y-3">
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={notifications.liquidationWarnings}
+                    onChange={(e) => setNotifications(prev => ({ ...prev, liquidationWarnings: e.target.checked }))}
+                    className="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-line-500"
+                  />
+                  <span className="text-sm">Liquidation Warnings</span>
+                </label>
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={notifications.priceAlerts}
+                    onChange={(e) => setNotifications(prev => ({ ...prev, priceAlerts: e.target.checked }))}
+                    className="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500"
+                  />
+                  <span className="text-sm">Price Alerts</span>
+                </label>
+                <label className="flex items-center space-x-3">
+                  <h4 className="font-medium text-gray-300">Weekly Reports</h4>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Risk Preferences */}
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700">
+        <div className="p-6 border-b border-gray-700">
+          <h3 className="text-xl font-semibold flex items-center space-x-2">
+            <Shield className="w-5 h-5 text-orange-400" />
+            <span>Risk Management</span>
+          </h3>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Max Loan-to-Value Ratio: {riskPreferences.maxLTV}%
+              </label>
+              <input
+                type="range"
+                min="50"
+                max="90"
+                value={riskPreferences.maxLTV}
+                onChange={(e) => setRiskPreferences(prev => ({ ...prev, maxLTV: parseInt(e.target.value) }))}
+                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Liquidation Threshold: {riskPreferences.liquidationThreshold}%
+              </label>
+              <input
+                type="range"
+                min="70"
+                max="95"
+                value={riskPreferences.liquidationThreshold}
+                onChange={(e) => setRiskPreferences(prev => ({ ...prev, liquidationThreshold: parseInt(e.target.value) }))}
+                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Risk Tolerance</label>
+              <select
+                value={riskPreferences.riskTolerance}
+                onChange={(e) => setRiskPreferences(prev => ({ ...prev, riskTolerance: e.target.value }))}
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
+              >
+                <option value="conservative">Conservative</option>
+                <option value="moderate">Moderate</option>
+                <option value="aggressive">Aggressive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Display Settings */}
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700">
+        <div className="p-6 border-b border-gray-700">
+          <h3 className="text-xl font-semibold flex items-center space-x-2">
+            <Eye className="w-5 h-5 text-green-400" />
+            <span>Display & Interface</span>
+          </h3>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Theme</label>
+              <select
+                value={displaySettings.theme}
+                onChange={(e) => setDisplaySettings(prev => ({ ...prev, theme: e.target.value }))}
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
+              >
+                <option value="dark">Dark Mode</option>
+                <option value="light">Light Mode</option>
+                <option value="auto">Auto</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Currency</label>
+              <select
+                value={displaySettings.currency}
+                onChange={(e) => setDisplaySettings(prev => ({ ...prev, currency: e.target.value }))}
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
+              >
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+                <option value="JPY">JPY (¥)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-2xl font-medium text-gray-400 mb-2">Language</label>
+              <select
+                value={displaySettings.language}
+                onChange={(e) => setDisplaySettings(prev => ({ ...prev, language: e.target.value }))}
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
+              >
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Timezone</label>
+              <select
+                value={displaySettings.timezone}
+                onChange={(e) => setDisplaySettings(prev => ({ ...prev, timezone: e.target.value }))}
+                className="w-full bg-gray-700 border border-gray-700 rounded-lg px-3 py-2 text-white"
+              >
+                <option value="UTC">UTC</option>
+                <option value="EST">Eastern Time</option>
+                <option value="PST">Pacific Time</option>
+                <option value="GMT">Greenwich Mean Time</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Social Lending Pools & Governance */}
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700">
+        <div className="p-6 border-b border-gray-700">
+          <h3 className="text-xl font-semibold flex items-center space-x-2">
+            <Globe className="w-5 h-5 text-green-400" />
+            <span>Social Lending Pools & Governance</span>
+            <Shield className="w-5 h-5 text-blue-400" />
+          </h3>
+        </div>
+        <div className="p-6">
+          <p className="text-sm text-gray-400 mb-4">
+            DAO-curated lending pools with cross-chain governance powered by ZetaChain.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-300">Active Proposals</h4>
+              <div className="space-y-3">
+                <div className="p-3 bg-gray-700/30 rounded-lg border border-gray-600">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">Increase ETH LTV to 80%</span>
+                    <span className="text-sm text-green-400">Active</span>
+                  </div>
+                  <p className="text-sm text-gray-400 mb-2">Proposal to increase ETH collateral LTV ratio</p>
+                  <div className="flex items-center space-x-2 text-xs">
+                    <span className="text-blue-400">For: 67%</span>
+                    <span className="text-red-400">Against: 23%</span>
+                    <span className="text-gray-400">Abstain: 10%</span>
+                  </div>
+                  <button className="mt-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs transition-colors">
+                    Vote
+                  </button>
+                </div>
+                
+                <div className="p-3 bg-gray-700/30 rounded-lg border border-gray-600">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">Add SOL as Collateral</span>
+                    <span className="text-sm text-yellow-400">Pending</span>
+                  </div>
+                  <p className="text-sm text-gray-400 mb-2">Proposal to add Solana as supported collateral</p>
+                  <div className="text-xs text-gray-400">Voting starts in 2 days</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-300">Community Stats</h4>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+                  <span className="text-sm">Total Voters</span>
+                  <span className="font-medium text-blue-400">1,247</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+                  <span className="text-sm">Active Pools</span>
+                  <span className="font-medium text-green-400">8</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+                  <span className="text-sm">Total TVL</span>
+                  <span className="font-medium text-purple-400">$2.4M</span>
+                </div>
+              </div>
+              
+              <button className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+                <Globe className="w-4 h-4 inline mr-2" />
+                Create New Proposal
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Save Button */}
+      <div className="text-center">
+        <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+          Save Settings
         </button>
       </div>
     </div>

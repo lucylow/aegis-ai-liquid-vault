@@ -116,6 +116,10 @@
   .badge-info {
     @apply bg-blue-100 text-blue-800;
   }
+
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-lg border border-white/20;
+  }
 }
 
 @layer utilities {
