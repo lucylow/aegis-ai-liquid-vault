@@ -20,7 +20,8 @@ import {
   Info,
   X,
   Copy,
-  ExternalLink
+  ExternalLink,
+  Globe
 } from 'lucide-react';
 import { useWallet } from '../contexts/WalletContext';
 
@@ -461,7 +462,7 @@ const Borrow = () => {
         {/* Main Borrow Form */}
         <div className="xl:col-span-2 space-y-6">
           {/* Credit Profile Summary */}
-          <div className="glass-effect border border-white/10 rounded-xl p-6">
+          <div className="bg-gray-800/50 border border-white/10 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Your Credit Profile</h3>
               <div className="flex items-center gap-2">
@@ -498,115 +499,47 @@ const Borrow = () => {
             </div>
             
             <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-              <div className="flex items-center gap-2 text-sm text-blue-400">
+              <div className="flex items-center gap-2 text-blue-400 text-sm">
                 <Info size={16} />
-                <span>AI Credit Score updated {creditProfile.lastUpdated.toLocaleDateString()}</span>
+                <span>AI Recommendation: You can safely borrow up to ${creditProfile.aiMaxBorrow.toLocaleString()} based on your credit profile and market conditions.</span>
               </div>
-            </div>
-          </div>
-
-          {/* Cross-Chain Credit Delegation */}
-          <div className="glass-effect border border-white/10 rounded-xl p-6 mb-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-              <Globe className="w-5 h-5 text-blue-400" />
-              <span>Cross-Chain Credit Delegation</span>
-              <Shield className="w-5 h-5 text-green-400" />
-            </h3>
-            <p className="text-sm text-gray-400 mb-4">
-              Use your credit line from one chain to borrow on another. Maximize capital efficiency across the ecosystem.
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
-                <div className="flex items-center space-x-2 mb-2">
-                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                  <span className="text-sm font-medium">Ethereum Credit</span>
-                </div>
-                <p className="text-2xl font-bold text-green-400">$15,000</p>
-                <p className="text-xs text-gray-400">Available to delegate</p>
-              </div>
-              
-              <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
-                <div className="flex items-center space-x-2 mb-2">
-                  <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
-                  <span className="text-sm font-medium">Solana Credit</span>
-                </div>
-                <p className="text-2xl font-bold text-blue-400">$8,500</p>
-                <p className="text-xs text-gray-400">Available to delegate</p>
-              </div>
-              
-              <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
-                <div className="flex items-center space-x-2 mb-2">
-                  <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
-                  <span className="text-sm font-medium">Total Delegated</span>
-                </div>
-                <p className="text-2xl font-bold text-purple-400">$12,300</p>
-                <p className="text-xs text-gray-400">Across 3 chains</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm">
-                <Globe className="w-4 h-4 inline mr-2" />
-                Delegate Credit
-              </button>
-              <button className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm">
-                <Shield className="w-4 h-4 inline mr-2" />
-                Manage Delegations
-              </button>
             </div>
           </div>
 
           {/* Asset Selection */}
-          <div className="glass-effect border border-white/10 rounded-xl p-6">
+          <div className="bg-gray-800/50 border border-white/10 rounded-xl p-6">
             <h3 className="text-lg font-semibold mb-4">Select Asset to Borrow</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {borrowableAssets.map((asset) => (
                 <button
                   key={asset.symbol}
                   onClick={() => setSelectedAsset(asset)}
-                  className={`p-4 rounded-lg border transition-all ${
+                  className={`p-4 border rounded-xl transition-all text-left ${
                     selectedAsset?.symbol === asset.symbol
-                      ? 'border-primary bg-primary/20'
-                      : 'border-white/10 bg-white/5 hover:bg-white/10'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-white/10 hover:border-white/20 hover:bg-white/5'
                   }`}
                 >
-                  <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center gap-3">
                     <div 
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: `${asset.color}20`, color: asset.color }}
+                      className="w-10 h-10 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: asset.color + '20' }}
                     >
-                      <asset.icon size={24} />
+                      <asset.icon size={20} style={{ color: asset.color }} />
                     </div>
-                    <div className="text-left flex-1">
+                    <div>
                       <div className="font-medium">{asset.symbol}</div>
                       <div className="text-sm text-gray-400">{asset.name}</div>
                     </div>
-                    <div className={`px-2 py-1 rounded text-xs ${
-                      asset.riskLevel === 'low' ? 'bg-green-500/20 text-green-400' :
-                      asset.riskLevel === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                      'bg-red-500/20 text-red-400'
-                    }`}>
-                      {asset.riskLevel}
-                    </div>
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <div className="text-gray-400">Price</div>
-                      <div className="font-medium">${asset.price.toLocaleString()}</div>
-                    </div>
-                    <div>
-                      <div className="text-gray-400">Liquidity</div>
-                      <div className="font-medium">${(asset.availableLiquidity / 1000000).toFixed(1)}M</div>
+                      <div className="text-gray-400">Rate</div>
+                      <div className="font-medium">{(asset.baseInterestRate * 100).toFixed(2)}%</div>
                     </div>
                     <div>
                       <div className="text-gray-400">LTV</div>
                       <div className="font-medium">{asset.maxLoanToValue}%</div>
-                    </div>
-                    <div>
-                      <div className="text-gray-400">Base Rate</div>
-                      <div className="font-medium">{(asset.baseInterestRate * 100).toFixed(1)}%</div>
                     </div>
                   </div>
                 </button>
@@ -614,59 +547,40 @@ const Borrow = () => {
             </div>
           </div>
 
-          {/* Loan Terms Input */}
+          {/* Loan Details Form */}
           {selectedAsset && (
-            <div className="glass-effect border border-white/10 rounded-xl p-6">
-              <h3 className="text-lg font-semibold mb-4">Loan Terms</h3>
+            <div className="bg-gray-800/50 border border-white/10 rounded-xl p-6">
+              <h3 className="text-lg font-semibold mb-4">Loan Details</h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Loan Amount
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Amount to Borrow</label>
                   <div className="relative">
                     <input
                       type="number"
                       value={loanAmount}
                       onChange={(e) => setLoanAmount(e.target.value)}
                       placeholder="0.00"
-                      max={Math.min(creditProfile.aiMaxBorrow, creditProfile.availableCredit)}
-                      step="0.01"
-                      className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary ${
-                        validationError ? 'border-red-500' : 'border-white/20'
-                      }`}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary"
                     />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                      <button
-                        onClick={() => setLoanAmount(Math.min(creditProfile.aiMaxBorrow, creditProfile.availableCredit).toString())}
-                        className="text-xs text-primary hover:text-primary/80 transition-colors"
-                      >
-                        MAX
-                      </button>
-                      <div className="text-gray-400">{selectedAsset.symbol}</div>
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-400">
+                      {selectedAsset.symbol}
                     </div>
                   </div>
-                  <div className="flex justify-between text-sm mt-1">
-                    <span className="text-gray-400">
-                      Max: ${Math.min(creditProfile.aiMaxBorrow, creditProfile.availableCredit).toLocaleString()}
-                    </span>
-                    {validationError && (
-                      <span className="text-red-400">{validationError}</span>
-                    )}
+                  <div className="mt-2 text-xs text-gray-400">
+                    Available: ${(creditProfile.availableCredit / selectedAsset.price).toFixed(2)} {selectedAsset.symbol}
                   </div>
                 </div>
-
+                
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Loan Duration
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Loan Duration</label>
                   <select
                     value={loanDuration}
                     onChange={(e) => setLoanDuration(Number(e.target.value))}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary"
                   >
-                    {durationOptions.map(option => (
-                      <option key={option.value} value={option.value} className="bg-gray-800">
+                    {durationOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
                     ))}
@@ -674,113 +588,86 @@ const Borrow = () => {
                 </div>
               </div>
 
-              {/* Loan Summary */}
-              {loanTerms && (
-                <div className="mt-6 p-4 bg-white/5 rounded-lg space-y-3">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <div className="text-gray-400">Interest Rate</div>
-                      <div className="font-medium text-yellow-400">
-                        {(loanTerms.interestRate * 100).toFixed(2)}%
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-gray-400">Monthly Payment</div>
-                      <div className="font-medium">
-                        ${loanTerms.monthlyPayment.toFixed(2)}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-gray-400">Total Interest</div>
-                      <div className="font-medium text-red-400">
-                        ${loanTerms.totalInterest.toFixed(2)}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-gray-400">Total Repayment</div>
-                      <div className="font-medium text-green-400">
-                        ${loanTerms.totalRepayment.toFixed(2)}
-                      </div>
-                    </div>
-                  </div>
+              {validationError && (
+                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+                  {validationError}
                 </div>
               )}
 
               <button
                 onClick={handleBorrow}
-                disabled={!selectedAsset || !loanAmount || !!validationError || isLoading}
-                className="w-full mt-6 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                disabled={isLoading || !loanAmount || !selectedAsset}
+                className="w-full px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
-                  <>
+                  <div className="flex items-center justify-center gap-2">
                     <RefreshCw size={20} className="animate-spin" />
-                    Processing Borrow Request...
-                  </>
+                    Processing...
+                  </div>
                 ) : (
-                  <>
-                    <Zap size={20} />
-                    Borrow via ZetaChain
-                    <ArrowRight size={20} />
-                  </>
+                  `Borrow ${loanAmount || '0'} ${selectedAsset?.symbol || ''}`
                 )}
               </button>
             </div>
           )}
 
-          {/* Repayment Schedule */}
-          {repaymentSchedule.length > 0 && (
-            <div className="glass-effect border border-white/10 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">Repayment Schedule</h3>
-                <button
-                  onClick={() => setShowRepaymentChart(!showRepaymentChart)}
-                  className="text-sm text-primary hover:text-primary/80 transition-colors"
-                >
-                  {showRepaymentChart ? 'Hide Chart' : 'Show Chart'}
-                </button>
-              </div>
+          {/* Loan Terms Preview */}
+          {loanTerms && (
+            <div className="bg-gray-800/50 border border-white/10 rounded-xl p-6">
+              <h3 className="text-lg font-semibold mb-4">Loan Terms Preview</h3>
               
-              {showRepaymentChart && (
-                <div className="space-y-4">
-                  {/* Chart Placeholder */}
-                  <div className="h-32 bg-white/5 rounded-lg flex items-center justify-center">
-                    <div className="text-center text-gray-400">
-                      <BarChart3 size={32} className="mx-auto mb-2" />
-                      <p className="text-sm">Repayment Chart Visualization</p>
-                    </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">
+                    {(loanTerms.interestRate * 100).toFixed(2)}%
+                  </div>
+                  <div className="text-xs text-gray-400">Interest Rate</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-400">
+                    ${loanTerms.monthlyPayment.toFixed(2)}
+                  </div>
+                  <div className="text-xs text-gray-400">Monthly Payment</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-400">
+                    ${loanTerms.totalRepayment.toFixed(2)}
+                  </div>
+                  <div className="text-xs text-gray-400">Total Repayment</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-400">
+                    ${loanTerms.totalInterest.toFixed(2)}
+                  </div>
+                  <div className="text-xs text-gray-400">Total Interest</div>
+                </div>
+              </div>
+
+              {/* Repayment Schedule Chart */}
+              {showRepaymentChart && repaymentSchedule.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-medium">Repayment Schedule</h4>
+                    <button
+                      onClick={() => setShowRepaymentChart(!showRepaymentChart)}
+                      className="text-sm text-gray-400 hover:text-white transition-colors"
+                    >
+                      {showRepaymentChart ? 'Hide' : 'Show'} Details
+                    </button>
                   </div>
                   
-                  {/* Schedule Table */}
-                  <div className="max-h-64 overflow-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-white/10">
-                          <th className="text-left py-2 text-gray-400">Month</th>
-                          <th className="text-right py-2 text-gray-400">Payment</th>
-                          <th className="text-right py-2 text-gray-400">Principal</th>
-                          <th className="text-right py-2 text-gray-400">Interest</th>
-                          <th className="text-right py-2 text-gray-400">Balance</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {repaymentSchedule.slice(0, 12).map((payment) => (
-                          <tr key={payment.month} className="border-b border-white/5">
-                            <td className="py-2">{payment.month}</td>
-                            <td className="text-right py-2">${payment.payment.toFixed(2)}</td>
-                            <td className="text-right py-2 text-green-400">${payment.principal.toFixed(2)}</td>
-                            <td className="text-right py-2 text-red-400">${payment.interest.toFixed(2)}</td>
-                            <td className="text-right py-2 text-gray-400">${payment.remainingBalance.toFixed(2)}</td>
-                          </tr>
-                        ))}
-                        {repaymentSchedule.length > 12 && (
-                          <tr className="text-gray-400">
-                            <td colSpan={5} className="text-center py-2">
-                              ... and {repaymentSchedule.length - 12} more months
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                    {repaymentSchedule.slice(0, 6).map((payment, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-white/5 rounded-lg text-sm">
+                        <span>Month {payment.month}</span>
+                        <span className="text-green-400">${payment.payment.toFixed(2)}</span>
+                      </div>
+                    ))}
+                    {repaymentSchedule.length > 6 && (
+                      <div className="text-center text-gray-400 text-sm py-2">
+                        +{repaymentSchedule.length - 6} more payments
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -790,115 +677,104 @@ const Borrow = () => {
 
         {/* Right Sidebar */}
         <div className="space-y-6">
-          {/* Borrowing Benefits */}
-          <div className="glass-effect border border-white/10 rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4">Why Borrow with Aegis?</h3>
+          {/* Cross-Chain Credit Delegation */}
+          <div className="bg-gray-800/50 border border-white/10 rounded-xl p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Globe size={20} className="text-blue-400" />
+              Cross-Chain Credit
+            </h3>
+            
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center mt-0.5">
-                  <Shield size={16} className="text-green-400" />
+              <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-blue-400">Ethereum</span>
+                  <span className="text-sm text-white">$5,000</span>
                 </div>
-                <div>
-                  <div className="font-medium text-sm">AI Credit Scoring</div>
-                  <div className="text-xs text-gray-400 mt-1">Dynamic rates based on real-time risk assessment</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center mt-0.5">
-                  <Zap size={16} className="text-blue-400" />
-                </div>
-                <div>
-                  <div className="font-medium text-sm">Cross-Chain Native</div>
-                  <div className="text-xs text-gray-400 mt-1">Borrow on any chain, use anywhere</div>
+                <div className="w-full bg-blue-500/20 rounded-full h-2">
+                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: '50%' }}></div>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center mt-0.5">
-                  <Calculator size={16} className="text-purple-400" />
+              
+              <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-purple-400">Solana</span>
+                  <span className="text-sm text-white">$2,500</span>
                 </div>
-                <div>
-                  <div className="font-medium text-sm">Flexible Terms</div>
-                  <div className="text-xs text-gray-400 mt-1">3-36 month terms with early repayment</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center mt-0.5">
-                  <Target size={16} className="text-yellow-400" />
-                </div>
-                <div>
-                  <div className="font-medium text-sm">Competitive Rates</div>
-                  <div className="text-xs text-gray-400 mt-1">Starting from 3.8% APY</div>
+                <div className="w-full bg-purple-500/20 rounded-full h-2">
+                  <div className="bg-purple-500 h-2 rounded-full" style={{ width: '25%' }}></div>
                 </div>
               </div>
+              
+              <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-green-400">Polygon</span>
+                  <span className="text-sm text-white">$1,000</span>
+                </div>
+                <div className="w-full bg-green-500/20 rounded-full h-2">
+                  <div className="bg-green-500 h-2 rounded-full" style={{ width: '10%' }}></div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-4 space-y-2">
+              <button className="w-full px-4 py-2 bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors text-sm">
+                Delegate Credit
+              </button>
+              <button className="w-full px-4 py-2 bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded-lg hover:bg-purple-500/30 transition-colors text-sm">
+                Manage Credit Lines
+              </button>
             </div>
           </div>
 
-          {/* Recent Borrows */}
-          <div className="glass-effect border border-white/10 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Recent Borrows</h3>
-              <button className="text-xs text-primary hover:text-primary/80">View All</button>
-            </div>
-            {borrowHistory.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
-                <CreditCard size={32} className="mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No borrows yet</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {borrowHistory.slice(0, 5).map((borrow) => (
-                  <div key={borrow.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center">
-                        <DollarSign size={16} className="text-primary" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium">
-                          {borrow.amount} {borrow.asset}
-                        </div>
-                        <div className="text-xs text-gray-400">{borrow.duration} months</div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">
-                        ${borrow.usdValue.toLocaleString()}
-                      </div>
-                      <div className={`text-xs ${
-                        borrow.status === 'confirmed' ? 'text-green-400' :
-                        borrow.status === 'pending' ? 'text-yellow-400' : 'text-red-400'
-                      }`}>
-                        {borrow.status.charAt(0).toUpperCase() + borrow.status.slice(1)}
-                      </div>
-                    </div>
+          {/* Borrow History */}
+          <div className="bg-gray-800/50 border border-white/10 rounded-xl p-6">
+            <h3 className="text-lg font-semibold mb-4">Recent Borrows</h3>
+            
+            <div className="space-y-3">
+              {borrowHistory.slice(0, 3).map((tx) => (
+                <div key={tx.id} className="p-3 bg-white/5 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">{tx.asset}</span>
+                    <span className={`text-sm px-2 py-1 rounded-full ${
+                      tx.status === 'confirmed' ? 'bg-green-500/20 text-green-400' :
+                      tx.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
+                      'bg-red-500/20 text-red-400'
+                    }`}>
+                      {tx.status}
+                    </span>
                   </div>
-                ))}
-              </div>
+                  <div className="text-sm text-gray-400">
+                    {tx.amount} {tx.asset} • {tx.duration} months
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {tx.timestamp.toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {borrowHistory.length > 3 && (
+              <button className="w-full mt-4 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+                View All ({borrowHistory.length})
+              </button>
             )}
           </div>
 
-          {/* Risk Information */}
-          <div className="glass-effect border border-yellow-500/30 rounded-xl p-6 bg-yellow-500/5">
-            <div className="flex items-start gap-3">
-              <AlertTriangle size={20} className="text-yellow-400 mt-0.5" />
-              <div>
-                <h4 className="font-medium text-yellow-400 mb-2">Risk Management</h4>
-                <p className="text-sm text-yellow-300/80 mb-3">
-                  Your borrowing power is dynamically adjusted based on collateral value, market conditions, and AI risk assessment.
-                </p>
-                <div className="flex items-center gap-4 text-xs">
-                  <div className="flex items-center gap-1">
-                    <CheckCircle size={12} className="text-yellow-400" />
-                    <span>LTV Monitoring</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <CheckCircle size={12} className="text-yellow-400" />
-                    <span>Auto-Liquidation</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <CheckCircle size={12} className="text-yellow-400" />
-                    <span>Risk Alerts</span>
-                  </div>
-                </div>
+          {/* Risk Management */}
+          <div className="bg-gray-800/50 border border-white/10 rounded-xl p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Shield size={20} className="text-yellow-400" />
+              Risk Management
+            </h3>
+            
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm">
+                <CheckCircle size={12} className="text-yellow-400" />
+                <span>Auto-Liquidation</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <CheckCircle size={12} className="text-yellow-400" />
+                <span>Risk Alerts</span>
               </div>
             </div>
           </div>
