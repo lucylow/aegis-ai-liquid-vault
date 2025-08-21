@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { useNotifications } from '../contexts/NotificationContext';
+import NotificationPanel from './NotificationPanel';
 
 const Header: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [notifications, setNotifications] = useState(3);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const { unreadCount } = useNotifications();
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6">
@@ -23,17 +26,26 @@ const Header: React.FC = () => {
       {/* Right side - Actions and profile */}
       <div className="flex items-center space-x-4">
         {/* Notifications */}
-        <button className="relative p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-5 5v-5z"></path>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-          </svg>
-          {notifications > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              {notifications}
-            </span>
-          )}
-        </button>
+        <div className="relative">
+          <button 
+            onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+            className="relative p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-5 5v-5z"></path>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+          <NotificationPanel 
+            isOpen={isNotificationOpen} 
+            onClose={() => setIsNotificationOpen(false)} 
+          />
+        </div>
 
         {/* Search */}
         <div className="hidden md:block relative">
@@ -108,7 +120,7 @@ const Header: React.FC = () => {
       {/* Click outside to close profile dropdown */}
       {isProfileOpen && (
         <div
-          className="fixed inset-0 z-40"
+          className="fixed inset-0 z-30"
           onClick={() => setIsProfileOpen(false)}
         />
       )}
