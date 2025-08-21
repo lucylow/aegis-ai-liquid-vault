@@ -31,7 +31,7 @@ import {
   Eye,
   Image
 } from 'lucide-react';
-import { unifiedAIService } from '../services/unifiedAIService';
+import { geminiService } from '../services/geminiService';
 
 // Enhanced mock wallet data with more realistic details
 const mockWallets = [
@@ -679,7 +679,7 @@ const AIDashboardTab: React.FC = () => {
 
   const checkServiceHealth = async () => {
     try {
-      const health = await unifiedAIService.generateContent('Health check');
+      const health = await geminiService.healthCheck();
       setServiceHealth('healthy');
     } catch (error) {
       setServiceHealth('unhealthy');
@@ -718,17 +718,19 @@ const AIDashboardTab: React.FC = () => {
         chain: 'Multiple'
       };
 
-      const creditScore = await unifiedAIService.getCreditScore(
+      const creditScore = await geminiService.getCreditScore(
+        mockUserData.userAddress,
         mockUserData.transactionHistory,
-        { collateralValue: mockUserData.collateralValue, loanAmount: mockUserData.loanAmount, chain: mockUserData.chain },
-        { userAddress: mockUserData.userAddress }
+        mockUserData.collateralValue,
+        mockUserData.loanAmount,
+        mockUserData.chain
       );
 
       setInsights(prev => prev.map(i => 
         i.title === 'AI Credit Score Analysis' 
           ? {
               ...i,
-              content: `Credit Score: ${creditScore.creditScore}/850\nRisk Level: ${creditScore.riskLevel}\nProvider: ${creditScore.provider}`,
+              content: `Credit Score: ${creditScore.creditAnalysis.creditScore}/100\nRisk Level: ${creditScore.creditAnalysis.riskLevel}\nMax Loan: $${creditScore.creditAnalysis.maxLoanAmount.toLocaleString()}`,
               status: 'success'
             }
           : i
@@ -756,7 +758,7 @@ const AIDashboardTab: React.FC = () => {
     });
 
     try {
-      const response = await unifiedAIService.generateContent(prompt);
+      const response = await geminiService.generateContent(prompt);
       setGeneratedText(response.generatedText);
       
       setInsights(prev => prev.map(i => 
@@ -980,19 +982,23 @@ const AIRiskTab: React.FC = () => {
 
   const generateCreditScore = async () => {
     try {
-      const response = await unifiedAIService.getCreditScore(
+      const response = await geminiService.getCreditScore(
+        '0xMockUser123',
         [],
-        { totalValue: mockPortfolio.totalValue, loans: mockPortfolio.loans },
-        { userAddress: '0xMockUser123' }
+        mockPortfolio.totalValue,
+        mockPortfolio.loans.reduce((sum, loan) => sum + loan.amount, 0),
+        'Multiple'
       );
 
-      return {
-        score: response.creditScore,
-        riskLevel: response.riskLevel,
-        factors: response.factors,
-        recommendations: response.recommendations,
-        lastUpdated: new Date().toISOString()
-      };
+      if (response.success) {
+        return {
+          score: response.creditAnalysis.creditScore,
+          riskLevel: response.creditAnalysis.riskLevel,
+          factors: response.creditAnalysis.riskFactors,
+          recommendations: response.creditAnalysis.recommendations,
+          lastUpdated: new Date().toISOString()
+        };
+      }
     } catch (error) {
       console.error('AI credit scoring failed:', error);
     }
@@ -1009,20 +1015,24 @@ const AIRiskTab: React.FC = () => {
 
   const generateLiquidationRisk = async () => {
     try {
-      const response = await unifiedAIService.generateRiskAssessment(mockPortfolio);
+      const response = await geminiService.getRiskAssessment(
+        mockPortfolio,
+        { marketVolatility: 'high', gasFees: 'high', correlation: 'medium' },
+        { riskTolerance: 'moderate' }
+      );
 
-      // Parse the response text to extract risk information
-      const riskText = response.toLowerCase();
-      const riskScore = riskText.includes('high') ? 8 : riskText.includes('medium') ? 5 : 2;
-      const probability = Math.min(riskScore * 10, 95);
-      
-      return {
-        probability,
-        timeToLiquidation: probability > 80 ? 2 : probability > 60 ? 24 : 168,
-        riskFactors: ['AI Risk Assessment', 'Market Conditions', 'Portfolio Analysis'],
-        mitigationActions: ['Monitor portfolio', 'Adjust positions', 'Stay informed'],
-        urgency: probability > 80 ? 'Critical' : probability > 60 ? 'High' : probability > 30 ? 'Medium' : 'Low'
-      };
+      if (response.success) {
+        const riskScore = response.riskAnalysis.riskScore;
+        const probability = Math.min(riskScore * 10, 95);
+        
+        return {
+          probability,
+          timeToLiquidation: probability > 80 ? 2 : probability > 60 ? 24 : 168,
+          riskFactors: response.riskAnalysis.threats.slice(0, 3),
+          mitigationActions: response.riskAnalysis.mitigation.slice(0, 3),
+          urgency: probability > 80 ? 'Critical' : probability > 60 ? 'High' : probability > 30 ? 'Medium' : 'Low'
+        };
+      }
     } catch (error) {
       console.error('AI liquidation risk assessment failed:', error);
     }
@@ -1059,15 +1069,16 @@ const AIRiskTab: React.FC = () => {
 
   const generatePortfolioRisk = async () => {
     try {
-      const response = await unifiedAIService.generateRiskAssessment(mockPortfolio);
+      const response = await geminiService.getRiskAssessment(
+        mockPortfolio,
+        { marketVolatility: 'high', correlation: 'medium', smartContractRisk: 'low' },
+        { riskTolerance: 'moderate' }
+      );
 
-      // Parse the response text to extract risk information
-      const riskText = response.toLowerCase();
-      const overallRisk = riskText.includes('high') ? 8 : riskText.includes('medium') ? 5 : 2;
-      
-      return {
-        overallRisk,
-        chainRisks: {
+      if (response.success) {
+        return {
+          overallRisk: response.riskAnalysis.riskScore,
+          chainRisks: {
             ethereum: 4,
             bitcoin: 3,
             solana: 6,
