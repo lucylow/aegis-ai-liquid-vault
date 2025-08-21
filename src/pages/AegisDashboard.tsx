@@ -6,6 +6,7 @@ import DashboardWidget from '../components/DashboardWidget';
 import NotificationToast, { Notification } from '../components/NotificationToast';
 import ThreatDetailsModal from '../components/ThreatDetailsModal';
 import AssetMonitor from '../components/AssetMonitor';
+import SecurityControls from '../components/SecurityControls';
 import { ThreatItem, RiskMetrics } from '../types/threats';
 import { ThreatDetectionService } from '../services/threatDetectionService';
 import { useWallet } from '../contexts/WalletContext';
@@ -336,7 +337,7 @@ export default function AegisDashboard() {
               )}
             </div>
 
-            <div className="glass-effect border border-white/10 rounded-xl p-6">
+            <div className="glass-effect border border-white/10 rounded-xl p-6 mb-6">
               <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
                 <Bot size={20} />
                 AI Controls
@@ -355,6 +356,12 @@ export default function AegisDashboard() {
                 )}
               </div>
             </div>
+
+            {/* Security Controls */}
+            <SecurityControls 
+              contractAddress="0x1234567890123456789012345678901234567890" // Example contract address
+              connectedWallet={isConnected ? address : undefined}
+            />
           </div>
 
           {/* Main Content */}
@@ -452,6 +459,7 @@ export default function AegisDashboard() {
               </div>
             </div>
           </div>
+
         </div>
       </div>
 
