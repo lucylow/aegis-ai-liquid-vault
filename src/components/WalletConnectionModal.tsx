@@ -439,6 +439,17 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
                     Enable cross-chain wallet linking
                   </label>
                 </div>
+                <div className="pt-3 border-t border-gray-600">
+                  <button
+                    onClick={() => {
+                      onClose();
+                      navigate('/app');
+                    }}
+                    className="w-full px-4 py-3 bg-orange-500/10 border border-orange-500/20 rounded-lg text-orange-400 hover:bg-orange-500/20 transition-colors text-sm font-medium"
+                  >
+                    🚀 Hackathon Demo - Enter Without Wallet
+                  </button>
+                </div>
               </div>
             </div>
           )}
