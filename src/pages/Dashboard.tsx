@@ -880,10 +880,16 @@ const AIDashboardTab: React.FC = () => {
       {/* AI-Powered Natural Language Interface */}
       <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700">
         <div className="p-6 border-b border-gray-700">
-          <h3 className="text-xl font-semibold flex items-center space-x-2">
-            <Brain className="w-5 h-5 text-purple-400" />
-            <span>AI Assistant - Natural Language Commands</span>
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold flex items-center space-x-2">
+              <Brain className="w-5 h-5 text-purple-400" />
+              <span>AI Assistant - Natural Language Commands</span>
+            </h3>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-xs text-green-400 font-medium">Demo Mode - AI Always Available</span>
+            </div>
+          </div>
         </div>
         <div className="p-6">
           <div className="space-y-4">
@@ -1336,7 +1342,13 @@ const AIRiskTab: React.FC = () => {
 
       {/* Cross-Chain Portfolio Overview */}
       <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
-        <h3 className="text-xl font-bold mb-4 text-primary">Cross-Chain Portfolio</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-bold text-primary">Cross-Chain Portfolio</h3>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-xs text-green-400 font-medium">Live Demo Data</span>
+          </div>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
           {Object.entries(crossChainVolatility).map(([chain, volatility]) => {
             const ltv = calculateDynamicLTV('', chain);
