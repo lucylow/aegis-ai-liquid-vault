@@ -25,7 +25,8 @@ import {
   Gauge,
   DollarSign,
   Clock,
-  Target
+  Target,
+  Globe
 } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
 
@@ -279,7 +280,10 @@ export const WalletDashboardPage: React.FC = () => {
           <>
             {/* Portfolio Summary Cards */}
             <section className="mb-8">
-              <h2 className="text-2xl font-bold mb-6">Portfolio Overview</h2>
+              <h2 className="text-2xl font-bold mb-6 flex items-center space-x-2">
+                <Globe className="w-6 h-6 text-blue-500" />
+                <span>Cross-Chain Portfolio Overview</span>
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-6 border border-blue-500/30">
                   <div className="flex items-center justify-between mb-4">
@@ -390,6 +394,42 @@ export const WalletDashboardPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Cross-Chain Summary */}
+            <section className="mb-8">
+              <h2 className="text-2xl font-bold mb-6 flex items-center space-x-2">
+                <Globe className="w-6 h-6 text-purple-500" />
+                <span>Cross-Chain Activity</span>
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-xl p-6 border border-purple-500/30">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <Coins className="w-6 h-6 text-purple-400" />
+                    <h3 className="text-lg font-semibold">Chains Active</h3>
+                  </div>
+                  <p className="text-3xl font-bold text-purple-400">5</p>
+                  <p className="text-sm text-gray-400 mt-2">Ethereum, Bitcoin, Solana, Avalanche, ZetaChain</p>
+                </div>
+                
+                <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl p-6 border border-green-500/30">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <TrendingUp className="w-6 h-6 text-green-400" />
+                    <h3 className="text-lg font-semibold">Cross-Chain Loans</h3>
+                  </div>
+                  <p className="text-3xl font-bold text-green-400">3</p>
+                  <p className="text-sm text-gray-400 mt-2">Active across multiple chains</p>
+                </div>
+                
+                <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-6 border border-blue-500/30">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <Shield className="w-6 h-6 text-blue-400" />
+                    <h3 className="text-lg font-semibold">Omnichain Security</h3>
+                  </div>
+                  <p className="text-3xl font-bold text-blue-400">100%</p>
+                  <p className="text-sm text-gray-400 mt-2">Protected by ZetaChain</p>
                 </div>
               </div>
             </section>

@@ -275,7 +275,7 @@ const Loans = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Loan Management</h1>
-          <p className="text-gray-300">Monitor and manage your cross-chain loans with AI-powered risk insights</p>
+          <p className="text-gray-300">Reduce debt and improve health across all chains. Monitor loan health and manage repayments with AI-powered risk insights.</p>
         </div>
 
         {/* Navigation Tabs */}

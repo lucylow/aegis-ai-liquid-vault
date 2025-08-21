@@ -454,7 +454,7 @@ const Borrow = () => {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Borrow Assets</h1>
-        <p className="text-gray-400">Access liquidity across all chains with AI-powered credit scoring</p>
+        <p className="text-gray-400">Get instant loans across chains using your deposited collateral. Powered by ZetaChain's omnichain infrastructure and AI-powered credit scoring.</p>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
