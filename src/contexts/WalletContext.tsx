@@ -40,9 +40,9 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     
     // Additional check to ensure it's not PLUG WALLET or other wallets
     const isPlugWallet = hasEthereum && (
-      window.ethereum.isPlugWallet || 
-      window.ethereum.isPlug || 
-      window.ethereum.providers?.some((provider: any) => provider.isPlugWallet)
+      (window.ethereum as any).isPlugWallet || 
+      (window.ethereum as any).isPlug || 
+      (window.ethereum as any).providers?.some((provider: any) => provider.isPlugWallet)
     );
     
     const installed = isRealMetaMask && !isPlugWallet;
@@ -63,15 +63,15 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     if (typeof window === 'undefined') return null;
     
     // If there are multiple providers, find MetaMask specifically
-    if (window.ethereum?.providers) {
-      const metaMaskProvider = window.ethereum.providers.find(
+    if ((window.ethereum as any)?.providers) {
+      const metaMaskProvider = (window.ethereum as any).providers.find(
         (provider: any) => provider.isMetaMask === true && !provider.isPlugWallet
       );
       return metaMaskProvider || null;
     }
     
     // Single provider case - ensure it's MetaMask
-    if (window.ethereum?.isMetaMask === true && !window.ethereum.isPlugWallet) {
+    if (window.ethereum?.isMetaMask === true && !(window.ethereum as any).isPlugWallet) {
       return window.ethereum;
     }
     
