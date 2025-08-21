@@ -37,6 +37,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const isMetaMaskInstalled = useCallback(() => {
     if (typeof window === 'undefined') return false;
     
+<<<<<<< HEAD
     // Check for MetaMask specifically, not just any ethereum provider
     const ethereum = (window as any).ethereum;
     return ethereum && ethereum.isMetaMask === true;
@@ -45,6 +46,14 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // Check if MetaMask is unlocked
   const isMetaMaskUnlocked = useCallback(async () => {
     if (!isMetaMaskInstalled()) return false;
+=======
+    // Additional check to ensure it's not PLUG WALLET or other wallets
+    const isPlugWallet = hasEthereum && (
+      (window.ethereum as any).isPlugWallet || 
+      (window.ethereum as any).isPlug || 
+      (window.ethereum as any).providers?.some((provider: any) => provider.isPlugWallet)
+    );
+>>>>>>> 6ca879e19615dddaf1a472f4c285b352ff79a4d9
     
     try {
       const ethereum = (window as any).ethereum;
@@ -59,6 +68,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const getMetaMaskProvider = useCallback(() => {
     if (typeof window === 'undefined') return null;
     
+<<<<<<< HEAD
     const ethereum = (window as any).ethereum;
     
     // Check if there are multiple providers and find MetaMask
@@ -70,6 +80,19 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     // Return the main ethereum object if it's MetaMask
     if (ethereum && ethereum.isMetaMask) {
       return ethereum;
+=======
+    // If there are multiple providers, find MetaMask specifically
+    if ((window.ethereum as any)?.providers) {
+      const metaMaskProvider = (window.ethereum as any).providers.find(
+        (provider: any) => provider.isMetaMask === true && !provider.isPlugWallet
+      );
+      return metaMaskProvider || null;
+    }
+    
+    // Single provider case - ensure it's MetaMask
+    if (window.ethereum?.isMetaMask === true && !(window.ethereum as any).isPlugWallet) {
+      return window.ethereum;
+>>>>>>> 6ca879e19615dddaf1a472f4c285b352ff79a4d9
     }
     
     return null;
