@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Shield, 
@@ -12,12 +12,20 @@ import {
   Star,
   Users,
   DollarSign,
-  BarChart3
+  BarChart3,
+  Bitcoin,
+  Coins,
+  Network
 } from 'lucide-react';
 import WalletConnect from '../components/WalletConnect';
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  
+  // Interactive demo state
+  const [activeStep, setActiveStep] = useState(1);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [showDetails, setShowDetails] = useState<number[]>([1]);
 
   const features = [
     {
@@ -67,6 +75,33 @@ const LandingPage = () => {
     { name: 'Avalanche', color: '#e84142' },
     { name: 'Arbitrum', color: '#28a0f0' }
   ];
+
+  // Interactive demo functions
+  const handleStepClick = (stepNumber: number) => {
+    setActiveStep(stepNumber);
+    if (!showDetails.includes(stepNumber)) {
+      setShowDetails([...showDetails, stepNumber]);
+    }
+  };
+
+  const handleStepComplete = (stepNumber: number) => {
+    if (!completedSteps.includes(stepNumber)) {
+      setCompletedSteps([...completedSteps, stepNumber]);
+      // Auto-advance to next step
+      if (stepNumber < 4) {
+        setTimeout(() => {
+          setActiveStep(stepNumber + 1);
+          setShowDetails([...showDetails, stepNumber + 1]);
+        }, 1000);
+      }
+    }
+  };
+
+  const resetDemo = () => {
+    setActiveStep(1);
+    setCompletedSteps([]);
+    setShowDetails([1]);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-darker to-dark text-white">
@@ -187,76 +222,260 @@ const LandingPage = () => {
             </p>
           </div>
 
+          {/* Interactive Demo Controls */}
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <button
+              onClick={() => setShowDetails([1, 2, 3, 4])}
+              className="px-4 py-2 bg-primary/20 border border-primary/30 text-primary rounded-lg text-sm hover:bg-primary/30 transition-colors"
+            >
+              Show All Steps
+            </button>
+            <button
+              onClick={resetDemo}
+              className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg text-sm transition-colors"
+            >
+              Reset Demo
+            </button>
+          </div>
+
           {/* Interactive Demo Section */}
           <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700 mb-12">
             <h3 className="text-2xl font-bold text-center mb-8 text-primary">Interactive Demo</h3>
             
             {/* Step 1: Deposit BTC */}
-            <div className="mb-8 p-6 bg-gray-700/30 rounded-xl border border-gray-600">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center">
-                  <div className="w-6 h-6 h-6 text-white font-bold">₿</div>
+            <div 
+              className={`mb-8 p-6 rounded-xl border transition-all cursor-pointer ${
+                activeStep === 1 
+                  ? 'bg-gray-700/50 border-orange-500/50 shadow-lg shadow-orange-500/20' 
+                  : completedSteps.includes(1)
+                  ? 'bg-gray-700/30 border-green-500/50'
+                  : 'bg-gray-700/30 border-gray-600 hover:border-gray-500'
+              }`}
+              onClick={() => handleStepClick(1)}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                    completedSteps.includes(1) 
+                      ? 'bg-green-500' 
+                      : activeStep === 1 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600' 
+                      : 'bg-gray-600'
+                  }`}>
+                    {completedSteps.includes(1) ? (
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    ) : (
+                      <Bitcoin className="w-6 h-6 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-semibold">Deposit Native BTC</h4>
+                    <p className="text-gray-400">Lock native asset</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-xl font-semibold">Deposit Native BTC</h4>
-                  <p className="text-gray-400">Lock native asset</p>
-                </div>
+                {activeStep === 1 && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                    <span className="text-orange-400 text-sm">Active</span>
+                  </div>
+                )}
               </div>
               
-              <p className="text-gray-300 text-sm mb-4">
-                Users can deposit their native Bitcoin (BTC) directly into the Aegis protocol. The protocol locks the native asset securely on its home chain (Bitcoin network) without requiring users to swap or bridge it.
-              </p>
+              {showDetails.includes(1) && (
+                <div className="space-y-4">
+                  <p className="text-gray-300 text-sm">
+                    Users can deposit their native Bitcoin (BTC) directly into the Aegis protocol. The protocol locks the native asset securely on its home chain (Bitcoin network) without requiring users to swap or bridge it.
+                  </p>
+                  
+                  {!completedSteps.includes(1) && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleStepComplete(1); }}
+                      className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                      Complete Step 1
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Step 2: Tokenize Collateral */}
-            <div className="mb-8 p-6 bg-gray-700/30 rounded-xl border border-gray-600">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center">
-                  <div className="w-6 h-6 h-6 text-white font-bold">🪙</div>
+            <div 
+              className={`mb-8 p-6 rounded-xl border transition-all cursor-pointer ${
+                activeStep === 2 
+                  ? 'bg-gray-700/50 border-green-500/50 shadow-lg shadow-green-500/20' 
+                  : completedSteps.includes(2)
+                  ? 'bg-gray-700/30 border-green-500/50'
+                  : 'bg-gray-700/30 border-gray-600 hover:border-gray-500'
+              }`}
+              onClick={() => handleStepClick(2)}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                    completedSteps.includes(2) 
+                      ? 'bg-green-500' 
+                      : activeStep === 2 
+                      ? 'bg-gradient-to-r from-green-500 to-green-600' 
+                      : 'bg-gray-600'
+                  }`}>
+                    {completedSteps.includes(2) ? (
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    ) : (
+                      <Coins className="w-6 h-6 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-semibold">Collateral Token Creation</h4>
+                    <p className="text-gray-400">Tokenize collateral</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-xl font-semibold">Collateral Token Creation</h4>
-                  <p className="text-gray-400">Tokenize collateral</p>
-                </div>
+                {activeStep === 2 && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-green-400 text-sm">Active</span>
+                  </div>
+                )}
               </div>
               
-              <p className="text-gray-300 text-sm mb-4">
-                Once the native asset is locked, Aegis creates a tokenized representation of the collateral on another blockchain. This token acts as proof of the locked asset and can be used seamlessly within the DeFi ecosystem.
-              </p>
+              {showDetails.includes(2) && (
+                <div className="space-y-4">
+                  <p className="text-gray-300 text-sm">
+                    Once the native asset is locked, Aegis creates a tokenized representation of the collateral on another blockchain. This token acts as proof of the locked asset and can be used seamlessly within the DeFi ecosystem.
+                  </p>
+                  
+                  {!completedSteps.includes(2) && completedSteps.includes(1) && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleStepComplete(2); }}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                      Complete Step 2
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Step 3: AI Risk Analysis */}
-            <div className="mb-8 p-6 bg-gray-700/30 rounded-xl border border-gray-600">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center">
-                  <Brain className="w-6 h-6 text-white" />
+            <div 
+              className={`mb-8 p-6 rounded-xl border transition-all cursor-pointer ${
+                activeStep === 3 
+                  ? 'bg-gray-700/50 border-purple-500/50 shadow-lg shadow-purple-500/20' 
+                  : completedSteps.includes(3)
+                  ? 'bg-gray-700/30 border-green-500/50'
+                  : 'bg-gray-700/30 border-gray-600 hover:border-gray-500'
+              }`}
+              onClick={() => handleStepClick(3)}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                    completedSteps.includes(3) 
+                      ? 'bg-green-500' 
+                      : activeStep === 3 
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-600' 
+                      : 'bg-gray-600'
+                  }`}>
+                    {completedSteps.includes(3) ? (
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    ) : (
+                      <Brain className="w-6 h-6 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-semibold">AI Risk Analysis</h4>
+                    <p className="text-gray-400">AI-optimized risk parameters</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-xl font-semibold">AI Risk Analysis</h4>
-                  <p className="text-gray-400">AI-optimized risk parameters</p>
-                </div>
+                {activeStep === 3 && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                    <span className="text-purple-400 text-sm">Active</span>
+                  </div>
+                )}
               </div>
               
-              <p className="text-gray-300 text-sm mb-4">
-                Aegis leverages real-time AI-powered risk analysis to assess creditworthiness and liquidation risk. The AI considers wallet history, behavioral patterns, and liquidity profiles across chains.
-              </p>
+              {showDetails.includes(3) && (
+                <div className="space-y-4">
+                  <p className="text-gray-300 text-sm">
+                    Aegis leverages real-time AI-powered risk analysis to assess creditworthiness and liquidation risk. The AI considers wallet history, behavioral patterns, and liquidity profiles across chains.
+                  </p>
+                  
+                  {!completedSteps.includes(3) && completedSteps.includes(2) && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleStepComplete(3); }}
+                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                      Complete Step 3
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Step 4: Loan Distribution */}
-            <div className="p-6 bg-gray-700/30 rounded-xl border border-gray-600">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
-                  <Globe className="w-6 h-6 text-white" />
+            <div 
+              className={`p-6 rounded-xl border transition-all cursor-pointer ${
+                activeStep === 4 
+                  ? 'bg-gray-700/50 border-blue-500/50 shadow-lg shadow-blue-500/20' 
+                  : completedSteps.includes(4)
+                  ? 'bg-gray-700/30 border-green-500/50'
+                  : 'bg-gray-700/30 border-gray-600 hover:border-gray-500'
+              }`}
+              onClick={() => handleStepClick(4)}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                    completedSteps.includes(4) 
+                      ? 'bg-green-500' 
+                      : activeStep === 4 
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600' 
+                      : 'bg-gray-600'
+                  }`}>
+                    {completedSteps.includes(4) ? (
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    ) : (
+                      <Network className="w-6 h-6 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-semibold">Loan Distribution</h4>
+                    <p className="text-gray-400">Cross-chain lending</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-xl font-semibold">Loan Distribution</h4>
-                  <p className="text-gray-400">Cross-chain lending</p>
-                </div>
+                {activeStep === 4 && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span className="text-blue-400 text-sm">Active</span>
+                  </div>
+                )}
               </div>
               
-              <p className="text-gray-300 text-sm mb-4">
-                Loans are distributed seamlessly across multiple blockchains based on collateral and AI risk assessment. Users can borrow on different chains without manual bridging.
-              </p>
+              {showDetails.includes(4) && (
+                <div className="space-y-4">
+                  <p className="text-gray-300 text-sm">
+                    Loans are distributed seamlessly across multiple blockchains based on collateral and AI risk assessment. Users can borrow on different chains without manual bridging.
+                  </p>
+                  
+                  {!completedSteps.includes(4) && completedSteps.includes(3) && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleStepComplete(4); }}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                      Complete Step 4
+                    </button>
+                  )}
+                  
+                  {completedSteps.includes(4) && (
+                    <div className="bg-green-900/30 p-4 rounded-lg border border-green-500/30 text-center">
+                      <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                      <p className="text-green-200 font-semibold">Demo Complete! 🎉</p>
+                      <p className="text-green-200 text-sm">You've successfully completed the Aegis cross-chain lending flow</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
