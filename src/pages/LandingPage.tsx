@@ -181,38 +181,132 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">How It Works</h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Simple 3-step process to access cross-chain liquidity
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Aegis transforms native assets into tokenized collateral across chains, uses AI to optimize risk parameters, 
+              and distributes loans efficiently across multiple blockchains—all powered by ZetaChain's universal interoperability.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
-                1
+          {/* Interactive Demo Section */}
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700 mb-12">
+            <h3 className="text-2xl font-bold text-center mb-8 text-primary">Interactive Demo</h3>
+            
+            {/* Step 1: Deposit BTC */}
+            <div className="mb-8 p-6 bg-gray-700/30 rounded-xl border border-gray-600">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center">
+                  <div className="w-6 h-6 h-6 text-white font-bold">₿</div>
+                </div>
+                <div>
+                  <h4 className="text-xl font-semibold">Deposit Native BTC</h4>
+                  <p className="text-gray-400">Lock native asset</p>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Connect & Deposit</h3>
-              <p className="text-gray-400">
-                Connect your wallet and deposit any supported asset as collateral across multiple chains
+              
+              <p className="text-gray-300 text-sm mb-4">
+                Users can deposit their native Bitcoin (BTC) directly into the Aegis protocol. The protocol locks the native asset securely on its home chain (Bitcoin network) without requiring users to swap or bridge it.
               </p>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
-                2
+
+            {/* Step 2: Tokenize Collateral */}
+            <div className="mb-8 p-6 bg-gray-700/30 rounded-xl border border-gray-600">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center">
+                  <div className="w-6 h-6 h-6 text-white font-bold">🪙</div>
+                </div>
+                <div>
+                  <h4 className="text-xl font-semibold">Collateral Token Creation</h4>
+                  <p className="text-gray-400">Tokenize collateral</p>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold mb-3">AI Assessment</h3>
-              <p className="text-gray-400">
-                Our AI analyzes your portfolio and provides optimal borrowing power and rates
+              
+              <p className="text-gray-300 text-sm mb-4">
+                Once the native asset is locked, Aegis creates a tokenized representation of the collateral on another blockchain. This token acts as proof of the locked asset and can be used seamlessly within the DeFi ecosystem.
               </p>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
-                3
+
+            {/* Step 3: AI Risk Analysis */}
+            <div className="mb-8 p-6 bg-gray-700/30 rounded-xl border border-gray-600">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center">
+                  <Brain className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-semibold">AI Risk Analysis</h4>
+                  <p className="text-gray-400">AI-optimized risk parameters</p>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Borrow Instantly</h3>
-              <p className="text-gray-400">
-                Borrow any supported asset on any chain with real-time risk monitoring
+              
+              <p className="text-gray-300 text-sm mb-4">
+                Aegis leverages real-time AI-powered risk analysis to assess creditworthiness and liquidation risk. The AI considers wallet history, behavioral patterns, and liquidity profiles across chains.
               </p>
+            </div>
+
+            {/* Step 4: Loan Distribution */}
+            <div className="p-6 bg-gray-700/30 rounded-xl border border-gray-600">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
+                  <Globe className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-semibold">Loan Distribution</h4>
+                  <p className="text-gray-400">Cross-chain lending</p>
+                </div>
+              </div>
+              
+              <p className="text-gray-300 text-sm mb-4">
+                Loans are distributed seamlessly across multiple blockchains based on collateral and AI risk assessment. Users can borrow on different chains without manual bridging.
+              </p>
+            </div>
+          </div>
+
+          {/* Key Benefits */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700">
+              <h3 className="text-2xl font-bold mb-6 text-primary">Key Benefits</h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <Shield className="w-6 h-6 text-green-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-green-400">Asset Security</h4>
+                    <p className="text-gray-300 text-sm">Native assets remain on their home chain, preserving security and integrity</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Zap className="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-blue-400">Cross-Chain Efficiency</h4>
+                    <p className="text-gray-300 text-sm">Access liquidity across multiple blockchains without manual bridging</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Brain className="w-6 h-6 text-purple-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-purple-400">AI Optimization</h4>
+                    <p className="text-gray-300 text-sm">Dynamic risk parameters continuously optimized for safety and access</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700">
+              <h3 className="text-2xl font-bold mb-6 text-secondary">Technical Architecture</h3>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                  <span className="text-gray-300">Bitcoin Network - Native BTC Locking</span>
+                </div>
+                <div className="w-5 h-5 text-gray-500 mx-auto">↓</div>
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-gray-300">ZetaChain - Cross-Chain Communication</span>
+                </div>
+                <div className="w-5 h-5 text-gray-500 mx-auto">↓</div>
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span className="text-gray-300">Target Chains - Tokenized Collateral & Loans</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
