@@ -1,775 +1,503 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Wallet, 
+  Shield, 
+  TrendingUp, 
+  AlertTriangle, 
   Plus, 
   X, 
-  RefreshCw, 
-  TrendingUp, 
-  TrendingDown, 
-  AlertTriangle, 
-  CheckCircle, 
-  Clock,
-  Activity,
-  BarChart3,
-  Shield,
-  Zap,
-  Globe,
-  DollarSign,
-  Bitcoin,
+  ChevronDown, 
   ExternalLink,
+  Activity,
+  CreditCard,
+  Coins,
+  BarChart3,
   Settings,
-  Eye,
-  EyeOff,
-  Copy,
-  QrCode,
-  Smartphone,
-  Monitor,
-  Tablet
+  Bell,
+  RefreshCw
 } from 'lucide-react';
-import { useWallet } from '../contexts/WalletContext';
 
-interface ConnectedWallet {
-  id: string;
-  name: string;
-  type: 'evm' | 'solana' | 'bitcoin' | 'walletconnect';
-  chain: string;
-  address: string;
-  status: 'connected' | 'connecting' | 'disconnected';
-  balance: number;
-  nativeToken: string;
-  isActive: boolean;
-  lastActivity: string;
-  icon: string;
-}
+// Enhanced mock wallet data with more realistic details
+const mockWallets = [
+  { 
+    id: '1',
+    name: 'MetaMask', 
+    chain: 'Ethereum', 
+    address: '0x2095...28b3',
+    fullAddress: '0x2095a8f7c8d9e2f1a3b4c5d6e7f8a9b0c1d2e3f4',
+    balance: 0.0020,
+    nativeToken: 'ETH',
+    status: 'connected',
+    icon: '🦊',
+    color: 'from-blue-500 to-blue-600'
+  },
+  { 
+    id: '2',
+    name: 'Phantom', 
+    chain: 'Solana', 
+    address: '5D4Xz...wqEr',
+    fullAddress: '5D4Xz8JcRqXz8JcRqXz8JcRqXz8JcRqXz8JcRqXz8JcRqXz8JcRqXz8JcRq',
+    balance: 15.8,
+    nativeToken: 'SOL',
+    status: 'connected',
+    icon: '👻',
+    color: 'from-purple-500 to-purple-600'
+  },
+  { 
+    id: '3',
+    name: 'WalletConnect', 
+    chain: 'Avalanche', 
+    address: '0xaBcD...789F',
+    fullAddress: '0xaBcD8ba1f109551bD432803012645Hac136c772c3c7c',
+    balance: 125.5,
+    nativeToken: 'AVAX',
+    status: 'connected',
+    icon: '🔗',
+    color: 'from-red-500 to-red-600'
+  },
+  { 
+    id: '4',
+    name: 'BTC Wallet', 
+    chain: 'Bitcoin', 
+    address: 'bc1qxyz...',
+    fullAddress: 'bc1qxyz123456789abcdefghijklmnopqrstuvwxyz',
+    balance: 0.0085,
+    nativeToken: 'BTC',
+    status: 'disconnected',
+    icon: '₿',
+    color: 'from-orange-500 to-orange-600'
+  }
+];
 
-interface PortfolioSummary {
-  totalCollateralUSD: number;
-  totalLoansUSD: number;
-  borrowingPowerUSD: number;
-  utilizationPercent: number;
-  creditScore: number;
-  liquidationRiskPercent: number;
-  netWorthUSD: number;
-  availableCreditUSD: number;
-  healthStatus: 'healthy' | 'warning' | 'critical';
-}
+// Enhanced portfolio data with per-chain breakdowns
+const mockPortfolio = {
+  depositedCollateral: {
+    Ethereum: { amount: 5000, change24h: 2.3, apy: 8.2 },
+    Avalanche: { amount: 2500, change24h: -1.2, apy: 9.1 },
+    Solana: { amount: 1200, change24h: 5.7, apy: 7.8 },
+    Bitcoin: { amount: 0.8, change24h: 3.1, apy: 6.5 }
+  },
+  outstandingLoans: {
+    Ethereum: { amount: 1200, interestRate: 12.5, dueDate: '2025-10-15' },
+    Avalanche: { amount: 800, interestRate: 14.2, dueDate: '2025-09-30' },
+    Solana: { amount: 400, interestRate: 13.8, dueDate: '2025-11-05' }
+  },
+  totalCollateralUSD: 8700,
+  totalLoansUSD: 2400,
+  borrowingPowerUSD: 5000,
+  utilizationPercent: 48,
+  creditScore: 78,
+  liquidationRiskPercent: 22,
+  netWorthUSD: 6300,
+  availableCreditUSD: 2600
+};
 
-interface ChainPortfolio {
-  chain: string;
-  collateral: {
-    [asset: string]: {
-      amount: number;
-      usdValue: number;
-      apy: number;
-      change24h: number;
-    };
-  };
-  loans: {
-    [asset: string]: {
-      amount: number;
-      usdValue: number;
-      interestRate: number;
-      dueDate: string;
-    };
-  };
-  totalCollateralUSD: number;
-  totalLoansUSD: number;
-  borrowingPowerUSD: number;
-}
+// Enhanced activity feed with more details
+const mockActivityFeed = [
+  { 
+    id: 1, 
+    type: 'Deposit', 
+    chain: 'Ethereum', 
+    asset: 'USDC', 
+    amount: 1000, 
+    usdValue: 1000,
+    timestamp: '2025-08-20 14:36',
+    status: 'confirmed',
+    txHash: '0x1234...5678',
+    icon: '⬇️'
+  },
+  { 
+    id: 2, 
+    type: 'Borrow', 
+    chain: 'Avalanche', 
+    asset: 'USDC', 
+    amount: 500, 
+    usdValue: 500,
+    timestamp: '2025-08-19 11:15',
+    status: 'confirmed',
+    txHash: '0xabcd...efgh',
+    icon: '⬆️'
+  },
+  { 
+    id: 3, 
+    type: 'Repay', 
+    chain: 'Ethereum', 
+    asset: 'ZETA', 
+    amount: 300, 
+    usdValue: 450,
+    timestamp: '2025-08-18 09:42',
+    status: 'confirmed',
+    txHash: '0x9876...5432',
+    icon: '💳'
+  },
+  { 
+    id: 4, 
+    type: 'Liquidation Warning', 
+    chain: 'Solana', 
+    asset: 'SOL', 
+    amount: 25, 
+    usdValue: 1800,
+    timestamp: '2025-08-17 16:20',
+    status: 'warning',
+    txHash: '0xdef0...1234',
+    icon: '⚠️'
+  }
+];
 
-interface ActivityEvent {
-  id: string;
-  type: 'deposit' | 'withdraw' | 'borrow' | 'repay' | 'liquidation' | 'collateral_adjustment';
-  chain: string;
-  asset: string;
-  amount: number;
-  usdValue: number;
-  status: 'pending' | 'confirmed' | 'failed';
-  timestamp: string;
-  txHash?: string;
-  wallet: string;
-  details: string;
-}
+export const WalletDashboardPage: React.FC = () => {
+  const [connectedWallets, setConnectedWallets] = useState<typeof mockWallets>([]);
+  const [selectedWallet, setSelectedWallet] = useState<typeof mockWallets[0] | null>(null);
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [notifications, setNotifications] = useState(3);
+  const [activeTab, setActiveTab] = useState('overview');
 
-interface WalletConnectionModal {
-  isOpen: boolean;
-  walletType?: string;
-}
-
-const Dashboard = () => {
-  const { address, isConnected, connect, disconnect } = useWallet();
-  const [connectedWallets, setConnectedWallets] = useState<ConnectedWallet[]>([]);
-  const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummary | null>(null);
-  const [chainPortfolios, setChainPortfolios] = useState<ChainPortfolio[]>([]);
-  const [activityFeed, setActivityFeed] = useState<ActivityEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showBalances, setShowBalances] = useState(true);
-  const [connectionModal, setConnectionModal] = useState<WalletConnectionModal>({ isOpen: false });
-  const [selectedWallet, setSelectedWallet] = useState<ConnectedWallet | null>(null);
-
+  // Initialize with some connected wallets
   useEffect(() => {
-    if (isConnected) {
-      loadDashboardData();
+    setConnectedWallets(mockWallets.filter(w => w.status === 'connected'));
+    setSelectedWallet(mockWallets[0]);
+  }, []);
+
+  const connectWallet = (wallet: typeof mockWallets[0]) => {
+    if (!connectedWallets.find(w => w.id === wallet.id)) {
+      const updatedWallet = { ...wallet, status: 'connected' as const };
+      setConnectedWallets([...connectedWallets, updatedWallet]);
+      setSelectedWallet(updatedWallet);
     }
-  }, [isConnected]);
-
-  const loadDashboardData = async () => {
-    setIsLoading(true);
-    try {
-      // Simulate API calls
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock connected wallets
-      const mockConnectedWallets: ConnectedWallet[] = [
-        {
-          id: '1',
-          name: 'MetaMask',
-          type: 'evm',
-          chain: 'Ethereum',
-          address: '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6',
-          status: 'connected',
-          balance: 2.45,
-          nativeToken: 'ETH',
-          isActive: true,
-          lastActivity: new Date().toISOString(),
-          icon: '🦊'
-        },
-        {
-          id: '2',
-          name: 'Phantom',
-          type: 'solana',
-          chain: 'Solana',
-          address: '5D4Xz8JcRqXz8JcRqXz8JcRqXz8JcRqXz8JcRqXz8JcRqXz8JcRqXz8JcRq',
-          status: 'connected',
-          balance: 15.8,
-          nativeToken: 'SOL',
-          isActive: false,
-          lastActivity: new Date(Date.now() - 3600000).toISOString(),
-          icon: '👻'
-        },
-        {
-          id: '3',
-          name: 'WalletConnect',
-          type: 'walletconnect',
-          chain: 'Avalanche',
-          address: '0x8ba1f109551bD432803012645Hac136c772c3c7c',
-          status: 'connected',
-          balance: 125.5,
-          nativeToken: 'AVAX',
-          isActive: false,
-          lastActivity: new Date(Date.now() - 7200000).toISOString(),
-          icon: '🔗'
-        }
-      ];
-      setConnectedWallets(mockConnectedWallets);
-
-      // Mock portfolio summary
-      const mockPortfolioSummary: PortfolioSummary = {
-        totalCollateralUSD: 15420,
-        totalLoansUSD: 8200,
-        borrowingPowerUSD: 12500,
-        utilizationPercent: 65.6,
-        creditScore: 82,
-        liquidationRiskPercent: 18,
-        netWorthUSD: 7220,
-        availableCreditUSD: 4300,
-        healthStatus: 'healthy'
-      };
-      setPortfolioSummary(mockPortfolioSummary);
-
-      // Mock chain portfolios
-      const mockChainPortfolios: ChainPortfolio[] = [
-        {
-          chain: 'Ethereum',
-          collateral: {
-            'USDC': { amount: 5000, usdValue: 5000, apy: 8.2, change24h: 0.1 },
-            'ETH': { amount: 2.5, usdValue: 4500, apy: 6.8, change24h: -2.3 },
-            'WBTC': { amount: 0.15, usdValue: 3200, apy: 7.5, change24h: 1.8 }
-          },
-          loans: {
-            'USDC': { amount: 3000, usdValue: 3000, interestRate: 12.5, dueDate: '2025-10-15' },
-            'ETH': { amount: 1.2, usdValue: 2200, interestRate: 11.8, dueDate: '2025-09-30' }
-          },
-          totalCollateralUSD: 12700,
-          totalLoansUSD: 5200,
-          borrowingPowerUSD: 8500
-        },
-        {
-          chain: 'Solana',
-          collateral: {
-            'SOL': { amount: 25, usdValue: 1800, apy: 9.1, change24h: 3.2 },
-            'USDC': { amount: 800, usdValue: 800, apy: 8.5, change24h: 0.1 }
-          },
-          loans: {
-            'USDC': { amount: 500, usdValue: 500, interestRate: 13.2, dueDate: '2025-10-20' }
-          },
-          totalCollateralUSD: 2600,
-          totalLoansUSD: 500,
-          borrowingPowerUSD: 2000
-        },
-        {
-          chain: 'Avalanche',
-          collateral: {
-            'AVAX': { amount: 50, usdValue: 120, apy: 7.8, change24h: -1.5 }
-          },
-          loans: {
-            'USDC': { amount: 2500, usdValue: 2500, interestRate: 14.1, dueDate: '2025-11-05' }
-          },
-          totalCollateralUSD: 120,
-          totalLoansUSD: 2500,
-          borrowingPowerUSD: 2000
-        }
-      ];
-      setChainPortfolios(mockChainPortfolios);
-
-      // Mock activity feed
-      const mockActivityFeed: ActivityEvent[] = [
-        {
-          id: '1',
-          type: 'deposit',
-          chain: 'Ethereum',
-          asset: 'USDC',
-          amount: 1000,
-          usdValue: 1000,
-          status: 'confirmed',
-          timestamp: new Date(Date.now() - 1800000).toISOString(),
-          txHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-          wallet: '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6',
-          details: 'Deposited USDC as collateral'
-        },
-        {
-          id: '2',
-          type: 'borrow',
-          chain: 'Avalanche',
-          asset: 'USDC',
-          amount: 500,
-          usdValue: 500,
-          status: 'confirmed',
-          timestamp: new Date(Date.now() - 3600000).toISOString(),
-          txHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
-          wallet: '0x8ba1f109551bD432803012645Hac136c772c3c7c',
-          details: 'Borrowed USDC against AVAX collateral'
-        },
-        {
-          id: '3',
-          type: 'repay',
-          chain: 'Ethereum',
-          asset: 'ETH',
-          amount: 0.5,
-          usdValue: 900,
-          status: 'confirmed',
-          timestamp: new Date(Date.now() - 7200000).toISOString(),
-          txHash: '0x7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456',
-          wallet: '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6',
-          details: 'Repaid ETH loan'
-        },
-        {
-          id: '4',
-          type: 'collateral_adjustment',
-          chain: 'Solana',
-          asset: 'SOL',
-          amount: 5,
-          usdValue: 360,
-          status: 'confirmed',
-          timestamp: new Date(Date.now() - 10800000).toISOString(),
-          txHash: '0x4567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123',
-          wallet: '5D4Xz8JcRqXz8JcRqXz8JcRqXz8JcRqXz8JcRqXz8JcRqXz8JcRqXz8JcRq',
-          details: 'Added SOL collateral'
-        }
-      ];
-      setActivityFeed(mockActivityFeed);
-
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const connectWallet = async (walletType: string) => {
-    try {
-      setConnectionModal({ isOpen: true, walletType });
-      
-      // Simulate wallet connection
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const newWallet: ConnectedWallet = {
-        id: Date.now().toString(),
-        name: walletType === 'evm' ? 'MetaMask' : walletType === 'solana' ? 'Phantom' : 'WalletConnect',
-        type: walletType as any,
-        chain: walletType === 'evm' ? 'Ethereum' : walletType === 'solana' ? 'Solana' : 'Avalanche',
-        address: walletType === 'evm' ? '0x' + Math.random().toString(16).substr(2, 40) : 
-                walletType === 'solana' ? Math.random().toString(36).substr(2, 44) : 
-                '0x' + Math.random().toString(16).substr(2, 40),
-        status: 'connected',
-        balance: Math.random() * 100,
-        nativeToken: walletType === 'evm' ? 'ETH' : walletType === 'solana' ? 'SOL' : 'AVAX',
-        isActive: true,
-        lastActivity: new Date().toISOString(),
-        icon: walletType === 'evm' ? '🦊' : walletType === 'solana' ? '👻' : '🔗'
-      };
-      
-      setConnectedWallets(prev => [...prev, newWallet]);
-      setConnectionModal({ isOpen: false });
-      
-    } catch (error) {
-      console.error('Error connecting wallet:', error);
-      setConnectionModal({ isOpen: false });
-    }
+    setShowWalletModal(false);
   };
 
   const disconnectWallet = (walletId: string) => {
-    setConnectedWallets(prev => prev.filter(w => w.id !== walletId));
+    setConnectedWallets(connectedWallets.filter(w => w.id !== walletId));
     if (selectedWallet?.id === walletId) {
-      setSelectedWallet(null);
+      setSelectedWallet(connectedWallets[0] || null);
     }
   };
 
-  const setActiveWallet = (wallet: ConnectedWallet) => {
-    setConnectedWallets(prev => prev.map(w => ({ ...w, isActive: w.id === wallet.id })));
-    setSelectedWallet(wallet);
-  };
-
-  const copyAddress = (address: string) => {
-    navigator.clipboard.writeText(address);
-    // You could add a toast notification here
-  };
-
-  const getHealthStatusColor = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'text-green-600 bg-green-100';
-      case 'warning': return 'text-yellow-600 bg-yellow-100';
-      case 'critical': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'connected': return 'text-green-400';
+      case 'disconnected': return 'text-gray-400';
+      default: return 'text-yellow-400';
     }
   };
 
-  const getActivityTypeIcon = (type: string) => {
+  const getStatusBgColor = (status: string) => {
+    switch (status) {
+      case 'connected': return 'bg-green-500';
+      case 'disconnected': return 'bg-gray-500';
+      default: return 'bg-yellow-500';
+    }
+  };
+
+  const getActivityIconColor = (type: string) => {
     switch (type) {
-      case 'deposit': return <Plus className="w-4 h-4 text-green-500" />;
-      case 'withdraw': return <TrendingDown className="w-4 h-4 text-red-500" />;
-      case 'borrow': return <Zap className="w-4 h-4 text-blue-500" />;
-      case 'repay': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'liquidation': return <AlertTriangle className="w-4 h-4 text-red-500" />;
-      case 'collateral_adjustment': return <Settings className="w-4 h-4 text-purple-500" />;
-      default: return <Activity className="w-4 h-4 text-gray-500" />;
+      case 'Deposit': return 'text-green-500';
+      case 'Borrow': return 'text-blue-500';
+      case 'Repay': return 'text-purple-500';
+      case 'Liquidation Warning': return 'text-red-500';
+      default: return 'text-gray-500';
     }
   };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    }).format(amount);
-  };
-
-  const formatAddress = (address: string) => {
-    if (address.length > 20) {
-      return `${address.slice(0, 8)}...${address.slice(-6)}`;
-    }
-    return address;
-  };
-
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return `${diffDays}d ago`;
-  };
-
-  if (!isConnected) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Wallet className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-          <h2 className="text-xl font-semibold mb-2">Wallet Not Connected</h2>
-          <p className="text-gray-600">Please connect your wallet to view the dashboard</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Wallet Dashboard</h1>
-          <p className="text-gray-300">Manage multiple wallets and monitor your cross-chain portfolio</p>
-        </div>
-
-        {/* Wallet Connection Section */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-white flex items-center">
-              <Wallet className="w-6 h-6 mr-3" />
-              Connected Wallets
-            </h2>
-            <button
-              onClick={() => setConnectionModal({ isOpen: true })}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors flex items-center space-x-2"
-            >
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+      {/* Header with Notifications */}
+      <header className="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Aegis Dashboard
+            </h1>
+            <div className="flex items-center space-x-2">
+              <Bell className="w-5 h-5 text-gray-400" />
+              <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 font-bold">
+                {notifications}
+              </span>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <button className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors">
+              <RefreshCw className="w-4 h-4" />
+              <span>Refresh</span>
+            </button>
+            <button className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors">
               <Plus className="w-4 h-4" />
-              <span>Add Wallet</span>
+              <span onClick={() => setShowWalletModal(true)}>Add Wallet</span>
             </button>
           </div>
+        </div>
+      </header>
 
-          {connectedWallets.length === 0 ? (
-            <div className="text-center py-8">
-              <Wallet className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-400 mb-4">No wallets connected</p>
-              <button
-                onClick={() => setConnectionModal({ isOpen: true })}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
-              >
-                Connect Your First Wallet
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {connectedWallets.map((wallet) => (
-                <div
-                  key={wallet.id}
-                  className={`p-4 rounded-lg border transition-all cursor-pointer ${
-                    wallet.isActive
-                      ? 'bg-blue-600/20 border-blue-500/50'
-                      : 'bg-slate-800/50 border-slate-700 hover:bg-slate-800/70'
-                  }`}
-                  onClick={() => setActiveWallet(wallet)}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl">{wallet.icon}</span>
-                      <div>
-                        <h3 className="font-semibold text-white">{wallet.name}</h3>
-                        <p className="text-sm text-gray-400">{wallet.chain}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        disconnectWallet(wallet.id);
-                      }}
-                      className="text-gray-400 hover:text-red-400 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Address:</span>
-                      <div className="flex items-center space-x-1">
-                        <span className="text-white font-mono">{formatAddress(wallet.address)}</span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copyAddress(wallet.address);
-                          }}
-                          className="text-gray-400 hover:text-white transition-colors"
-                        >
-                          <Copy className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Balance:</span>
-                      <span className="text-white">
-                        {showBalances ? `${wallet.balance.toFixed(4)} ${wallet.nativeToken}` : '••••'}
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Status:</span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        wallet.status === 'connected' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {wallet.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Tab Navigation */}
+        <div className="flex space-x-1 bg-gray-800/50 p-1 rounded-lg mb-8">
+          {['overview', 'portfolio', 'activity', 'settings'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-md transition-colors capitalize ${
+                activeTab === tab 
+                  ? 'bg-blue-600 text-white' 
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
 
-        {/* Portfolio Summary */}
-        {portfolioSummary && (
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-white flex items-center">
-                <BarChart3 className="w-6 h-6 mr-3" />
-                Portfolio Summary
-              </h2>
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => setShowBalances(!showBalances)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  {showBalances ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-                <button
-                  onClick={loadDashboardData}
-                  disabled={isLoading}
-                  className="text-gray-400 hover:text-white transition-colors disabled:opacity-50"
-                >
-                  <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-400 mb-2">
-                  {showBalances ? formatCurrency(portfolioSummary.totalCollateralUSD) : '••••'}
-                </div>
-                <div className="text-sm text-gray-400">Total Collateral</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-400 mb-2">
-                  {showBalances ? formatCurrency(portfolioSummary.totalLoansUSD) : '••••'}
-                </div>
-                <div className="text-sm text-gray-400">Outstanding Loans</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-400 mb-2">
-                  {showBalances ? formatCurrency(portfolioSummary.borrowingPowerUSD) : '••••'}
-                </div>
-                <div className="text-sm text-gray-400">Borrowing Power</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-400 mb-2">
-                  {showBalances ? formatCurrency(portfolioSummary.netWorthUSD) : '••••'}
-                </div>
-                <div className="text-sm text-gray-400">Net Worth</div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-slate-800/50 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-400">Credit Score</span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getHealthStatusColor(portfolioSummary.healthStatus)}`}>
-                    {portfolioSummary.healthStatus.toUpperCase()}
-                  </span>
-                </div>
-                <div className="text-3xl font-bold text-white mb-2">{portfolioSummary.creditScore}</div>
-                <div className="w-full bg-slate-700 rounded-full h-2">
-                  <div 
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
-                    style={{ width: `${portfolioSummary.creditScore}%` }}
-                  ></div>
-                </div>
-              </div>
-              
-              <div className="bg-slate-800/50 rounded-lg p-4">
-                <div className="text-gray-400 mb-2">Liquidation Risk</div>
-                <div className="text-3xl font-bold text-red-400 mb-2">{portfolioSummary.liquidationRiskPercent}%</div>
-                <div className="w-full bg-slate-700 rounded-full h-2">
-                  <div 
-                    className="bg-red-500 h-2 rounded-full transition-all duration-300" 
-                    style={{ width: `${portfolioSummary.liquidationRiskPercent}%` }}
-                  ></div>
-                </div>
-              </div>
-              
-              <div className="bg-slate-800/50 rounded-lg p-4">
-                <div className="text-gray-400 mb-2">Utilization</div>
-                <div className="text-3xl font-bold text-yellow-400 mb-2">{portfolioSummary.utilizationPercent}%</div>
-                <div className="w-full bg-slate-700 rounded-full h-2">
-                  <div 
-                    className="bg-yellow-500 h-2 rounded-full transition-all duration-300" 
-                    style={{ width: `${portfolioSummary.utilizationPercent}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Chain Portfolios */}
-        {chainPortfolios.length > 0 && (
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 mb-8">
-            <h2 className="text-2xl font-semibold text-white mb-6 flex items-center">
-              <Globe className="w-6 h-6 mr-3" />
-              Chain Portfolios
-            </h2>
-            
-            <div className="space-y-6">
-              {chainPortfolios.map((chainPortfolio) => (
-                <div key={chainPortfolio.chain} className="bg-slate-800/50 rounded-lg p-4">
+        {activeTab === 'overview' && (
+          <>
+            {/* Portfolio Summary Cards */}
+            <section className="mb-8">
+              <h2 className="text-2xl font-bold mb-6">Portfolio Overview</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-6 border border-blue-500/30">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-white">{chainPortfolio.chain}</h3>
-                    <div className="flex space-x-4 text-sm">
-                      <div>
-                        <span className="text-gray-400">Collateral: </span>
-                        <span className="text-white">{formatCurrency(chainPortfolio.totalCollateralUSD)}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-400">Loans: </span>
-                        <span className="text-white">{formatCurrency(chainPortfolio.totalLoansUSD)}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-400">Power: </span>
-                        <span className="text-white">{formatCurrency(chainPortfolio.borrowingPowerUSD)}</span>
+                    <Coins className="w-8 h-8 text-blue-400" />
+                    <span className="text-sm text-blue-400">+2.3%</span>
+                  </div>
+                  <h3 className="text-sm text-gray-400 mb-2">Total Collateral</h3>
+                  <p className="text-2xl font-bold">${mockPortfolio.totalCollateralUSD.toLocaleString()}</p>
+                </div>
+                
+                <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-xl p-6 border border-purple-500/30">
+                  <div className="flex items-center justify-between mb-4">
+                    <CreditCard className="w-8 h-8 text-purple-400" />
+                    <span className="text-sm text-purple-400">Active</span>
+                  </div>
+                  <h3 className="text-sm text-gray-400 mb-2">Outstanding Loans</h3>
+                  <p className="text-2xl font-bold">${mockPortfolio.totalLoansUSD.toLocaleString()}</p>
+                </div>
+                
+                <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl p-6 border border-green-500/30">
+                  <div className="flex items-center justify-between mb-4">
+                    <TrendingUp className="w-8 h-8 text-green-400" />
+                    <span className="text-sm text-green-400">{mockPortfolio.utilizationPercent}%</span>
+                  </div>
+                  <h3 className="text-sm text-gray-400 mb-2">Borrowing Power</h3>
+                  <p className="text-2xl font-bold">${mockPortfolio.borrowingPowerUSD.toLocaleString()}</p>
+                </div>
+                
+                <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-sm rounded-xl p-6 border border-orange-500/30">
+                  <div className="flex items-center justify-between mb-4">
+                    <Shield className="w-8 h-8 text-orange-400" />
+                    <span className="text-sm text-orange-400">Good</span>
+                  </div>
+                  <h3 className="text-sm text-gray-400 mb-2">Credit Score</h3>
+                  <p className="text-2xl font-bold">{mockPortfolio.creditScore}</p>
+                </div>
+              </div>
+            </section>
+
+            {/* Risk Overview */}
+            <section className="mb-8">
+              <h2 className="text-2xl font-bold mb-6">Risk Assessment</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <Shield className="w-5 h-5 mr-2 text-blue-400" />
+                    AI Credit Score
+                  </h3>
+                  <div className="text-center">
+                    <div className="relative inline-block">
+                      <svg className="w-32 h-32 transform -rotate-90">
+                        <circle
+                          cx="64"
+                          cy="64"
+                          r="56"
+                          stroke="currentColor"
+                          strokeWidth="8"
+                          fill="transparent"
+                          className="text-gray-700"
+                        />
+                        <circle
+                          cx="64"
+                          cy="64"
+                          r="56"
+                          stroke="currentColor"
+                          strokeWidth="8"
+                          fill="transparent"
+                          strokeDasharray={`${(mockPortfolio.creditScore / 100) * 352} 352`}
+                          className="text-blue-500 transition-all duration-1000 ease-out"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-3xl font-bold">{mockPortfolio.creditScore}</span>
                       </div>
                     </div>
+                    <p className="text-gray-400 mt-2">Good Credit Standing</p>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                </div>
+                
+                <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <AlertTriangle className="w-5 h-5 mr-2 text-red-400" />
+                    Liquidation Risk
+                  </h3>
+                  <div className="space-y-4">
                     <div>
-                      <h4 className="font-medium text-white mb-3">Collateral Assets</h4>
-                      <div className="space-y-2">
-                        {Object.entries(chainPortfolio.collateral).map(([asset, data]) => (
-                          <div key={asset} className="flex justify-between items-center p-2 bg-slate-700/50 rounded">
-                            <span className="text-white">{asset}</span>
-                            <div className="text-right">
-                              <div className="text-white">{data.amount.toFixed(4)}</div>
-                              <div className="text-sm text-gray-400">{formatCurrency(data.usdValue)}</div>
-                            </div>
-                          </div>
-                        ))}
+                      <div className="flex justify-between text-sm mb-2">
+                        <span>Current Risk</span>
+                        <span className="text-red-400">{mockPortfolio.liquidationRiskPercent}%</span>
+                      </div>
+                      <div className="w-full bg-gray-700 rounded-full h-3">
+                        <div 
+                          className="bg-red-500 h-3 rounded-full transition-all duration-1000"
+                          style={{ width: `${mockPortfolio.liquidationRiskPercent}%` }}
+                        ></div>
                       </div>
                     </div>
                     
-                    <div>
-                      <h4 className="font-medium text-white mb-3">Active Loans</h4>
-                      <div className="space-y-2">
-                        {Object.entries(chainPortfolio.loans).map(([asset, data]) => (
-                          <div key={asset} className="flex justify-between items-center p-2 bg-slate-700/50 rounded">
-                            <span className="text-white">{asset}</span>
-                            <div className="text-right">
-                              <div className="text-white">{data.amount.toFixed(4)}</div>
-                              <div className="text-sm text-gray-400">{formatCurrency(data.usdValue)}</div>
-                            </div>
-                          </div>
-                        ))}
+                    <div className="grid grid-cols-2 gap-4 text-center">
+                      <div className="bg-gray-700/50 rounded-lg p-3">
+                        <p className="text-sm text-gray-400">Net Worth</p>
+                        <p className="text-lg font-semibold">${mockPortfolio.netWorthUSD.toLocaleString()}</p>
+                      </div>
+                      <div className="bg-gray-700/50 rounded-lg p-3">
+                        <p className="text-sm text-gray-400">Available Credit</p>
+                        <p className="text-lg font-semibold">${mockPortfolio.availableCreditUSD.toLocaleString()}</p>
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            </section>
+
+            {/* Recent Activity */}
+            <section className="mb-8">
+              <h2 className="text-2xl font-bold mb-6">Recent Activity</h2>
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 overflow-hidden">
+                <div className="p-6">
+                  <div className="space-y-4">
+                    {mockActivityFeed.map((activity) => (
+                      <div key={activity.id} className="flex items-center justify-between p-4 bg-gray-700/30 rounded-lg hover:bg-gray-700/50 transition-colors">
+                        <div className="flex items-center space-x-4">
+                          <div className={`w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-lg`}>
+                            {activity.icon}
+                          </div>
+                          <div>
+                            <div className="flex items-center space-x-2">
+                              <span className="font-semibold">{activity.type}</span>
+                              <span className="text-sm text-gray-400">{activity.amount} {activity.asset}</span>
+                              <span className="text-xs bg-gray-600 px-2 py-1 rounded">on {activity.chain}</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-sm text-gray-400">
+                              <span>{activity.timestamp}</span>
+                              <span>•</span>
+                              <span className={`${getActivityIconColor(activity.type)}`}>
+                                {activity.status}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold">${activity.usdValue.toLocaleString()}</p>
+                          <button className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+                            View TX
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          </>
         )}
 
-        {/* Recent Activity Feed */}
-        {activityFeed.length > 0 && (
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-            <h2 className="text-2xl font-semibold text-white mb-6 flex items-center">
-              <Activity className="w-6 h-6 mr-3" />
-              Recent Activity
-            </h2>
+        {/* Wallet Management Section - Bottom Right */}
+        <div className="fixed bottom-6 right-6 z-40">
+          <div className="bg-gray-800/95 backdrop-blur-md rounded-xl border border-gray-600 shadow-2xl p-4 w-80">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                <Wallet className="w-4 h-4 text-blue-400" />
+                <h3 className="text-sm font-semibold text-white">Connected Wallets</h3>
+              </div>
+              <span className="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded-full">
+                {connectedWallets.length} active
+              </span>
+            </div>
             
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {activityFeed.map((event) => (
-                <div key={event.id} className="flex items-center space-x-4 p-3 bg-slate-800/50 rounded-lg">
-                  <div className="flex-shrink-0">
-                    {getActivityTypeIcon(event.type)}
+            {/* Connected Wallets List */}
+            <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
+              {connectedWallets.map((wallet) => (
+                <div key={wallet.id} className="flex items-center justify-between p-3 bg-gray-700/60 rounded-lg hover:bg-gray-700/80 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${wallet.color} flex items-center justify-center text-white text-sm font-medium`}>
+                      {wallet.icon}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm font-medium text-white truncate">{wallet.name}</span>
+                        <div className={`w-2 h-2 rounded-full ${getStatusBgColor(wallet.status)} flex-shrink-0`}></div>
+                      </div>
+                      <div className="text-xs text-gray-400 truncate">{wallet.address}</div>
+                      <div className="text-xs text-gray-300">
+                        {wallet.balance.toFixed(4)} {wallet.nativeToken}
+                      </div>
+                    </div>
                   </div>
                   
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium text-white capitalize">{event.type}</div>
-                        <div className="text-sm text-gray-400">{event.details}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-white">{event.amount} {event.asset}</div>
-                        <div className="text-sm text-gray-400">{formatCurrency(event.usdValue)}</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
-                        <span className="flex items-center">
-                          <Globe className="w-3 h-3 mr-1" />
-                          {event.chain}
-                        </span>
-                        <span className="flex items-center">
-                          <Wallet className="w-3 h-3 mr-1" />
-                          {formatAddress(event.wallet)}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          event.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                          event.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {event.status}
-                        </span>
-                        <span className="text-xs text-gray-500">{formatTimestamp(event.timestamp)}</span>
-                      </div>
-                    </div>
+                  <div className="flex flex-col space-y-1 ml-2">
+                    <button className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded transition-colors">
+                      Switch
+                    </button>
+                    <button 
+                      onClick={() => disconnectWallet(wallet.id)}
+                      className="text-xs bg-red-600 hover:bg-red-500 text-white px-2 py-1 rounded transition-colors"
+                    >
+                      Disconnect
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
+            
+            {/* Add Wallet Button */}
+            <button 
+              onClick={() => setShowWalletModal(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-2.5 px-3 rounded-lg transition-colors flex items-center justify-center space-x-2 font-medium"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Connect New Wallet</span>
+            </button>
           </div>
-        )}
+        </div>
 
         {/* Wallet Connection Modal */}
-        {connectionModal.isOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-slate-800 rounded-lg p-6 w-full max-w-md mx-4">
-              <h3 className="text-xl font-semibold text-white mb-4">Connect Wallet</h3>
-              
-              <div className="space-y-3">
-                <button
-                  onClick={() => connectWallet('evm')}
-                  className="w-full p-4 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors flex items-center space-x-3"
+        {showWalletModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-gray-800 rounded-2xl p-8 max-w-md w-full mx-4">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold">Connect Wallet</h3>
+                <button 
+                  onClick={() => setShowWalletModal(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
                 >
-                  <span className="text-2xl">🦊</span>
-                  <div className="text-left">
-                    <div className="font-medium text-white">MetaMask</div>
-                    <div className="text-sm text-gray-400">Ethereum & EVM chains</div>
-                  </div>
-                </button>
-                
-                <button
-                  onClick={() => connectWallet('solana')}
-                  className="w-full p-4 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors flex items-center space-x-3"
-                >
-                  <span className="text-2xl">👻</span>
-                  <div className="text-left">
-                    <div className="font-medium text-white">Phantom</div>
-                    <div className="text-sm text-gray-400">Solana ecosystem</div>
-                  </div>
-                </button>
-                
-                <button
-                  onClick={() => connectWallet('walletconnect')}
-                  className="w-full p-4 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors flex items-center space-x-3"
-                >
-                  <span className="text-2xl">🔗</span>
-                  <div className="text-left">
-                    <div className="font-medium text-white">WalletConnect</div>
-                    <div className="text-sm text-gray-400">Multi-chain support</div>
-                  </div>
+                  <X className="w-6 h-6" />
                 </button>
               </div>
               
-              <button
-                onClick={() => setConnectionModal({ isOpen: false })}
-                className="w-full mt-4 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors"
-              >
-                Cancel
-              </button>
+              <div className="space-y-3">
+                {mockWallets.filter(w => w.status === 'disconnected').map((wallet) => (
+                  <button
+                    key={wallet.id}
+                    onClick={() => connectWallet(wallet)}
+                    className="w-full flex items-center space-x-4 p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-left"
+                  >
+                    <div className={`w-10 h-10 rounded-full bg-gradient-to-r ${wallet.color} flex items-center justify-center text-white text-lg`}>
+                      {wallet.icon}
+                    </div>
+                    <div>
+                      <p className="font-semibold">{wallet.name}</p>
+                      <p className="text-sm text-gray-400">{wallet.chain}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -778,4 +506,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default WalletDashboardPage;
