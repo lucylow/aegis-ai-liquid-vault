@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Bitcoin, Coins, Network, Activity, AlertTriangle, Bot, Play, Square } from 'lucide-react';
+import { Shield, Bitcoin, Coins, Network, Activity, AlertTriangle, Bot, Play, Square, Bell, Filter } from 'lucide-react';
 import WalletConnect from '../components/WalletConnect';
-
-interface ThreatItem {
-  id: string;
-  title: string;
-  description: string;
-  severity: 'critical' | 'high' | 'medium' | 'low';
-  chain: string;
-  timestamp: string;
-  status: 'active' | 'resolved' | 'investigating';
-}
+import ThreatCard from '../components/ThreatCard';
+import DashboardWidget from '../components/DashboardWidget';
+import NotificationToast, { Notification } from '../components/NotificationToast';
+import { ThreatItem, RiskMetrics } from '../types/threats';
+import { ThreatDetectionService } from '../services/threatDetectionService';
 
 export default function AegisDashboard() {
   const [threats, setThreats] = useState<ThreatItem[]>([]);
@@ -21,12 +16,22 @@ export default function AegisDashboard() {
     { id: '2', text: 'Simulation ready. All systems nominal.', type: 'system' }
   ]);
   const [inputValue, setInputValue] = useState('');
-  const [riskMetrics, setRiskMetrics] = useState({
+  const [riskMetrics, setRiskMetrics] = useState<RiskMetrics>({
     totalThreats: 0,
     protectedValue: '$2.4M',
     critical: 0,
-    high: 0
+    high: 0,
+    medium: 0,
+    low: 0,
+    totalRiskScore: 0,
+    averageRiskScore: 0,
+    threatsByChain: {},
+    threatsByCategory: {},
+    lastUpdated: new Date().toISOString()
   });
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [selectedThreat, setSelectedThreat] = useState<ThreatItem | null>(null);
+  const [threatFilter, setThreatFilter] = useState<'all' | 'critical' | 'high' | 'medium' | 'low'>('all');
 
   let simulationInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -47,62 +52,60 @@ export default function AegisDashboard() {
   ];
 
   const generateThreat = () => {
-    const threatTypes = [
-      'Critical Cross-Chain Exploit Attempt',
-      'High Risk Transaction Pattern',
-      'Unusual Contract Interaction',
-      'Minor Anomaly Detected',
-      'Suspicious Bridge Activity'
-    ];
-    
-    const descriptions = [
-      'Suspicious depositAndCall detected from blacklisted address. Potential bridge exploit.',
-      'Multiple small transactions to unknown addresses. Possible dust attack or sybil attempt.',
-      'Interaction with a newly deployed, unaudited smart contract.',
-      'Slight deviation from normal transaction volume.',
-      'Unusual cross-chain message routing detected.'
-    ];
-
-    const severities: ('critical' | 'high' | 'medium' | 'low')[] = ['critical', 'high', 'medium', 'low'];
-    const chainNames = ['Bitcoin', 'Ethereum', 'Solana', 'Polygon', 'Avalanche'];
-
-    const threat: ThreatItem = {
-      id: `THR-${Date.now()}`,
-      title: threatTypes[Math.floor(Math.random() * threatTypes.length)],
-      description: descriptions[Math.floor(Math.random() * descriptions.length)],
-      severity: severities[Math.floor(Math.random() * severities.length)],
-      chain: chainNames[Math.floor(Math.random() * chainNames.length)],
-      timestamp: new Date().toISOString(),
-      status: 'active'
-    };
-
-    return threat;
+    return ThreatDetectionService.generateRealisticThreat();
   };
 
   const startSimulation = () => {
     setIsSimulationRunning(true);
     addMessage('🤖 Advanced AI simulation started. Gemini 2.5 Pro analysis active.', 'system');
     
+    // Add initial notification
+    addNotification({
+      type: 'info',
+      title: 'Threat Simulation Started',
+      message: 'Advanced AI monitoring is now active. Real-time threat detection enabled.',
+      duration: 5000
+    });
+    
     simulationInterval = setInterval(() => {
       const threat = generateThreat();
-      setThreats(prev => [threat, ...prev.slice(0, 9)]);
-      
-      setRiskMetrics(prev => ({
-        ...prev,
-        totalThreats: prev.totalThreats + 1,
-        critical: threat.severity === 'critical' ? prev.critical + 1 : prev.critical,
-        high: threat.severity === 'high' ? prev.high + 1 : prev.high
-      }));
+      setThreats(prev => {
+        const newThreats = [threat, ...prev.slice(0, 9)];
+        // Update risk metrics with new threat data
+        const newMetrics = ThreatDetectionService.calculateRiskMetrics(newThreats);
+        setRiskMetrics(newMetrics);
+        return newThreats;
+      });
 
+      // Add AI copilot messages
       if (threat.severity === 'critical') {
         addMessage(`🚨 CRITICAL ALERT: ${threat.title} on ${threat.chain}! Initiating autonomous intervention.`, 'assistant');
+        addNotification({
+          type: 'error',
+          title: 'Critical Threat Detected',
+          message: `${threat.title} on ${threat.chain}. Estimated loss: ${threat.estimatedLoss}`,
+          duration: 10000
+        });
         setTimeout(() => {
-          addMessage(`✅ Assets frozen across multiple chains. Threat neutralized.`, 'assistant');
+          addMessage(`✅ Mitigation protocols activated. Threat containment in progress.`, 'assistant');
         }, 2000);
       } else if (threat.severity === 'high') {
-        addMessage(`⚠️ High Risk: ${threat.title} on ${threat.chain}. Recommending review.`, 'assistant');
+        addMessage(`⚠️ High Risk: ${threat.title} on ${threat.chain}. Recommending immediate review.`, 'assistant');
+        addNotification({
+          type: 'warning',
+          title: 'High Risk Threat',
+          message: `${threat.title} detected. Confidence: ${threat.confidence}%`,
+          duration: 7000
+        });
+      } else if (threat.severity === 'medium') {
+        addNotification({
+          type: 'warning',
+          title: 'Medium Risk Alert',
+          message: `${threat.category} threat on ${threat.chain}. Monitoring...`,
+          duration: 5000
+        });
       }
-    }, 3000);
+    }, 4000); // Slightly slower for better UX
   };
 
   const stopSimulation = () => {
@@ -123,6 +126,24 @@ export default function AegisDashboard() {
     setMessages(prev => [...prev, newMessage]);
   };
 
+  const addNotification = (notification: Omit<Notification, 'id' | 'timestamp'>) => {
+    const newNotification: Notification = {
+      ...notification,
+      id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+      timestamp: new Date()
+    };
+    setNotifications(prev => [...prev, newNotification]);
+  };
+
+  const dismissNotification = (id: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
+  const viewThreatDetails = (threat: ThreatItem) => {
+    setSelectedThreat(threat);
+    addMessage(`📊 Viewing detailed analysis for: ${threat.title}`, 'system');
+  };
+
   const handleSendMessage = () => {
     if (inputValue.trim()) {
       addMessage(inputValue, 'user');
@@ -134,15 +155,49 @@ export default function AegisDashboard() {
   };
 
   const resolveThreat = (id: string) => {
-    setThreats(prev => prev.map(threat => 
-      threat.id === id ? { ...threat, status: 'resolved' as const } : threat
-    ));
+    setThreats(prev => {
+      const updatedThreats = prev.map(threat => 
+        threat.id === id ? { ...threat, status: 'resolved' as const } : threat
+      );
+      // Update risk metrics
+      const newMetrics = ThreatDetectionService.calculateRiskMetrics(updatedThreats);
+      setRiskMetrics(newMetrics);
+      return updatedThreats;
+    });
+    
+    const threat = threats.find(t => t.id === id);
+    if (threat) {
+      addMessage(`✅ Threat resolved: ${threat.title}. Security protocols updated.`, 'assistant');
+      addNotification({
+        type: 'success',
+        title: 'Threat Resolved',
+        message: `Successfully mitigated ${threat.title} on ${threat.chain}`,
+        duration: 5000
+      });
+    }
   };
 
   const investigateThreat = (id: string) => {
-    setThreats(prev => prev.map(threat => 
-      threat.id === id ? { ...threat, status: 'investigating' as const } : threat
-    ));
+    setThreats(prev => {
+      const updatedThreats = prev.map(threat => 
+        threat.id === id ? { ...threat, status: 'investigating' as const } : threat
+      );
+      // Update risk metrics
+      const newMetrics = ThreatDetectionService.calculateRiskMetrics(updatedThreats);
+      setRiskMetrics(newMetrics);
+      return updatedThreats;
+    });
+    
+    const threat = threats.find(t => t.id === id);
+    if (threat) {
+      addMessage(`🔍 Investigation started: ${threat.title}. Deep analysis in progress.`, 'assistant');
+      addNotification({
+        type: 'info',
+        title: 'Investigation Started',
+        message: `Analyzing ${threat.title} with confidence ${threat.confidence}%`,
+        duration: 5000
+      });
+    }
   };
 
   useEffect(() => {
