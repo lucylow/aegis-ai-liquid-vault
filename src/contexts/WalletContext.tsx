@@ -1,17 +1,21 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 
 interface WalletContextType {
   address: string | null;
   isConnected: boolean;
+  isConnecting: boolean;
   chainId: number | null;
-  balance: string;
-  network: string;
+  network: string | null;
+  balance: string | null;
+  connectionError: string | null;
   connect: () => Promise<void>;
   disconnect: () => void;
+  isMetaMaskInstalled: () => boolean;
+  isMetaMaskUnlocked: () => Promise<boolean>;
+  getMetaMaskProvider: () => any;
+  getAccountInfo: () => Promise<void>;
+  refreshBalance: () => Promise<void>;
   switchNetwork: (chainId: number) => Promise<void>;
-  isConnecting: boolean;
-  connectionError: string | null;
-  clearError: () => void;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -24,20 +28,23 @@ export const useWallet = () => {
   return context;
 };
 
-export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface WalletProviderProps {
+  children: ReactNode;
+}
+
+export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [address, setAddress] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [chainId, setChainId] = useState<number | null>(null);
-  const [balance, setBalance] = useState<string>('0');
-  const [network, setNetwork] = useState<string>('Not Connected');
   const [isConnecting, setIsConnecting] = useState(false);
+  const [chainId, setChainId] = useState<number | null>(null);
+  const [network, setNetwork] = useState<string | null>(null);
+  const [balance, setBalance] = useState<string | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
 
   // Check if MetaMask is installed
   const isMetaMaskInstalled = useCallback(() => {
     if (typeof window === 'undefined') return false;
     
-<<<<<<< HEAD
     // Check for MetaMask specifically, not just any ethereum provider
     const ethereum = (window as any).ethereum;
     return ethereum && ethereum.isMetaMask === true;
@@ -46,14 +53,6 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // Check if MetaMask is unlocked
   const isMetaMaskUnlocked = useCallback(async () => {
     if (!isMetaMaskInstalled()) return false;
-=======
-    // Additional check to ensure it's not PLUG WALLET or other wallets
-    const isPlugWallet = hasEthereum && (
-      (window.ethereum as any).isPlugWallet || 
-      (window.ethereum as any).isPlug || 
-      (window.ethereum as any).providers?.some((provider: any) => provider.isPlugWallet)
-    );
->>>>>>> 6ca879e19615dddaf1a472f4c285b352ff79a4d9
     
     try {
       const ethereum = (window as any).ethereum;
@@ -62,13 +61,12 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch {
       return false;
     }
-  }, []);
+  }, [isMetaMaskInstalled]);
 
   // Get the correct MetaMask provider
   const getMetaMaskProvider = useCallback(() => {
     if (typeof window === 'undefined') return null;
     
-<<<<<<< HEAD
     const ethereum = (window as any).ethereum;
     
     // Check if there are multiple providers and find MetaMask
@@ -80,19 +78,6 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     // Return the main ethereum object if it's MetaMask
     if (ethereum && ethereum.isMetaMask) {
       return ethereum;
-=======
-    // If there are multiple providers, find MetaMask specifically
-    if ((window.ethereum as any)?.providers) {
-      const metaMaskProvider = (window.ethereum as any).providers.find(
-        (provider: any) => provider.isMetaMask === true && !provider.isPlugWallet
-      );
-      return metaMaskProvider || null;
-    }
-    
-    // Single provider case - ensure it's MetaMask
-    if (window.ethereum?.isMetaMask === true && !(window.ethereum as any).isPlugWallet) {
-      return window.ethereum;
->>>>>>> 6ca879e19615dddaf1a472f4c285b352ff79a4d9
     }
     
     return null;
@@ -161,49 +146,84 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         throw new Error('MetaMask provider not found');
       }
 
-      // Check if already connected
-      const accounts = await provider.request({ method: 'eth_accounts' });
-      if (accounts && accounts.length > 0) {
-        // Already connected, just get account info
-        await getAccountInfo();
-        return;
-      }
-
-      // Request accounts (this will show the popup)
-      const newAccounts = await provider.request({ method: 'eth_requestAccounts' });
+      // Request accounts (this will trigger the popup)
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
       
-      if (newAccounts && newAccounts.length > 0) {
-        await getAccountInfo();
+      if (accounts && accounts.length > 0) {
+        const account = accounts[0];
+        setAddress(account);
+        setIsConnected(true);
+        
+        // Get chain ID
+        const chainId = await provider.request({ method: 'eth_chainId' });
+        setChainId(parseInt(chainId, 16));
+        
+        // Get balance
+        const balance = await provider.request({ 
+          method: 'eth_getBalance', 
+          params: [account, 'latest'] 
+        });
+        setBalance(parseFloat(parseInt(balance, 16) / 1e18).toFixed(4));
+        
+        // Set network name
+        const networkNames: { [key: number]: string } = {
+          1: 'Ethereum Mainnet',
+          137: 'Polygon',
+          56: 'Binance Smart Chain',
+          42161: 'Arbitrum',
+          10: 'Optimism',
+          8453: 'Base',
+          59144: 'Linea'
+        };
+        setNetwork(networkNames[parseInt(chainId, 16)] || `Chain ID: ${parseInt(chainId, 16)}`);
+        
+        console.log('Wallet connected successfully:', account);
       }
     } catch (error: any) {
       console.error('Connection error:', error);
       
       if (error.code === 4001) {
-        setConnectionError('Connection rejected by user');
+        setConnectionError('User rejected the connection request');
       } else if (error.code === -32002) {
-        setConnectionError('Connection request already pending. Please check MetaMask.');
+        setConnectionError('MetaMask is already processing a request. Please check MetaMask and try again.');
       } else {
         setConnectionError(error.message || 'Failed to connect wallet');
       }
     } finally {
       setIsConnecting(false);
     }
-  }, [isMetaMaskInstalled, getMetaMaskProvider, getAccountInfo]);
+  }, [isMetaMaskInstalled, getMetaMaskProvider]);
 
   // Disconnect wallet
   const disconnect = useCallback(() => {
     setAddress(null);
     setIsConnected(false);
     setChainId(null);
-    setBalance('0');
-    setNetwork('Not Connected');
+    setNetwork(null);
+    setBalance(null);
     setConnectionError(null);
-    
-    // Clear any stored connection state
-    localStorage.removeItem('aegis-wallet-connected');
+    console.log('Wallet disconnected');
   }, []);
 
-  // Switch network with minimal popup
+  // Refresh balance
+  const refreshBalance = useCallback(async () => {
+    if (!isConnected || !address) return;
+
+    try {
+      const provider = getMetaMaskProvider();
+      if (!provider) return;
+
+      const balance = await provider.request({ 
+        method: 'eth_getBalance', 
+        params: [address, 'latest'] 
+      });
+      setBalance(parseFloat(parseInt(balance, 16) / 1e18).toFixed(4));
+    } catch (error) {
+      console.error('Error refreshing balance:', error);
+    }
+  }, [isConnected, address, getMetaMaskProvider]);
+
+  // Switch network
   const switchNetwork = useCallback(async (targetChainId: number) => {
     if (!isConnected) return;
 
@@ -211,85 +231,34 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const provider = getMetaMaskProvider();
       if (!provider) return;
 
-      // Try to switch network
       await provider.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: `0x${targetChainId.toString(16)}` }],
       });
       
-      // Update local state
-      setChainId(targetChainId);
-      
-      // Update network name
-      const networkNames: { [key: number]: string } = {
-        1: 'Ethereum Mainnet',
-        137: 'Polygon',
-        56: 'Binance Smart Chain',
-        42161: 'Arbitrum',
-        10: 'Optimism',
-        8453: 'Base',
-        59144: 'Linea'
-      };
-      setNetwork(networkNames[targetChainId] || `Chain ID: ${targetChainId}`);
-      
+      // Refresh account info after network switch
+      await getAccountInfo();
     } catch (error: any) {
-      console.error('Network switch error:', error);
+      console.error('Error switching network:', error);
       
       if (error.code === 4902) {
-        // Chain not added, try to add it
-        try {
-          await provider.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: `0x${targetChainId.toString(16)}`,
-              chainName: `Chain ${targetChainId}`,
-              nativeCurrency: {
-                name: 'ETH',
-                symbol: 'ETH',
-                decimals: 18,
-              },
-              rpcUrls: ['https://rpc.example.com'],
-            }],
-          });
-        } catch (addError) {
-          console.error('Failed to add chain:', addError);
-          setConnectionError('Failed to add new network');
-        }
+        // Chain not added to MetaMask
+        setConnectionError('Network not found in MetaMask. Please add it manually.');
       } else {
         setConnectionError('Failed to switch network');
       }
     }
-  }, [isConnected, getMetaMaskProvider]);
-
-  // Clear connection errors
-  const clearError = useCallback(() => {
-    setConnectionError(null);
-  }, []);
-
-  // Auto-connect if previously connected
-  useEffect(() => {
-    const wasConnected = localStorage.getItem('aegis-wallet-connected');
-    
-    if (wasConnected && isMetaMaskInstalled()) {
-      // Check if MetaMask is unlocked and has accounts
-      isMetaMaskUnlocked().then((unlocked) => {
-        if (unlocked) {
-          getAccountInfo();
-        }
-      });
-    }
-  }, [isMetaMaskInstalled, isMetaMaskUnlocked, getAccountInfo]);
+  }, [isConnected, getMetaMaskProvider, getAccountInfo]);
 
   // Listen for account changes
   useEffect(() => {
-    const provider = getMetaMaskProvider();
-    if (!provider) return;
+    if (typeof window === 'undefined') return;
 
     const handleAccountsChanged = (accounts: string[]) => {
       if (accounts.length === 0) {
         // User disconnected
         disconnect();
-      } else {
+      } else if (accounts[0] !== address) {
         // Account changed
         setAddress(accounts[0]);
         getAccountInfo();
@@ -297,45 +266,57 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
 
     const handleChainChanged = (chainId: string) => {
-      setChainId(parseInt(chainId, 16));
-      if (address) {
+      // Reload the page when chain changes (recommended by MetaMask)
+      window.location.reload();
+    };
+
+    const ethereum = (window as any).ethereum;
+    if (ethereum) {
+      ethereum.on('accountsChanged', handleAccountsChanged);
+      ethereum.on('chainChanged', handleChainChanged);
+
+      return () => {
+        ethereum.removeListener('accountsChanged', handleAccountsChanged);
+        ethereum.removeListener('chainChanged', handleChainChanged);
+      };
+    }
+  }, [address, disconnect, getAccountInfo]);
+
+  // Auto-connect if MetaMask is already unlocked
+  useEffect(() => {
+    const autoConnect = async () => {
+      if (isMetaMaskInstalled() && await isMetaMaskUnlocked()) {
         getAccountInfo();
       }
     };
 
-    const handleDisconnect = () => {
-      disconnect();
-    };
+    autoConnect();
+  }, [isMetaMaskInstalled, isMetaMaskUnlocked, getAccountInfo]);
 
-    // Add event listeners
-    provider.on('accountsChanged', handleAccountsChanged);
-    provider.on('chainChanged', handleChainChanged);
-    provider.on('disconnect', handleDisconnect);
+  // Auto-refresh balance every 30 seconds when connected
+  useEffect(() => {
+    if (!isConnected) return;
 
-    // Store connection state
-    if (isConnected) {
-      localStorage.setItem('aegis-wallet-connected', 'true');
-    }
-
-    return () => {
-      provider.removeListener('accountsChanged', handleAccountsChanged);
-      provider.removeListener('chainChanged', handleChainChanged);
-      provider.removeListener('disconnect', handleDisconnect);
-    };
-  }, [getMetaMaskProvider, isConnected, address, getAccountInfo, disconnect]);
+    const interval = setInterval(refreshBalance, 30000);
+    return () => clearInterval(interval);
+  }, [isConnected, refreshBalance]);
 
   const value: WalletContextType = {
     address,
     isConnected,
+    isConnecting,
     chainId,
-    balance,
     network,
+    balance,
+    connectionError,
     connect,
     disconnect,
+    isMetaMaskInstalled,
+    isMetaMaskUnlocked,
+    getMetaMaskProvider,
+    getAccountInfo,
+    refreshBalance,
     switchNetwork,
-    isConnecting,
-    connectionError,
-    clearError
   };
 
   return (
