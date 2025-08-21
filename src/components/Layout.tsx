@@ -17,10 +17,12 @@ import {
   Globe
 } from 'lucide-react';
 import WalletConnect from './WalletConnect';
+import WalletConnectionModal from './WalletConnectionModal';
 import { useWallet } from '../contexts/WalletContext';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { isConnected } = useWallet();
@@ -44,14 +46,30 @@ const Layout = () => {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-darker to-dark text-white flex items-center justify-center">
-        <div className="text-center">
-          <Shield size={64} className="mx-auto mb-6 text-primary" />
-          <h1 className="text-3xl font-bold mb-4">Connect Your Wallet</h1>
-          <p className="text-gray-400 mb-8">Connect your wallet to access the Aegis lending platform</p>
-          <WalletConnect />
+      <>
+        <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center">
+          <div className="text-center max-w-md mx-4">
+            <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Shield size={32} className="text-primary" />
+            </div>
+            <h1 className="text-3xl font-bold mb-4 text-foreground">Welcome to Aegis</h1>
+            <p className="text-muted-foreground mb-8 leading-relaxed">
+              The next-generation multi-chain lending platform. Connect your wallet to access 
+              lending, borrowing, and DeFi opportunities across multiple blockchains.
+            </p>
+            <button
+              onClick={() => setWalletModalOpen(true)}
+              className="px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl"
+            >
+              Connect Wallet
+            </button>
+          </div>
         </div>
-      </div>
+        <WalletConnectionModal 
+          isOpen={walletModalOpen} 
+          onClose={() => setWalletModalOpen(false)} 
+        />
+      </>
     );
   }
 
