@@ -10,7 +10,6 @@ import Loans from './pages/Loans';
 import NftCollateral from './pages/NftCollateral';
 import Analytics from './pages/Analytics';
 import Governance from './pages/Governance';
-import GeminiAIDashboard from './components/GeminiAIDashboard';
 import CrossChainLending from './components/CrossChainLending';
 import NotFound from './pages/NotFound';
 
@@ -32,7 +31,6 @@ const App = () => {
             <Route path="nft-collateral" element={<NftCollateral />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="governance" element={<Governance />} />
-            <Route path="ai-dashboard" element={<GeminiAIDashboard />} />
             <Route path="cross-chain-lending" element={<CrossChainLending />} />
           </Route>
           
