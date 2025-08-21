@@ -559,11 +559,12 @@ const Analytics = () => {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                   {['Ethereum', 'Avalanche', 'Solana', 'Polygon', 'Base', 'ZetaChain'].map((chain) => {
                     const latestRate = interestRateTrends[interestRateTrends.length - 1];
-                    const rate = latestRate ? latestRate[chain.toLowerCase() as keyof InterestRateTrends] : 0;
+                    const chainKey = chain.toLowerCase() as 'ethereum' | 'avalanche' | 'solana' | 'polygon' | 'base' | 'zetachain';
+                    const rate = latestRate ? latestRate[chainKey] : 0;
                     return (
                       <div key={chain} className="text-center">
                         <div className="text-sm text-gray-400">{chain}</div>
-                        <div className="text-lg font-semibold text-white">{(rate * 100).toFixed(2)}%</div>
+                        <div className="text-lg font-semibold text-white">{(Number(rate) * 100).toFixed(2)}%</div>
                       </div>
                     );
                   })}

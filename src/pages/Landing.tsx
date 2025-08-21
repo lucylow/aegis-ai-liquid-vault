@@ -10,7 +10,7 @@ import {
   ExternalLink, 
   Github, 
   Twitter, 
-  Discord, 
+  MessageCircle, 
   BookOpen, 
   Users, 
   Vote,
@@ -351,7 +351,7 @@ const Landing = () => {
                   <Twitter className="w-5 h-5" />
                 </a>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Discord className="w-5 h-5" />
+                  <MessageCircle className="w-5 h-5" />
                 </a>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
                   <Github className="w-5 h-5" />
