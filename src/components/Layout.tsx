@@ -20,12 +20,14 @@ import {
 } from 'lucide-react';
 import WalletConnect from './WalletConnect';
 import WalletConnectionModal from './WalletConnectionModal';
+import NotificationPanel from './NotificationPanel';
 import { useWallet } from '../contexts/WalletContext';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [hasShownWalletModal, setHasShownWalletModal] = useState(false);
+  const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { isConnected, address, network, isDemoMode } = useWallet();
@@ -193,9 +195,12 @@ const Layout = () => {
 
           <div className="flex items-center gap-4">
             {/* Notifications */}
-            <button className="p-2 rounded-lg hover:bg-white/10 relative">
+            <button 
+              onClick={() => setNotificationPanelOpen(!notificationPanelOpen)}
+              className="p-2 rounded-lg hover:bg-white/10 relative transition-colors"
+            >
               <Bell size={20} />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
             </button>
 
             {/* Wallet connection */}
@@ -208,6 +213,12 @@ const Layout = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Notification Panel */}
+      <NotificationPanel 
+        isOpen={notificationPanelOpen}
+        onClose={() => setNotificationPanelOpen(false)}
+      />
     </div>
   );
 };

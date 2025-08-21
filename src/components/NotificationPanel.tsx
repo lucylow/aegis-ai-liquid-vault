@@ -1,6 +1,16 @@
-import React from 'react';
-import { Bell, X, CheckCircle, AlertTriangle, Info, AlertCircle, Clock, Trash2 } from 'lucide-react';
-import { useNotifications } from '../contexts/NotificationContext';
+import React, { useState, useEffect } from 'react';
+import { Bell, X, CheckCircle, AlertTriangle, Info, Clock, TrendingUp, Shield, DollarSign } from 'lucide-react';
+
+export interface Notification {
+  id: string;
+  type: 'success' | 'warning' | 'info' | 'alert';
+  title: string;
+  message: string;
+  timestamp: Date;
+  read: boolean;
+  action?: string;
+  priority: 'low' | 'medium' | 'high';
+}
 
 interface NotificationPanelProps {
   isOpen: boolean;
@@ -8,31 +18,134 @@ interface NotificationPanelProps {
 }
 
 const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, onClose }) => {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification, clearAll } = useNotifications();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'alerts'>('all');
 
-  if (!isOpen) return null;
+  // Generate mock notifications
+  useEffect(() => {
+    const mockNotifications: Notification[] = [
+      {
+        id: '1',
+        type: 'success',
+        title: 'Loan Approved',
+        message: 'Your BTC-backed loan for 5,000 USDC has been approved on Avalanche chain.',
+        timestamp: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
+        read: false,
+        action: 'View Loan',
+        priority: 'high'
+      },
+      {
+        id: '2',
+        type: 'warning',
+        title: 'LTV Ratio Alert',
+        message: 'Your Bitcoin collateral LTV has increased to 72%. Consider adding more collateral.',
+        timestamp: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
+        read: false,
+        action: 'Manage Collateral',
+        priority: 'high'
+      },
+      {
+        id: '3',
+        type: 'info',
+        title: 'AI Risk Update',
+        message: 'AI engine has updated your portfolio risk score to 23 (Low Risk). New opportunities detected.',
+        timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+        read: true,
+        action: 'View Analysis',
+        priority: 'medium'
+      },
+      {
+        id: '4',
+        type: 'success',
+        title: 'Cross-Chain Transfer',
+        message: 'Successfully transferred 2,000 USDC from Ethereum to Solana for yield farming.',
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        read: true,
+        action: 'View Transaction',
+        priority: 'medium'
+      },
+      {
+        id: '5',
+        type: 'alert',
+        title: 'Market Volatility',
+        message: 'High volatility detected in SOL market. AI recommends reducing exposure by 15%.',
+        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+        read: false,
+        action: 'Review Portfolio',
+        priority: 'high'
+      },
+      {
+        id: '6',
+        type: 'info',
+        title: 'New DeFi Protocol',
+        message: 'Base chain has launched a new lending protocol with 18% APY. AI suggests allocating 10% of portfolio.',
+        timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+        read: true,
+        action: 'Explore Protocol',
+        priority: 'low'
+      },
+      {
+        id: '7',
+        type: 'success',
+        title: 'Yield Optimization',
+        message: 'Portfolio yield increased by 2.3% this week. AI rebalancing recommendations available.',
+        timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
+        read: true,
+        action: 'View Report',
+        priority: 'medium'
+      },
+      {
+        id: '8',
+        type: 'warning',
+        title: 'Gas Fee Alert',
+        message: 'Ethereum gas fees are currently high (45 gwei). Consider batching transactions.',
+        timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
+        read: true,
+        action: 'Monitor Fees',
+        priority: 'low'
+      }
+    ];
+    
+    setNotifications(mockNotifications);
+  }, []);
 
-  const getIcon = (type: string) => {
+  const markAsRead = (id: string) => {
+    setNotifications(prev => 
+      prev.map(notif => 
+        notif.id === id ? { ...notif, read: true } : notif
+      )
+    );
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(prev => 
+      prev.map(notif => ({ ...notif, read: true }))
+    );
+  };
+
+  const deleteNotification = (id: string) => {
+    setNotifications(prev => prev.filter(notif => notif.id !== id));
+  };
+
+  const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'success':
-        return <CheckCircle size={16} className="text-green-500" />;
-      case 'error':
-        return <AlertCircle size={16} className="text-red-500" />;
+        return <CheckCircle className="w-5 h-5 text-green-500" />;
       case 'warning':
-        return <AlertTriangle size={16} className="text-yellow-500" />;
+        return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
+      case 'alert':
+        return <AlertTriangle className="w-5 h-5 text-red-500" />;
       case 'info':
-        return <Info size={16} className="text-blue-500" />;
+        return <Info className="w-5 h-5 text-blue-500" />;
       default:
-        return <Bell size={16} className="text-gray-500" />;
+        return <Info className="w-5 h-5 text-gray-500" />;
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critical':
-        return 'border-l-red-500';
       case 'high':
-        return 'border-l-orange-500';
+        return 'border-l-red-500';
       case 'medium':
         return 'border-l-yellow-500';
       case 'low':
@@ -42,122 +155,189 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, onClose }
     }
   };
 
-  const formatTime = (timestamp: Date) => {
+  const getTimeAgo = (timestamp: Date) => {
     const now = new Date();
-    const diff = now.getTime() - timestamp.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (days > 0) return `${days}d ago`;
-    if (hours > 0) return `${hours}h ago`;
-    if (minutes > 0) return `${minutes}m ago`;
-    return 'Just now';
+    const diffInMinutes = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays}d ago`;
   };
 
+  const filteredNotifications = notifications.filter(notif => {
+    if (activeTab === 'unread') return !notif.read;
+    if (activeTab === 'alerts') return notif.type === 'alert' || notif.type === 'warning';
+    return true;
+  });
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+  const alertCount = notifications.filter(n => n.type === 'alert' || n.type === 'warning').length;
+
+  if (!isOpen) return null;
+
   return (
-    <>
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 z-40 bg-black/20" 
-        onClick={onClose}
-      />
-      
-      {/* Panel */}
-      <div className="absolute right-0 top-full mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 flex flex-col">
+    <div className="fixed inset-0 z-50" onClick={onClose}>
+      <div className="absolute top-16 right-6 w-96 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl" onClick={e => e.stopPropagation()}>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <div className="flex items-center gap-2">
-            <Bell size={20} className="text-gray-600" />
-            <h3 className="font-semibold text-gray-900">Notifications</h3>
+        <div className="flex items-center justify-between p-4 border-b border-gray-700">
+          <div className="flex items-center gap-3">
+            <Bell className="w-5 h-5 text-primary" />
+            <h3 className="text-lg font-semibold text-white">Notifications</h3>
             {unreadCount > 0 && (
-              <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">
+              <span className="px-2 py-1 bg-primary text-white text-xs rounded-full">
                 {unreadCount}
               </span>
             )}
           </div>
           <div className="flex items-center gap-2">
-            {unreadCount > 0 && (
-              <button
-                onClick={markAllAsRead}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Mark all read
-              </button>
-            )}
             <button
-              onClick={clearAll}
-              className="text-sm text-gray-500 hover:text-gray-700"
-              title="Clear all"
+              onClick={markAllAsRead}
+              className="text-xs text-gray-400 hover:text-white transition-colors"
             >
-              <Trash2 size={16} />
+              Mark all read
             </button>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="p-1 hover:bg-gray-800 rounded-lg transition-colors"
             >
-              <X size={20} />
+              <X className="w-4 h-4 text-gray-400" />
             </button>
           </div>
         </div>
 
+        {/* Tabs */}
+        <div className="flex border-b border-gray-700">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              activeTab === 'all' 
+                ? 'text-primary border-b-2 border-primary' 
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            All ({notifications.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('unread')}
+            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              activeTab === 'unread' 
+                ? 'text-primary border-b-2 border-primary' 
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            Unread ({unreadCount})
+          </button>
+          <button
+            onClick={() => setActiveTab('alerts')}
+            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              activeTab === 'alerts' 
+                ? 'text-primary border-b-2 border-primary' 
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            Alerts ({alertCount})
+          </button>
+        </div>
+
         {/* Notifications List */}
-        <div className="flex-1 overflow-y-auto">
-          {notifications.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <Bell size={48} className="mx-auto mb-3 text-gray-300" />
-              <p className="text-sm">No notifications</p>
+        <div className="max-h-96 overflow-y-auto">
+          {filteredNotifications.length === 0 ? (
+            <div className="p-8 text-center text-gray-400">
+              <Bell className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>No notifications</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
-              {notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`p-4 hover:bg-gray-50 cursor-pointer border-l-4 ${getPriorityColor(notification.priority)} ${
-                    !notification.isRead ? 'bg-blue-50/50' : ''
-                  }`}
-                  onClick={() => markAsRead(notification.id)}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 mt-0.5">
-                      {getIcon(notification.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <h4 className={`text-sm font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'}`}>
-                          {notification.title}
-                        </h4>
+            filteredNotifications.map((notification) => (
+              <div
+                key={notification.id}
+                className={`p-4 border-l-4 ${getPriorityColor(notification.priority)} ${
+                  notification.read ? 'bg-gray-800/30' : 'bg-gray-800/50'
+                } hover:bg-gray-800/70 transition-colors`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1">
+                    {getNotificationIcon(notification.type)}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <h4 className={`text-sm font-medium ${
+                        notification.read ? 'text-gray-300' : 'text-white'
+                      }`}>
+                        {notification.title}
+                      </h4>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">
+                          {getTimeAgo(notification.timestamp)}
+                        </span>
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeNotification(notification.id);
-                          }}
-                          className="text-gray-400 hover:text-gray-600"
+                          onClick={() => deleteNotification(notification.id)}
+                          className="p-1 hover:bg-gray-700 rounded transition-colors"
                         >
-                          <X size={14} />
+                          <X className="w-3 h-3 text-gray-500 hover:text-red-400" />
                         </button>
                       </div>
-                      <p className={`text-sm mt-1 ${!notification.isRead ? 'text-gray-700' : 'text-gray-500'}`}>
-                        {notification.message}
-                      </p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Clock size={12} className="text-gray-400" />
-                        <span className="text-xs text-gray-400">
-                          {formatTime(notification.timestamp)}
-                        </span>
-                        {!notification.isRead && (
-                          <div className="w-2 h-2 bg-blue-500 rounded-full ml-auto"></div>
-                        )}
-                      </div>
                     </div>
+                    
+                    <p className={`text-sm mt-1 ${
+                      notification.read ? 'text-gray-400' : 'text-gray-300'
+                    }`}>
+                      {notification.message}
+                    </p>
+                    
+                    {notification.action && (
+                      <button
+                        onClick={() => markAsRead(notification.id)}
+                        className="mt-2 text-xs text-primary hover:text-primary/80 transition-colors"
+                      >
+                        {notification.action} →
+                      </button>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
+                
+                {!notification.read && (
+                  <div className="mt-3 flex items-center gap-2">
+                    <button
+                      onClick={() => markAsRead(notification.id)}
+                      className="text-xs text-gray-400 hover:text-white transition-colors"
+                    >
+                      Mark as read
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
           )}
         </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-700 bg-gray-800/30">
+          <div className="flex items-center justify-between text-xs text-gray-400">
+            <span>Last updated: {getTimeAgo(new Date())}</span>
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" />
+                {notifications.filter(n => n.type === 'success').length} Success
+              </span>
+              <span className="flex items-center gap-1">
+                <Shield className="w-3 h-3" />
+                {notifications.filter(n => n.type === 'info').length} Info
+              </span>
+              <span className="flex items-center gap-1">
+                <AlertTriangle className="w-3 h-3" />
+                {alertCount} Alerts
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 
