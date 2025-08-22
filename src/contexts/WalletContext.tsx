@@ -279,55 +279,42 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     // Only enable wallet listeners if user has explicitly connected
     if (!isConnected) return;
 
+    const provider = getMetaMaskProvider();
+
     const handleAccountsChanged = (accounts: string[]) => {
       if (accounts.length === 0) {
         // User disconnected
         disconnect();
       } else if (accounts[0] !== address) {
-        // Account changed
+        // Account changed - just update the address and refresh info
         setAddress(accounts[0]);
-        // Call getAccountInfo directly to avoid dependency issues
-        const provider = getMetaMaskProvider();
+        // Refresh account info for the new address
         if (provider) {
-          provider.request({ method: 'eth_accounts' }).then((accounts: string[]) => {
-            if (accounts && accounts.length > 0) {
-              const account = accounts[0];
-              setAddress(account);
-              setIsConnected(true);
-              
-              // Get chain ID
-              provider.request({ method: 'eth_chainId' }).then((chainId: string) => {
-                setChainId(parseInt(chainId, 16));
-                
-                // Get balance
-                provider.request({ 
-                  method: 'eth_getBalance', 
-                  params: [account, 'latest'] 
-                }).then((balance: string) => {
-                  setBalance((parseInt(balance, 16) / 1e18).toFixed(4));
-                });
-                
-                // Set network name
-                const networkNames: { [key: number]: string } = {
-                  1: 'Ethereum Mainnet',
-                  137: 'Polygon',
-                  56: 'Binance Smart Chain',
-                  42161: 'Arbitrum',
-                  10: 'Optimism',
-                  8453: 'Base',
-                  59144: 'Linea'
-                };
-                setNetwork(networkNames[parseInt(chainId, 16)] || `Chain ID: ${parseInt(chainId, 16)}`);
-              });
-            }
-          });
+          refreshBalance();
         }
       }
     };
 
     const handleChainChanged = (chainId: string) => {
-      // Reload the page when chain changes (recommended by MetaMask)
-      window.location.reload();
+      // Update chain ID without reloading the page
+      setChainId(parseInt(chainId, 16));
+      
+      // Update network name
+      const networkNames: { [key: number]: string } = {
+        1: 'Ethereum Mainnet',
+        137: 'Polygon',
+        56: 'Binance Smart Chain',
+        42161: 'Arbitrum',
+        10: 'Optimism',
+        8453: 'Base',
+        59144: 'Linea'
+      };
+      setNetwork(networkNames[parseInt(chainId, 16)] || `Chain ID: ${parseInt(chainId, 16)}`);
+      
+      // Refresh balance for new chain
+      if (address) {
+        refreshBalance();
+      }
     };
 
     const ethereum = (window as any).ethereum;
