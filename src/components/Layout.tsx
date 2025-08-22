@@ -358,6 +358,7 @@ const Layout = () => {
                     ≈ ${balance ? (parseFloat(balance) * 2000).toFixed(2) : '0.00'} USD
                   </span>
                 </div>
+                <span className="text-xs text-gray-500 mt-1 block">Connected</span>
               </div>
 
               {/* ZetaChain Network Status */}
