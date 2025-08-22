@@ -168,6 +168,19 @@ const Deposit = () => {
       balance: 25,
       apy: 5.9,
       ltv: 72
+    },
+    { 
+      symbol: 'ZETA', 
+      name: 'ZetaChain', 
+      type: 'crypto',
+      icon: DollarSign, 
+      color: '#00d4aa', 
+      decimals: 18, 
+      price: 2.45, 
+      change24h: 5.2, 
+      balance: 1000,
+      apy: 12.5,
+      ltv: 85
     }
   ];
 
@@ -292,7 +305,7 @@ const Deposit = () => {
       icon: '⚡', 
       color: '#00d4aa', 
       status: 'healthy', 
-      gasPrice: '0.1 gwei', 
+      gasPrice: '0.001 gaZETA', 
       confirmationTime: '~2 sec',
       bridgeFee: 0,
       isNative: true

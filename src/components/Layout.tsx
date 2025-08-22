@@ -31,6 +31,7 @@ const Layout = () => {
   const [hasShownWalletModal, setHasShownWalletModal] = useState(false);
   const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
   const [zetaNetwork, setZetaNetwork] = useState<'mainnet' | 'testnet'>('mainnet');
+  const [walletInfoOpen, setWalletInfoOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { isConnected, address, network, isDemoMode } = useWallet();
@@ -176,7 +177,10 @@ const Layout = () => {
               </div>
             </button>
           ) : (
-            <div className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5">
+            <button 
+              onClick={() => setWalletInfoOpen(true)}
+              className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+            >
               <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
                 <Wallet size={16} className="text-white" />
               </div>
@@ -188,7 +192,7 @@ const Layout = () => {
                   {network || 'Ethereum'} • Connected
                 </p>
               </div>
-            </div>
+            </button>
           )}
         </div>
       </div>
@@ -269,6 +273,103 @@ const Layout = () => {
         isOpen={notificationPanelOpen}
         onClose={() => setNotificationPanelOpen(false)}
       />
+
+      {/* Wallet Info Popup */}
+      {walletInfoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setWalletInfoOpen(false)} />
+          <div className="relative bg-gray-900 border border-gray-700 rounded-xl p-6 w-96 max-w-[90vw]">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Wallet size={20} className="text-primary" />
+                Wallet Information
+              </h3>
+              <button
+                onClick={() => setWalletInfoOpen(false)}
+                className="p-1 rounded-lg hover:bg-white/10 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Wallet Address */}
+              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-400">Wallet Address</span>
+                  <button className="p-1 hover:bg-white/10 rounded transition-colors">
+                    <Copy size={14} />
+                  </button>
+                </div>
+                <p className="text-white font-mono text-sm break-all">
+                  {address || 'Not connected'}
+                </p>
+              </div>
+
+              {/* Network Information */}
+              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                <span className="text-sm text-gray-400">Network</span>
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-white font-medium">{network || 'Ethereum'}</span>
+                  <span className="text-xs text-gray-500">• Chain ID: {chainId || 'N/A'}</span>
+                </div>
+              </div>
+
+              {/* ZetaChain Network */}
+              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                <span className="text-sm text-gray-400">ZetaChain Network</span>
+                <div className="flex items-center gap-2 mt-2">
+                  <Network size={16} className="text-blue-400" />
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    zetaNetwork === 'mainnet' 
+                      ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' 
+                      : 'bg-orange-600/20 text-orange-400 border border-orange-500/30'
+                  }`}>
+                    {zetaNetwork === 'mainnet' ? 'Mainnet' : 'Testnet'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Balance */}
+              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                <span className="text-sm text-gray-400">Balance</span>
+                <p className="text-white font-medium mt-2">
+                  {balance ? `${parseFloat(balance).toFixed(4)} ${network || 'ETH'}` : 'Loading...'}
+                </p>
+              </div>
+
+              {/* Connection Status */}
+              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                <span className="text-sm text-gray-400">Connection Status</span>
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-green-400 font-medium">Connected</span>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => {
+                    setWalletInfoOpen(false);
+                    // Add disconnect logic here if needed
+                  }}
+                  className="flex-1 px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                >
+                  Disconnect
+                </button>
+                <button
+                  onClick={() => setWalletInfoOpen(false)}
+                  className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

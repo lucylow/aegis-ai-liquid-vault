@@ -687,8 +687,12 @@ const Borrow = () => {
             <div className="space-y-4">
               <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-blue-400">Ethereum</span>
+                  <span className="text-sm font-medium text-blue-400">ETH.USDC</span>
                   <span className="text-sm text-white">$5,000</span>
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-blue-300">Cross-chain path</span>
+                  <span className="text-xs text-yellow-400">Gas: 0.001 gaZETA</span>
                 </div>
                 <div className="w-full bg-blue-500/20 rounded-full h-2">
                   <div className="bg-blue-500 h-2 rounded-full" style={{ width: '50%' }}></div>
@@ -697,8 +701,12 @@ const Borrow = () => {
               
               <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-purple-400">Solana</span>
+                  <span className="text-sm font-medium text-purple-400">SOL.AVAX</span>
                   <span className="text-sm text-white">$2,500</span>
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-purple-300">Cross-chain path</span>
+                  <span className="text-xs text-yellow-400">Gas: 0.002 gaZETA</span>
                 </div>
                 <div className="w-full bg-purple-500/20 rounded-full h-2">
                   <div className="bg-purple-500 h-2 rounded-full" style={{ width: '25%' }}></div>
@@ -707,8 +715,12 @@ const Borrow = () => {
               
               <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-green-400">Polygon</span>
+                  <span className="text-sm font-medium text-green-400">POL.BNB</span>
                   <span className="text-sm text-white">$1,000</span>
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-green-300">Cross-chain path</span>
+                  <span className="text-xs text-yellow-400">Gas: 0.0015 gaZETA</span>
                 </div>
                 <div className="w-full bg-green-500/20 rounded-full h-2">
                   <div className="bg-green-500 h-2 rounded-full" style={{ width: '10%' }}></div>
