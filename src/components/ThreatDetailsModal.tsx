@@ -154,10 +154,19 @@ const ThreatDetailsModal: React.FC<ThreatDetailsModalProps> = ({
                       <span className="text-gray-400">Transaction Hash:</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-white font-mono text-sm">{threat.transactionHash}</span>
+                      <a
+                        href={`https://explorer.zetachain.com/cc/tx/${threat.transactionHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300 transition-colors font-mono text-sm cursor-pointer"
+                        title="View on ZetaScan"
+                      >
+                        {threat.transactionHash}
+                      </a>
                       <button
                         onClick={() => copyToClipboard(threat.transactionHash!)}
                         className="p-1 hover:bg-white/10 rounded transition-colors"
+                        title="Copy Transaction Hash"
                       >
                         <Copy size={14} className="text-gray-400" />
                       </button>

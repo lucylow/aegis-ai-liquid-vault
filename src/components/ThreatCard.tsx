@@ -147,7 +147,15 @@ const ThreatCard: React.FC<ThreatCardProps> = ({ threat, onResolve, onInvestigat
           {threat.transactionHash && (
             <div className="text-xs">
               <span className="text-gray-400">Tx Hash:</span>
-              <span className="text-white ml-1 font-mono">{threat.transactionHash.substring(0, 8)}...{threat.transactionHash.substring(56)}</span>
+              <a
+                href={`https://explorer.zetachain.com/cc/tx/${threat.transactionHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-300 transition-colors ml-1 font-mono cursor-pointer"
+                title="View on ZetaScan"
+              >
+                {threat.transactionHash.substring(0, 8)}...{threat.transactionHash.substring(56)}
+              </a>
             </div>
           )}
         </div>

@@ -74,6 +74,12 @@ const NftCollateral = () => {
   const [activeTab, setActiveTab] = useState<'nfts' | 'borrowing' | 'history' | 'marketplace'>('nfts');
   const [filterChain, setFilterChain] = useState<string>('all');
   const [filterRarity, setFilterRarity] = useState<string>('all');
+  const [showBridgeModal, setShowBridgeModal] = useState(false);
+  const [selectedNFTForBridge, setSelectedNFTForBridge] = useState<NFTCollateral | null>(null);
+  const [bridgeTargetChain, setBridgeTargetChain] = useState<string>('solana');
+  const [bridgeStatus, setBridgeStatus] = useState<'idle' | 'bridging' | 'success' | 'error'>('idle');
+  const [bridgeProgress, setBridgeProgress] = useState(0);
+  const [bridgeTransactionHash, setBridgeTransactionHash] = useState<string>('');
 
   // Mock NFT data - replace with real API calls
   useEffect(() => {
@@ -84,7 +90,7 @@ const NftCollateral = () => {
         contractAddress: '0x1234567890123456789012345678901234567890',
         name: 'Dragon Slayer Sword',
         description: 'Epic rare sword from Fantasy Game X with fire enchantment',
-        imageUrl: 'https://via.placeholder.com/300x300/8B5CF6/FFFFFF?text=Dragon+Sword',
+        imageUrl: 'https://raw.githubusercontent.com/lucylow/aegis-ai-liquid-vault/refs/heads/main/images/DragonSlayer_Sword_In_Use.webp',
         lockedOnChain: 'ethereum',
         targetChain: 'solana',
         gameFiPlatform: 'Fantasy Game X',
@@ -131,7 +137,7 @@ const NftCollateral = () => {
         contractAddress: '0x2345678901234567890123456789012345678901',
         name: 'Crypto Racer Car',
         description: 'Limited edition NFT car in Racing Game Y with turbo boost',
-        imageUrl: 'https://via.placeholder.com/300x300/10B981/FFFFFF?text=Crypto+Car',
+        imageUrl: 'https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/images/solana%20crypto%20racer%20car%20nft%20racing%20game%20turbo%20boost.jpg?raw=true',
         lockedOnChain: 'solana',
         targetChain: 'ethereum',
         gameFiPlatform: 'Racing Game Y',
@@ -169,7 +175,7 @@ const NftCollateral = () => {
         contractAddress: '0x3456789012345678901234567890123456789012',
         name: 'Pixel Warrior',
         description: 'Rare pixel art warrior from Retro Game Z',
-        imageUrl: 'https://via.placeholder.com/300x300/F59E0B/FFFFFF?text=Pixel+Warrior',
+        imageUrl: 'https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/images/polygon%20pixel%20warrior%20nft%20.png?raw=true',
         lockedOnChain: 'polygon',
         targetChain: 'avalanche',
         gameFiPlatform: 'Retro Game Z',
@@ -753,7 +759,15 @@ const NftCollateral = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-xs text-gray-400">TX Hash</div>
-                      <div className="text-blue-400 font-mono text-sm">{item.txHash}</div>
+                      <a
+                        href={`https://explorer.zetachain.com/cc/tx/${item.txHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 font-mono text-sm hover:text-blue-300 transition-colors cursor-pointer"
+                        title="View on ZetaScan"
+                      >
+                        {item.txHash}
+                      </a>
                     </div>
                   </div>
                 </div>

@@ -555,7 +555,7 @@ class BorrowService {
       'polygon': 'https://polygonscan.com/tx/',
       'avalanche': 'https://snowtrace.io/tx/',
       'arbitrum': 'https://arbiscan.io/tx/',
-      'zetachain': 'https://zetachain.blockscout.com/tx/'
+      'zetachain': 'https://explorer.zetachain.com/cc/tx/'
     };
 
     const baseUrl = explorers[chain.toLowerCase()] || explorers['ethereum'];

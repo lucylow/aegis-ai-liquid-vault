@@ -987,10 +987,19 @@ const Deposit = () => {
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Tx Hash:</span>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono">{currentTransaction.txHash.substring(0, 8)}...</span>
+                      <a
+                        href={`https://explorer.zetachain.com/cc/tx/${currentTransaction.txHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono text-blue-400 hover:text-blue-300 transition-colors"
+                        title="View on ZetaScan"
+                      >
+                        {currentTransaction.txHash.substring(0, 8)}...
+                      </a>
                       <button
                         onClick={() => copyToClipboard(currentTransaction.txHash!)}
                         className="text-primary hover:text-primary/80 transition-colors"
+                        title="Copy Transaction Hash"
                       >
                         <Copy size={14} />
                       </button>
