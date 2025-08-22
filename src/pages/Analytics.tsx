@@ -125,25 +125,37 @@ const Analytics = () => {
       ];
       setLiquidityStats(mockLiquidityStats);
 
-      // Mock risk model data
+      // Mock risk model data with more comprehensive data
       const mockRiskModelData: RiskModelData[] = [
         { month: 'Jan', avgCreditScore: 78, liquidations: 4, borrowRepayments: 70, defaultRate: 2.1, marketVolatility: 15 },
         { month: 'Feb', avgCreditScore: 80, liquidations: 5, borrowRepayments: 75, defaultRate: 1.9, marketVolatility: 18 },
         { month: 'Mar', avgCreditScore: 82, liquidations: 3, borrowRepayments: 80, defaultRate: 1.7, marketVolatility: 12 },
         { month: 'Apr', avgCreditScore: 81, liquidations: 4, borrowRepayments: 85, defaultRate: 1.8, marketVolatility: 16 },
         { month: 'May', avgCreditScore: 83, liquidations: 2, borrowRepayments: 88, defaultRate: 1.5, marketVolatility: 14 },
-        { month: 'Jun', avgCreditScore: 85, liquidations: 1, borrowRepayments: 92, defaultRate: 1.2, marketVolatility: 11 }
+        { month: 'Jun', avgCreditScore: 85, liquidations: 1, borrowRepayments: 92, defaultRate: 1.2, marketVolatility: 11 },
+        { month: 'Jul', avgCreditScore: 87, liquidations: 1, borrowRepayments: 95, defaultRate: 1.0, marketVolatility: 10 },
+        { month: 'Aug', avgCreditScore: 89, liquidations: 0, borrowRepayments: 98, defaultRate: 0.8, marketVolatility: 9 },
+        { month: 'Sep', avgCreditScore: 91, liquidations: 0, borrowRepayments: 100, defaultRate: 0.6, marketVolatility: 8 },
+        { month: 'Oct', avgCreditScore: 93, liquidations: 0, borrowRepayments: 102, defaultRate: 0.5, marketVolatility: 7 },
+        { month: 'Nov', avgCreditScore: 94, liquidations: 0, borrowRepayments: 105, defaultRate: 0.4, marketVolatility: 6 },
+        { month: 'Dec', avgCreditScore: 95, liquidations: 0, borrowRepayments: 108, defaultRate: 0.3, marketVolatility: 5 }
       ];
       setRiskModelData(mockRiskModelData);
 
-      // Mock interest rate trends
+      // Mock interest rate trends with more comprehensive data
       const mockInterestRateTrends: InterestRateTrends[] = [
         { month: 'Jan', ethereum: 0.052, avalanche: 0.048, solana: 0.055, polygon: 0.049, base: 0.061, zetachain: 0.058 },
         { month: 'Feb', ethereum: 0.054, avalanche: 0.050, solana: 0.053, polygon: 0.051, base: 0.059, zetachain: 0.056 },
         { month: 'Mar', ethereum: 0.051, avalanche: 0.047, solana: 0.054, polygon: 0.048, base: 0.057, zetachain: 0.054 },
         { month: 'Apr', ethereum: 0.053, avalanche: 0.049, solana: 0.052, polygon: 0.050, base: 0.055, zetachain: 0.052 },
         { month: 'May', ethereum: 0.050, avalanche: 0.046, solana: 0.051, polygon: 0.047, base: 0.053, zetachain: 0.050 },
-        { month: 'Jun', ethereum: 0.048, avalanche: 0.044, solana: 0.049, polygon: 0.045, base: 0.051, zetachain: 0.048 }
+        { month: 'Jun', ethereum: 0.048, avalanche: 0.044, solana: 0.049, polygon: 0.045, base: 0.051, zetachain: 0.048 },
+        { month: 'Jul', ethereum: 0.046, avalanche: 0.042, solana: 0.047, polygon: 0.043, base: 0.049, zetachain: 0.046 },
+        { month: 'Aug', ethereum: 0.044, avalanche: 0.040, solana: 0.045, polygon: 0.041, base: 0.047, zetachain: 0.044 },
+        { month: 'Sep', ethereum: 0.042, avalanche: 0.038, solana: 0.043, polygon: 0.039, base: 0.045, zetachain: 0.042 },
+        { month: 'Oct', ethereum: 0.040, avalanche: 0.036, solana: 0.041, polygon: 0.037, base: 0.043, zetachain: 0.040 },
+        { month: 'Nov', ethereum: 0.038, avalanche: 0.034, solana: 0.039, polygon: 0.035, base: 0.041, zetachain: 0.038 },
+        { month: 'Dec', ethereum: 0.036, avalanche: 0.032, solana: 0.037, polygon: 0.033, base: 0.039, zetachain: 0.036 }
       ];
       setInterestRateTrends(mockInterestRateTrends);
 

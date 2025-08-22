@@ -272,9 +272,12 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     setConnectionError(null);
   }, []);
 
-  // Listen for account changes
+  // Listen for account changes - DISABLED on landing page to prevent automatic popups
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    
+    // Only enable wallet listeners if user has explicitly connected
+    if (!isConnected) return;
 
     const handleAccountsChanged = (accounts: string[]) => {
       if (accounts.length === 0) {
@@ -337,18 +340,18 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         ethereum.removeListener('chainChanged', handleChainChanged);
       };
     }
-  }, [address, disconnect]); // Removed getAccountInfo dependency
+  }, [address, disconnect, isConnected]); // Added isConnected dependency
 
-  // Auto-connect if MetaMask is already unlocked
-  useEffect(() => {
-    const autoConnect = async () => {
-      if (isMetaMaskInstalled() && await isMetaMaskUnlocked()) {
-        getAccountInfo();
-      }
-    };
+  // Auto-connect if MetaMask is already unlocked - DISABLED to prevent automatic popups
+  // useEffect(() => {
+  //   const autoConnect = async () => {
+  //     if (isMetaMaskInstalled() && await isMetaMaskUnlocked()) {
+  //       getAccountInfo();
+  //     }
+  //   };
 
-    autoConnect();
-  }, []); // Only run once on mount
+  //   autoConnect();
+  // }, []); // Only run once on mount
 
   // Auto-refresh balance every 30 seconds when connected
   useEffect(() => {

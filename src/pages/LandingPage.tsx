@@ -17,7 +17,7 @@ import {
   Coins,
   Network
 } from 'lucide-react';
-import WalletConnect from '../components/WalletConnect';
+
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -116,7 +116,7 @@ const LandingPage = () => {
               AEGIS
             </span>
           </div>
-          <WalletConnect />
+  
         </div>
       </nav>
 
