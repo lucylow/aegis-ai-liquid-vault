@@ -23,15 +23,6 @@ import {
 
 const AppWelcome = () => {
   const navigate = useNavigate();
-  
-  // Debug logging
-  console.log('AppWelcome component rendering');
-  
-  // Add error boundary
-  React.useEffect(() => {
-    console.log('AppWelcome component mounted');
-    return () => console.log('AppWelcome component unmounted');
-  }, []);
 
   const features = [
     {

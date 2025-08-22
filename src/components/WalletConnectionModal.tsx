@@ -113,11 +113,9 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
   const handleConnect = async (walletId: string) => {
     try {
       clearError();
-      console.log('Starting wallet connection...');
       await connect();
-      console.log('Wallet connection successful');
       onClose();
-      console.log('Wallet connected, navigating to /app');
+      // Navigate to the main app interface after successful connection
       navigate('/app');
     } catch (error) {
       console.error('Connection failed:', error);
@@ -444,10 +442,8 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
                 <div className="pt-3 border-t border-gray-600">
                   <button
                     onClick={() => {
-                      console.log('Demo mode button clicked');
                       enableDemoMode();
                       onClose();
-                      console.log('Demo mode enabled, navigating to /app');
                       navigate('/app');
                     }}
                     className="w-full px-4 py-3 bg-orange-500/10 border border-orange-500/20 rounded-lg text-orange-400 hover:bg-orange-500/20 transition-colors text-sm font-medium"

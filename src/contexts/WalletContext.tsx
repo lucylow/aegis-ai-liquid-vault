@@ -272,49 +272,59 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     setConnectionError(null);
   }, []);
 
-  // Listen for account changes - DISABLED on landing page to prevent automatic popups
+  // Listen for account changes
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
-    // Only enable wallet listeners if user has explicitly connected
-    if (!isConnected) return;
-
-    const provider = getMetaMaskProvider();
 
     const handleAccountsChanged = (accounts: string[]) => {
       if (accounts.length === 0) {
         // User disconnected
         disconnect();
       } else if (accounts[0] !== address) {
-        // Account changed - just update the address and refresh info
+        // Account changed
         setAddress(accounts[0]);
-        // Refresh account info for the new address
+        // Call getAccountInfo directly to avoid dependency issues
+        const provider = getMetaMaskProvider();
         if (provider) {
-          refreshBalance();
+          provider.request({ method: 'eth_accounts' }).then((accounts: string[]) => {
+            if (accounts && accounts.length > 0) {
+              const account = accounts[0];
+              setAddress(account);
+              setIsConnected(true);
+              
+              // Get chain ID
+              provider.request({ method: 'eth_chainId' }).then((chainId: string) => {
+                setChainId(parseInt(chainId, 16));
+                
+                // Get balance
+                provider.request({ 
+                  method: 'eth_getBalance', 
+                  params: [account, 'latest'] 
+                }).then((balance: string) => {
+                  setBalance((parseInt(balance, 16) / 1e18).toFixed(4));
+                });
+                
+                // Set network name
+                const networkNames: { [key: number]: string } = {
+                  1: 'Ethereum Mainnet',
+                  137: 'Polygon',
+                  56: 'Binance Smart Chain',
+                  42161: 'Arbitrum',
+                  10: 'Optimism',
+                  8453: 'Base',
+                  59144: 'Linea'
+                };
+                setNetwork(networkNames[parseInt(chainId, 16)] || `Chain ID: ${parseInt(chainId, 16)}`);
+              });
+            }
+          });
         }
       }
     };
 
     const handleChainChanged = (chainId: string) => {
-      // Update chain ID without reloading the page
-      setChainId(parseInt(chainId, 16));
-      
-      // Update network name
-      const networkNames: { [key: number]: string } = {
-        1: 'Ethereum Mainnet',
-        137: 'Polygon',
-        56: 'Binance Smart Chain',
-        42161: 'Arbitrum',
-        10: 'Optimism',
-        8453: 'Base',
-        59144: 'Linea'
-      };
-      setNetwork(networkNames[parseInt(chainId, 16)] || `Chain ID: ${parseInt(chainId, 16)}`);
-      
-      // Refresh balance for new chain
-      if (address) {
-        refreshBalance();
-      }
+      // Reload the page when chain changes (recommended by MetaMask)
+      window.location.reload();
     };
 
     const ethereum = (window as any).ethereum;
@@ -327,18 +337,18 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         ethereum.removeListener('chainChanged', handleChainChanged);
       };
     }
-  }, [address, disconnect, isConnected]); // Added isConnected dependency
+  }, [address, disconnect]); // Removed getAccountInfo dependency
 
-  // Auto-connect if MetaMask is already unlocked - DISABLED to prevent automatic popups
-  // useEffect(() => {
-  //   const autoConnect = async () => {
-  //     if (isMetaMaskInstalled() && await isMetaMaskUnlocked()) {
-  //       getAccountInfo();
-  //     }
-  //   };
+  // Auto-connect if MetaMask is already unlocked
+  useEffect(() => {
+    const autoConnect = async () => {
+      if (isMetaMaskInstalled() && await isMetaMaskUnlocked()) {
+        getAccountInfo();
+      }
+    };
 
-  //   autoConnect();
-  // }, []); // Only run once on mount
+    autoConnect();
+  }, []); // Only run once on mount
 
   // Auto-refresh balance every 30 seconds when connected
   useEffect(() => {
