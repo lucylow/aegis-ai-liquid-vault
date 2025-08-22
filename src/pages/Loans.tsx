@@ -53,10 +53,10 @@ const Loans = () => {
   const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null);
   const [collateralAmount, setCollateralAmount] = useState('');
   const [repayAmount, setRepayAmount] = useState('');
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
-  const [activeTab, setActiveTab] = useState<'loans' | 'perpetual' | 'notifications' | 'analytics'>('loans');
+  const [activeTab, setActiveTab] = useState<'loans' | 'perpetual' | 'analytics'>('loans');
 
   // Mock loan data - replace with real API calls
   useEffect(() => {
@@ -121,27 +121,7 @@ const Loans = () => {
     setLoans(mockLoans);
   }, []);
 
-  // Simulate real-time notifications
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Check for high-risk loans and generate notifications
-      loans.forEach(loan => {
-        if (loan.liquidationRisk > 70 && !notifications.find(n => n.message.includes(loan.id))) {
-          const newNotification: Notification = {
-            id: `notif-${Date.now()}`,
-            type: loan.liquidationRisk > 80 ? 'liquidation_warning' : 'margin_call',
-            message: `⚠️ ${loan.liquidationRisk > 80 ? 'CRITICAL' : 'WARNING'}: Loan ${loan.id} liquidation risk at ${loan.liquidationRisk}%`,
-            timestamp: new Date(),
-            isRead: false,
-            severity: loan.liquidationRisk > 80 ? 'critical' : 'high'
-          };
-          setNotifications(prev => [newNotification, ...prev]);
-        }
-      });
-    }, 10000); // Check every 10 seconds
 
-    return () => clearInterval(interval);
-  }, [loans, notifications]);
 
   const handleAddCollateral = async () => {
     if (!selectedLoanId || !collateralAmount) {
@@ -161,16 +141,7 @@ const Loans = () => {
           : loan
       ));
 
-      // Add notification
-      const newNotification: Notification = {
-        id: `notif-${Date.now()}`,
-        type: 'collateral_update',
-        message: `✅ Added ${collateralAmount} USDC collateral to Loan ${selectedLoanId}`,
-        timestamp: new Date(),
-        isRead: false,
-        severity: 'low'
-      };
-      setNotifications(prev => [newNotification, ...prev]);
+
 
       setCollateralAmount('');
       alert('Collateral added successfully!');
@@ -218,16 +189,7 @@ const Loans = () => {
           : l
       ));
 
-      // Add notification
-      const newNotification: Notification = {
-        id: `notif-${Date.now()}`,
-        type: 'payment_due',
-        message: `✅ Repaid ${repayAmount} USDC on Loan ${selectedLoanId}`,
-        timestamp: new Date(),
-        isRead: false,
-        severity: 'low'
-      };
-      setNotifications(prev => [newNotification, ...prev]);
+
 
       setRepayAmount('');
       alert('Repayment successful!');
@@ -238,11 +200,7 @@ const Loans = () => {
     }
   };
 
-  const markNotificationAsRead = (notificationId: string) => {
-    setNotifications(prev => prev.map(n => 
-      n.id === notificationId ? { ...n, isRead: true } : n
-    ));
-  };
+
 
   const getHealthStatusColor = (status: string) => {
     switch (status) {
@@ -309,24 +267,7 @@ const Loans = () => {
               <span>Perpetual Loans</span>
             </div>
           </button>
-          <button
-            onClick={() => setActiveTab('notifications')}
-            className={`flex-1 py-2 px-4 rounded-md transition-all ${
-              activeTab === 'notifications' 
-                ? 'bg-blue-600 text-white shadow-lg' 
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <div className="flex items-center justify-center space-x-2">
-              <Bell className="w-4 h-4" />
-              <span>Notifications</span>
-              {notifications.filter(n => !n.isRead).length > 0 && (
-                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                  {notifications.filter(n => !n.isRead).length}
-                </span>
-              )}
-            </div>
-          </button>
+
           <button
             onClick={() => setActiveTab('analytics')}
             className={`flex-1 py-2 px-4 rounded-md transition-all ${
@@ -558,73 +499,7 @@ const Loans = () => {
           </div>
         )}
 
-        {/* Notifications Tab */}
-        {activeTab === 'notifications' && (
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-            <h2 className="text-2xl font-semibold text-white mb-6">Real-time Notifications</h2>
-            
-            {notifications.length === 0 ? (
-              <div className="text-center py-8">
-                <Bell className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                <p className="text-gray-400">No notifications yet</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`p-4 rounded-lg border transition-all ${
-                      notification.isRead 
-                        ? 'bg-slate-800/30 border-slate-700' 
-                        : 'bg-slate-800/50 border-slate-600'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          {notification.type === 'margin_call' && (
-                            <AlertTriangle className="w-4 h-4 text-yellow-400" />
-                          )}
-                          {notification.type === 'liquidation_warning' && (
-                            <AlertTriangle className="w-4 h-4 text-red-400" />
-                          )}
-                          {notification.type === 'payment_due' && (
-                            <Clock className="w-4 h-4 text-blue-400" />
-                          )}
-                          {notification.type === 'collateral_update' && (
-                            <CheckCircle className="w-4 h-4 text-green-400" />
-                          )}
-                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                            notification.severity === 'critical' ? 'bg-red-500 text-white' :
-                            notification.severity === 'high' ? 'bg-orange-500 text-white' :
-                            notification.severity === 'medium' ? 'bg-yellow-500 text-white' :
-                            'bg-green-500 text-white'
-                          }`}>
-                            {notification.severity.toUpperCase()}
-                          </span>
-                        </div>
-                        <p className={`text-sm ${notification.isRead ? 'text-gray-400' : 'text-white'}`}>
-                          {notification.message}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-2">
-                          {notification.timestamp.toLocaleString()}
-                        </p>
-                      </div>
-                      {!notification.isRead && (
-                        <button
-                          onClick={() => markNotificationAsRead(notification.id)}
-                          className="text-gray-400 hover:text-white transition-colors"
-                        >
-                          <XCircle className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+
 
         {/* Perpetual Loans Tab */}
         {activeTab === 'perpetual' && (

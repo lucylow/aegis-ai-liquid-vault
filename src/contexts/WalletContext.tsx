@@ -9,6 +9,8 @@ interface WalletContextType {
   balance: string | null;
   connectionError: string | null;
   isDemoMode: boolean;
+  zetaNetwork: 'mainnet' | 'testnet';
+  setZetaNetwork: (network: 'mainnet' | 'testnet') => void;
   connect: () => Promise<void>;
   disconnect: () => void;
   enableDemoMode: () => void;
@@ -44,6 +46,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [balance, setBalance] = useState<string | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const [zetaNetwork, setZetaNetwork] = useState<'mainnet' | 'testnet'>('mainnet');
 
   // Check if MetaMask is installed
   const isMetaMaskInstalled = useCallback(() => {

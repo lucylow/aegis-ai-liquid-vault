@@ -986,28 +986,31 @@ const AIDashboardTab: React.FC = () => {
               <div className="bg-gray-700/30 p-4 rounded-lg border border-gray-600">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-green-400 text-sm font-semibold">Bitcoin → Ethereum</span>
+                  <span className="text-green-400 text-sm font-semibold">BTC.ETH</span>
                 </div>
                 <p className="text-gray-300 text-xs">Processing cross-chain message</p>
                 <p className="text-white text-sm font-mono">0x7f3...a2b1</p>
+                <p className="text-xs text-yellow-400 mt-1">Gas: 0.001 gaZETA</p>
               </div>
               
               <div className="bg-gray-700/30 p-4 rounded-lg border border-gray-600">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                  <span className="text-blue-400 text-sm font-semibold">Solana → Avalanche</span>
+                  <span className="text-blue-400 text-sm font-semibold">SOL.AVAX</span>
                 </div>
                 <p className="text-gray-300 text-xs">Liquidity routing</p>
                 <p className="text-white text-sm font-mono">0x9c4...d5e6</p>
+                <p className="text-xs text-yellow-400 mt-1">Gas: 0.002 gaZETA</p>
               </div>
               
               <div className="bg-gray-700/30 p-4 rounded-lg border border-gray-600">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-                  <span className="text-purple-400 text-sm font-semibold">Base → Bitcoin</span>
+                  <span className="text-purple-400 text-sm font-semibold">POL.BNB</span>
                 </div>
                 <p className="text-gray-300 text-xs">Collateral verification</p>
                 <p className="text-white text-sm font-mono">0x2a1...b3c4</p>
+                <p className="text-xs text-yellow-400 mt-1">Gas: 0.0015 gaZETA</p>
               </div>
             </div>
 
@@ -1029,6 +1032,21 @@ const AIDashboardTab: React.FC = () => {
                 <div>
                   <p className="text-green-200 font-semibold">99.9%</p>
                   <p className="text-green-300 text-xs">Success Rate</p>
+                </div>
+              </div>
+              
+              {/* ZETA Token & Gas Info */}
+              <div className="mt-4 pt-4 border-t border-green-500/30">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-300">ZETA Token:</span>
+                    <span className="text-green-200 font-semibold">$2.45</span>
+                    <span className="text-green-400 text-xs">+5.2%</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-300">Gas Price:</span>
+                    <span className="text-yellow-400 font-semibold">0.001 gaZETA</span>
+                  </div>
                 </div>
               </div>
             </div>

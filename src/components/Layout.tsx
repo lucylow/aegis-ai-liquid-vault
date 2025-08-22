@@ -16,7 +16,9 @@ import {
   Brain,
   Globe,
   AlertTriangle,
-  BookOpen
+  BookOpen,
+  Network,
+  CheckCircle
 } from 'lucide-react';
 import WalletConnect from './WalletConnect';
 import WalletConnectionModal from './WalletConnectionModal';
@@ -28,6 +30,7 @@ const Layout = () => {
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [hasShownWalletModal, setHasShownWalletModal] = useState(false);
   const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
+  const [zetaNetwork, setZetaNetwork] = useState<'mainnet' | 'testnet'>('mainnet');
   const navigate = useNavigate();
   const location = useLocation();
   const { isConnected, address, network, isDemoMode } = useWallet();
@@ -118,6 +121,21 @@ const Layout = () => {
             <X size={20} />
           </button>
         </div>
+        
+        {/* Network Indicator */}
+        <div className="px-6 py-3 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <Network size={16} className="text-gray-400" />
+            <span className="text-sm text-gray-400">ZetaChain</span>
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+              zetaNetwork === 'mainnet' 
+                ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' 
+                : 'bg-orange-600/20 text-orange-400 border border-orange-500/30'
+            }`}>
+              {zetaNetwork === 'mainnet' ? 'Mainnet' : 'Testnet'}
+            </span>
+          </div>
+        </div>
 
         <nav className="mt-6 px-3">
           <div className="space-y-1">
@@ -194,6 +212,38 @@ const Layout = () => {
           </div>
 
           <div className="flex items-center gap-4">
+            {/* ZetaChain Network Switcher */}
+            <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg p-1 border border-gray-700">
+              <button
+                onClick={() => setZetaNetwork('mainnet')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  zetaNetwork === 'mainnet'
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Network size={14} />
+                  <span>Mainnet</span>
+                  {zetaNetwork === 'mainnet' && <CheckCircle size={14} />}
+                </div>
+              </button>
+              <button
+                onClick={() => setZetaNetwork('testnet')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  zetaNetwork === 'testnet'
+                    ? 'bg-orange-600 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Network size={14} />
+                  <span>Testnet</span>
+                  {zetaNetwork === 'testnet' && <CheckCircle size={14} />}
+                </div>
+              </button>
+            </div>
+
             {/* Notifications */}
             <button 
               onClick={() => setNotificationPanelOpen(!notificationPanelOpen)}
