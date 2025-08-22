@@ -266,7 +266,10 @@ export const WalletDashboardPage: React.FC = () => {
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                console.log('Dashboard: Switching to tab:', tab.id);
+                setActiveTab(tab.id);
+              }}
               className={`px-4 py-2 rounded-md transition-colors capitalize flex items-center space-x-2 whitespace-nowrap ${
                 activeTab === tab.id 
                   ? 'bg-blue-600 text-white' 
@@ -521,7 +524,10 @@ export const WalletDashboardPage: React.FC = () => {
         )}
 
         {activeTab === 'ai-dashboard' && (
-          <AIDashboardTab />
+          <>
+            {console.log('Dashboard: Rendering AIDashboardTab')}
+            <AIDashboardTab />
+          </>
         )}
 
         {activeTab === 'ai-risk' && (
@@ -658,6 +664,8 @@ export const WalletDashboardPage: React.FC = () => {
 
 // AI Dashboard Tab Component
 const AIDashboardTab: React.FC = () => {
+  console.log('AIDashboardTab: Component definition reached');
+  
   const [insights, setInsights] = useState<AIInsight[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [serviceHealth, setServiceHealth] = useState<'healthy' | 'unhealthy' | 'checking'>('checking');
@@ -674,13 +682,16 @@ const AIDashboardTab: React.FC = () => {
   }
 
   useEffect(() => {
+    console.log('AIDashboardTab: useEffect triggered');
     checkServiceHealth();
   }, []);
 
   const checkServiceHealth = async () => {
     try {
       // Use mock service for demo - always healthy
+      console.log('AIDashboardTab: Checking service health...');
       setServiceHealth('healthy');
+      console.log('AIDashboardTab: Service health set to healthy');
     } catch (error) {
       setServiceHealth('unhealthy');
       console.error('Service health check failed:', error);
@@ -697,6 +708,7 @@ const AIDashboardTab: React.FC = () => {
   };
 
   const generateCreditScore = async () => {
+    console.log('AIDashboardTab: generateCreditScore called');
     setIsGenerating(true);
     addInsight({
       type: 'credit',
@@ -718,6 +730,7 @@ const AIDashboardTab: React.FC = () => {
         chain: 'Multiple'
       };
 
+      console.log('AIDashboardTab: Calling unifiedAIService.getCreditScore...');
       const creditScore = await unifiedAIService.getCreditScore(
         mockUserData.userAddress,
         mockUserData.transactionHistory,
@@ -725,6 +738,7 @@ const AIDashboardTab: React.FC = () => {
         mockUserData.loanAmount,
         mockUserData.chain
       );
+      console.log('AIDashboardTab: Credit score response:', creditScore);
 
       setInsights(prev => prev.map(i => 
         i.title === 'AI Credit Score Analysis' 
@@ -736,6 +750,7 @@ const AIDashboardTab: React.FC = () => {
           : i
       ));
     } catch (error) {
+      console.error('AIDashboardTab: Error generating credit score:', error);
       setInsights(prev => prev.map(i => 
         i.title === 'AI Credit Score Analysis' 
           ? { ...i, content: 'Failed to generate credit score', status: 'error' }
@@ -777,6 +792,8 @@ const AIDashboardTab: React.FC = () => {
     }
   };
 
+  console.log('AIDashboardTab: Rendering component');
+  
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -1104,15 +1121,14 @@ const AIRiskTab: React.FC = () => {
         'Multiple'
       );
 
-      if (response.success) {
-        return {
-          score: response.creditScore,
-          riskLevel: response.riskLevel,
-          factors: response.riskFactors,
-          recommendations: response.recommendations,
-          lastUpdated: new Date().toISOString()
-        };
-      }
+      // The unifiedAIService returns the response directly, no need to check response.success
+      return {
+        score: response.creditScore,
+        riskLevel: response.riskLevel,
+        factors: response.riskFactors,
+        recommendations: response.recommendations,
+        lastUpdated: new Date().toISOString()
+      };
     } catch (error) {
       console.error('AI credit scoring failed:', error);
     }
@@ -1138,17 +1154,18 @@ const AIRiskTab: React.FC = () => {
       // Parse the string response from unifiedAIService
       try {
         const riskData = JSON.parse(response);
-        const riskScore = riskData.riskScore;
+        const riskScore = riskData.riskScore || 35; // Default fallback
         const probability = Math.min(riskScore * 10, 95);
         
         return {
           probability,
           timeToLiquidation: probability > 80 ? 2 : probability > 60 ? 24 : 168,
-          riskFactors: riskData.threats.slice(0, 3),
-          mitigationActions: riskData.mitigation.slice(0, 3),
+          riskFactors: (riskData.threats || ['ETH price volatility', 'High loan utilization', 'Market correlation risk']).slice(0, 3),
+          mitigationActions: (riskData.mitigation || ['Add stablecoin collateral', 'Reduce loan amount', 'Monitor ETH price']).slice(0, 3),
           urgency: probability > 80 ? 'Critical' : probability > 60 ? 'High' : probability > 30 ? 'Medium' : 'Low'
         };
       } catch (parseError) {
+        console.error('Failed to parse risk assessment response:', parseError);
         // Fallback if parsing fails
         return {
           probability: 35,
@@ -1204,7 +1221,7 @@ const AIRiskTab: React.FC = () => {
       try {
         const riskData = JSON.parse(response);
         return {
-          overallRisk: riskData.riskScore,
+          overallRisk: riskData.riskScore || 5, // Default fallback
           chainRisks: {
             ethereum: 4,
             bitcoin: 3,
@@ -1222,6 +1239,7 @@ const AIRiskTab: React.FC = () => {
           smartContractRisk: 2
         };
       } catch (parseError) {
+        console.error('Failed to parse portfolio risk response:', parseError);
         // Fallback if parsing fails
         return {
           overallRisk: 5,
