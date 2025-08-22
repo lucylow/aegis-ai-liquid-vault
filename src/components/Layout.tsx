@@ -120,7 +120,7 @@ const Layout = () => {
               </span>
             </div>
             <span className="text-xs text-gray-400 ml-11">
-              Cross-Chain Lending
+              AEGIS Cross-Chain Lending
             </span>
           </div>
           <button
