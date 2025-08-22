@@ -18,7 +18,10 @@ import {
   AlertTriangle,
   BookOpen,
   Network,
-  CheckCircle
+  CheckCircle,
+  Copy,
+  ExternalLink,
+  RefreshCw
 } from 'lucide-react';
 import WalletConnect from './WalletConnect';
 import WalletConnectionModal from './WalletConnectionModal';
@@ -106,13 +109,18 @@ const Layout = () => {
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900/95 backdrop-blur-sm border-r border-white/10 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <div className="flex items-center justify-between h-16 px-6 border-b border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-              <Shield size={20} className="text-white" />
+        <div className="flex items-center justify-between h-20 px-6 border-b border-white/10">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                <Shield size={20} className="text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                AEGIS
+              </span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              AEGIS
+            <span className="text-xs text-gray-400 ml-11">
+              Cross-Chain Lending
             </span>
           </div>
           <button
@@ -278,11 +286,11 @@ const Layout = () => {
       {walletInfoOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/50" onClick={() => setWalletInfoOpen(false)} />
-          <div className="relative bg-gray-900 border border-gray-700 rounded-xl p-6 w-96 max-w-[90vw]">
+          <div className="relative bg-gray-900 border border-gray-700 rounded-xl p-6 w-[500px] max-w-[90vw]">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Wallet size={20} className="text-primary" />
-                Wallet Information
+                Wallet Dashboard
               </h3>
               <button
                 onClick={() => setWalletInfoOpen(false)}
@@ -293,58 +301,125 @@ const Layout = () => {
             </div>
 
             <div className="space-y-4">
-              {/* Wallet Address */}
+              {/* Wallet Address with Copy & Explorer */}
               <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-3">
                   <span className="text-sm text-gray-400">Wallet Address</span>
-                  <button className="p-1 hover:bg-white/10 rounded transition-colors">
-                    <Copy size={14} />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => {
+                        if (address) {
+                          navigator.clipboard.writeText(address);
+                          // You could add a toast notification here
+                        }
+                      }}
+                      className="p-2 hover:bg-white/10 rounded transition-colors text-blue-400 hover:text-blue-300"
+                      title="Copy Address"
+                    >
+                      <Copy size={14} />
+                    </button>
+                    {address && (
+                      <a
+                        href={`https://etherscan.io/address/${address}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 hover:bg-white/10 rounded transition-colors text-green-400 hover:text-green-300"
+                        title="View on Etherscan"
+                      >
+                        <ExternalLink size={14} />
+                      </a>
+                    )}
+                  </div>
                 </div>
                 <p className="text-white font-mono text-sm break-all">
                   {address || 'Not connected'}
                 </p>
               </div>
 
-              {/* Network Information */}
-              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                <span className="text-sm text-gray-400">Network</span>
-                <div className="flex items-center gap-2 mt-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-white font-medium">{network || 'Ethereum'}</span>
-                  <span className="text-xs text-gray-500">• Chain ID: {chainId || 'N/A'}</span>
+              {/* Network & Balance Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Network Information */}
+                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                  <span className="text-sm text-gray-400">Network</span>
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-white font-medium">{network || 'Ethereum'}</span>
+                  </div>
+                  <span className="text-xs text-gray-500 mt-1 block">Chain ID: {chainId || 'N/A'}</span>
+                </div>
+
+                {/* Balance */}
+                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                  <span className="text-sm text-gray-400">Balance</span>
+                  <p className="text-white font-medium mt-2 text-lg">
+                    {balance ? `${parseFloat(balance).toFixed(4)} ${network?.split(' ')[0] || 'ETH'}` : 'Loading...'}
+                  </p>
+                  <span className="text-xs text-gray-500 mt-1 block">
+                    ≈ ${balance ? (parseFloat(balance) * 2000).toFixed(2) : '0.00'} USD
+                  </span>
                 </div>
               </div>
 
-              {/* ZetaChain Network */}
+              {/* ZetaChain Network Status */}
               <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                <span className="text-sm text-gray-400">ZetaChain Network</span>
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-gray-400">ZetaChain Network</span>
                   <Network size={16} className="text-blue-400" />
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${
                     zetaNetwork === 'mainnet' 
                       ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' 
                       : 'bg-orange-600/20 text-orange-400 border border-orange-500/30'
                   }`}>
                     {zetaNetwork === 'mainnet' ? 'Mainnet' : 'Testnet'}
                   </span>
+                  <span className="text-xs text-gray-500">
+                    {zetaNetwork === 'mainnet' ? 'Production Network' : 'Test Network'}
+                  </span>
                 </div>
               </div>
 
-              {/* Balance */}
+              {/* Quick Actions */}
               <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                <span className="text-sm text-gray-400">Balance</span>
-                <p className="text-white font-medium mt-2">
-                  {balance ? `${parseFloat(balance).toFixed(4)} ${network || 'ETH'}` : 'Loading...'}
-                </p>
+                <span className="text-sm text-gray-400 mb-3 block">Quick Actions</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <button className="px-3 py-2 bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors text-sm flex items-center gap-2 justify-center">
+                    <RefreshCw size={14} />
+                    Refresh Balance
+                  </button>
+                  <button className="px-3 py-2 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-colors text-sm flex items-center gap-2 justify-center">
+                    <Globe size={14} />
+                    Switch Network
+                  </button>
+                </div>
               </div>
 
-              {/* Connection Status */}
+              {/* Connection Health */}
               <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                <span className="text-sm text-gray-400">Connection Status</span>
-                <div className="flex items-center gap-2 mt-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-green-400 font-medium">Connected</span>
+                <span className="text-sm text-gray-400 mb-3 block">Connection Health</span>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-300">Wallet Status</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-green-400 text-sm">Connected</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-300">ZetaChain</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-blue-400 text-sm">Active</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-300">Cross-Chain Ready</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-green-400 text-sm">Ready</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -357,7 +432,7 @@ const Layout = () => {
                   }}
                   className="flex-1 px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
                 >
-                  Disconnect
+                  Disconnect Wallet
                 </button>
                 <button
                   onClick={() => setWalletInfoOpen(false)}
