@@ -22,6 +22,22 @@ import {
   Calendar
 } from 'lucide-react';
 import { useWallet } from '../contexts/WalletContext';
+import { 
+  LineChart, 
+  Line, 
+  AreaChart, 
+  Area, 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer,
+  PieChart as RechartsPieChart,
+  Cell
+} from 'recharts';
 
 interface LiquidityStats {
   chain: string;

@@ -672,6 +672,74 @@ const AIDashboardTab: React.FC = () => {
   const [prompt, setPrompt] = useState('');
   const [generatedText, setGeneratedText] = useState('');
 
+  // Mock data for demo
+  const mockCreditScoreData = {
+    score: 87,
+    riskLevel: 'Low Risk',
+    maxLoanAmount: 25000,
+    factors: [
+      'Excellent repayment history (95% on-time)',
+      'Strong collateral ratio (78%)',
+      'Diversified portfolio across 4 chains',
+      'No liquidations in 12 months',
+      'Active user for 8 months'
+    ],
+    recommendations: [
+      'Consider increasing BTC collateral for better rates',
+      'Eligible for premium lending tier',
+      'Can access up to 85% LTV on stable assets'
+    ]
+  };
+
+  const mockPortfolioAnalysis = {
+    totalValue: 18500,
+    allocation: {
+      'BTC': { value: 8000, percentage: 43.2, risk: 'Low' },
+      'ETH': { value: 6500, percentage: 35.1, risk: 'Medium' },
+      'SOL': { value: 2500, percentage: 13.5, risk: 'High' },
+      'ZETA': { value: 1500, percentage: 8.1, risk: 'Medium' }
+    },
+    crossChainExposure: {
+      'Bitcoin': 43.2,
+      'Ethereum': 35.1,
+      'Solana': 13.5,
+      'ZetaChain': 8.1
+    },
+    riskMetrics: {
+      volatility: 0.28,
+      sharpeRatio: 1.85,
+      maxDrawdown: -12.5,
+      correlation: 0.42
+    }
+  };
+
+  const mockAIIssues = [
+    {
+      id: '1',
+      type: 'credit' as const,
+      title: 'Credit Score Analysis',
+      content: `Credit Score: ${mockCreditScoreData.score}/100\nRisk Level: ${mockCreditScoreData.riskLevel}\nMax Loan: $${mockCreditScoreData.maxLoanAmount.toLocaleString()}\n\nKey Factors:\n${mockCreditScoreData.factors.map(f => `• ${f}`).join('\n')}\n\nRecommendations:\n${mockCreditScoreData.recommendations.map(r => `• ${r}`).join('\n')}`,
+      timestamp: new Date(Date.now() - 300000).toISOString(),
+      status: 'success' as const
+    },
+    {
+      id: '2',
+      type: 'analysis' as const,
+      title: 'Portfolio Risk Assessment',
+      content: `Portfolio Value: $${mockPortfolioAnalysis.totalValue.toLocaleString()}\n\nRisk Metrics:\n• Volatility: ${(mockPortfolioAnalysis.riskMetrics.volatility * 100).toFixed(1)}%\n• Sharpe Ratio: ${mockPortfolioAnalysis.riskMetrics.sharpeRatio}\n• Max Drawdown: ${mockPortfolioAnalysis.riskMetrics.maxDrawdown}%\n\nRecommendation: Consider rebalancing SOL position to reduce volatility.`,
+      timestamp: new Date(Date.now() - 600000).toISOString(),
+      status: 'success' as const
+    },
+    {
+      id: '3',
+      type: 'recommendation' as const,
+      title: 'Cross-Chain Optimization',
+      content: 'Based on your portfolio, consider:\n\n• Moving 20% of ETH to ZetaChain for better yields\n• Using BTC as collateral for USDC loans on Avalanche\n• Leveraging cross-chain arbitrage opportunities\n\nEstimated additional yield: 2.3% APY',
+      timestamp: new Date(Date.now() - 900000).toISOString(),
+      status: 'success' as const
+    }
+  ];
+
   interface AIInsight {
     id: string;
     type: 'credit' | 'risk' | 'recommendation' | 'analysis';
@@ -684,6 +752,8 @@ const AIDashboardTab: React.FC = () => {
   useEffect(() => {
     console.log('AIDashboardTab: useEffect triggered');
     checkServiceHealth();
+    // Initialize with mock insights for demo
+    setInsights(mockAIIssues);
   }, []);
 
   const checkServiceHealth = async () => {
@@ -710,55 +780,43 @@ const AIDashboardTab: React.FC = () => {
   const generateCreditScore = async () => {
     console.log('AIDashboardTab: generateCreditScore called');
     setIsGenerating(true);
-    addInsight({
-      type: 'credit',
-      title: 'AI Credit Score Analysis',
-      content: 'Analyzing your lending profile...',
-      status: 'loading'
-    });
+    
+          // Add loading insight
+      const loadingInsightId = Date.now().toString();
+      addInsight({
+        type: 'credit' as const,
+        title: 'AI Credit Score Analysis',
+        content: 'Analyzing your lending profile across all chains...',
+        status: 'loading' as const
+      });
 
-    try {
-      const mockUserData = {
-        userAddress: '0x1234...5678',
-        transactionHistory: [
-          { type: 'deposit', amount: 5000, chain: 'Ethereum', timestamp: '2025-01-15' },
-          { type: 'borrow', amount: 2000, chain: 'Avalanche', timestamp: '2025-01-10' },
-          { type: 'repay', amount: 1500, chain: 'Ethereum', timestamp: '2025-01-05' }
-        ],
-        collateralValue: 8000,
-        loanAmount: 2000,
-        chain: 'Multiple'
-      };
-
-      console.log('AIDashboardTab: Calling unifiedAIService.getCreditScore...');
-      const creditScore = await unifiedAIService.getCreditScore(
-        mockUserData.userAddress,
-        mockUserData.transactionHistory,
-        mockUserData.collateralValue,
-        mockUserData.loanAmount,
-        mockUserData.chain
-      );
-      console.log('AIDashboardTab: Credit score response:', creditScore);
-
-      setInsights(prev => prev.map(i => 
-        i.title === 'AI Credit Score Analysis' 
-          ? {
-              ...i,
-              content: `Credit Score: ${creditScore.creditScore}/100\nRisk Level: ${creditScore.riskLevel}\nMax Loan: $${creditScore.maxLoanAmount.toLocaleString()}`,
-              status: 'success'
-            }
-          : i
-      ));
-    } catch (error) {
-      console.error('AIDashboardTab: Error generating credit score:', error);
-      setInsights(prev => prev.map(i => 
-        i.title === 'AI Credit Score Analysis' 
-          ? { ...i, content: 'Failed to generate credit score', status: 'error' }
-          : i
-      ));
-    } finally {
-      setIsGenerating(false);
-    }
+      try {
+        // Simulate AI processing delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Use mock data for demo
+        const newInsight = {
+          type: 'credit' as const,
+          title: 'AI Credit Score Analysis',
+          content: `Credit Score: ${mockCreditScoreData.score}/100\nRisk Level: ${mockCreditScoreData.riskLevel}\nMax Loan: $${mockCreditScoreData.maxLoanAmount.toLocaleString()}\n\nKey Factors:\n${mockCreditScoreData.factors.map(f => `• ${f}`).join('\n')}\n\nRecommendations:\n${mockCreditScoreData.recommendations.map(r => `• ${r}`).join('\n')}`,
+          status: 'success' as const
+        };
+        
+        addInsight(newInsight);
+        
+        // Remove loading insight by finding it by title and status
+        setInsights(prev => prev.filter(i => !(i.title === 'AI Credit Score Analysis' && i.status === 'loading')));
+        
+      } catch (error) {
+        console.error('AIDashboardTab: Error generating credit score:', error);
+        setInsights(prev => prev.map(i => 
+          i.title === 'AI Credit Score Analysis' && i.status === 'loading'
+            ? { ...i, content: 'Failed to generate credit score', status: 'error' }
+            : i
+        ));
+      } finally {
+        setIsGenerating(false);
+      }
   };
 
   const generateContent = async () => {
@@ -768,22 +826,43 @@ const AIDashboardTab: React.FC = () => {
     addInsight({
       type: 'analysis',
       title: 'AI Content Generation',
-      content: 'Generating content...',
+      content: 'Analyzing your request and generating insights...',
       status: 'loading'
     });
 
     try {
-      const response = await unifiedAIService.generateContent(prompt);
-      setGeneratedText(response);
+      // Simulate AI processing delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
+      // Generate mock content based on prompt
+      let mockResponse = '';
+      const lowerPrompt = prompt.toLowerCase();
+      
+      if (lowerPrompt.includes('portfolio') || lowerPrompt.includes('analysis')) {
+        mockResponse = `Portfolio Analysis Report:\n\nTotal Value: $${mockPortfolioAnalysis.totalValue.toLocaleString()}\n\nAsset Allocation:\n${Object.entries(mockPortfolioAnalysis.allocation).map(([asset, data]) => 
+          `• ${asset}: $${data.value.toLocaleString()} (${data.percentage}%) - Risk: ${data.risk}`
+        ).join('\n')}\n\nCross-Chain Exposure:\n${Object.entries(mockPortfolioAnalysis.crossChainExposure).map(([chain, percentage]) => 
+          `• ${chain}: ${percentage}%`
+        ).join('\n')}\n\nRisk Metrics:\n• Volatility: ${(mockPortfolioAnalysis.riskMetrics.volatility * 100).toFixed(1)}%\n• Sharpe Ratio: ${mockPortfolioAnalysis.riskMetrics.sharpeRatio}\n• Max Drawdown: ${mockPortfolioAnalysis.riskMetrics.maxDrawdown}%\n\nRecommendation: Your portfolio shows good diversification but consider reducing SOL exposure for better risk-adjusted returns.`;
+      } else if (lowerPrompt.includes('loan') || lowerPrompt.includes('borrow')) {
+        mockResponse = `Loan Analysis & Recommendations:\n\nBased on your credit score of ${mockCreditScoreData.score}/100:\n\nAvailable Loan Options:\n• USDC: Up to $${Math.floor(mockCreditScoreData.maxLoanAmount * 0.4).toLocaleString()} at 4.2% APY\n• DAI: Up to $${Math.floor(mockCreditScoreData.maxLoanAmount * 0.3).toLocaleString()} at 4.8% APY\n• ZETA: Up to $${Math.floor(mockCreditScoreData.maxLoanAmount * 0.2).toLocaleString()} at 5.2% APY\n\nOptimal Strategy:\n• Use BTC as collateral for stablecoin loans\n• Consider cross-chain borrowing on Avalanche for better rates\n• Leverage your excellent credit for premium lending tiers\n\nEstimated Monthly Payment: $${Math.floor(mockCreditScoreData.maxLoanAmount * 0.05).toLocaleString()}`;
+      } else if (lowerPrompt.includes('risk') || lowerPrompt.includes('volatility')) {
+        mockResponse = `Risk Assessment Report:\n\nCurrent Risk Level: ${mockCreditScoreData.riskLevel}\n\nPortfolio Risk Metrics:\n• Overall Volatility: ${(mockPortfolioAnalysis.riskMetrics.volatility * 100).toFixed(1)}%\n• Correlation Risk: ${(mockPortfolioAnalysis.riskMetrics.correlation * 100).toFixed(1)}%\n• Liquidation Risk: Low (78% collateral ratio)\n\nRisk Factors:\n• SOL position contributes 35% of total volatility\n• Cross-chain exposure reduces correlation risk\n• Strong collateral ratio provides safety buffer\n\nRisk Mitigation:\n• Consider hedging SOL with stablecoin positions\n• Diversify across more chains for better risk distribution\n• Monitor collateral ratios during market volatility`;
+      } else {
+        mockResponse = `AI Analysis:\n\nBased on your request "${prompt}", here are the key insights:\n\n• Your portfolio shows strong fundamentals with $${mockPortfolioAnalysis.totalValue.toLocaleString()} in assets\n• Credit score of ${mockCreditScoreData.score}/100 qualifies you for premium rates\n• Cross-chain diversification reduces systemic risk\n• Consider leveraging ZetaChain's omnichain capabilities for better yields\n\nFor more specific analysis, try asking about:\n• Portfolio optimization\n• Loan recommendations\n• Risk assessment\n• Cross-chain strategies`;
+      }
+      
+      setGeneratedText(mockResponse);
+      
+      // Update the insight with the generated content
       setInsights(prev => prev.map(i => 
-        i.title === 'AI Content Generation' 
-          ? { ...i, content: response, status: 'success' }
+        i.title === 'AI Content Generation' && i.status === 'loading'
+          ? { ...i, content: mockResponse, status: 'success' }
           : i
       ));
     } catch (error) {
       setInsights(prev => prev.map(i => 
-        i.title === 'AI Content Generation' 
+        i.title === 'AI Content Generation' && i.status === 'loading'
           ? { ...i, content: 'Failed to generate content', status: 'error' }
           : i
       ));
@@ -967,6 +1046,70 @@ const AIDashboardTab: React.FC = () => {
                 This gives you the best risk-adjusted borrowing power while maintaining safety margins."
               </p>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* AI Insights Display */}
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700">
+        <div className="p-6 border-b border-gray-700">
+          <h3 className="text-xl font-semibold flex items-center space-x-2">
+            <Brain className="w-5 h-5 text-purple-400" />
+            <span>AI-Generated Insights</span>
+          </h3>
+          <p className="text-gray-400 text-sm mt-1">
+            Real-time AI analysis of your portfolio, credit, and cross-chain opportunities
+          </p>
+        </div>
+        <div className="p-6">
+          <div className="space-y-4">
+            {insights.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                <Brain className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+                <p>No insights generated yet. Use the AI tools above to get started.</p>
+              </div>
+            ) : (
+              insights.map((insight) => (
+                <div
+                  key={insight.id}
+                  className={`p-4 rounded-lg border ${
+                    insight.status === 'success'
+                      ? 'bg-green-900/20 border-green-500/30'
+                      : insight.status === 'loading'
+                      ? 'bg-blue-900/20 border-blue-500/30'
+                      : 'bg-red-900/20 border-red-500/30'
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      {insight.type === 'credit' && <TrendingUp className="w-4 h-4 text-blue-400" />}
+                      {insight.type === 'risk' && <Shield className="w-4 h-4 text-yellow-400" />}
+                      {insight.type === 'recommendation' && <Zap className="w-4 h-4 text-green-400" />}
+                      {insight.type === 'analysis' && <BarChart3 className="w-4 h-4 text-purple-400" />}
+                      <span className="font-semibold text-white">{insight.title}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        insight.status === 'success'
+                          ? 'bg-green-500/20 text-green-400'
+                          : insight.status === 'loading'
+                          ? 'bg-blue-500/20 text-blue-400'
+                          : 'bg-red-500/20 text-red-400'
+                      }`}>
+                        {insight.status === 'success' ? '✓ Complete' : 
+                         insight.status === 'loading' ? '⏳ Processing' : '✗ Error'}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {new Date(insight.timestamp).toLocaleTimeString()}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-gray-300 text-sm whitespace-pre-line">
+                    {insight.content}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
