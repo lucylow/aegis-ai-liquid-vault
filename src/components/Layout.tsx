@@ -336,27 +336,12 @@ const Layout = () => {
                 </p>
               </div>
 
-              {/* Network & Balance Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Network Information */}
-                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                  <span className="text-sm text-gray-400">Network</span>
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-white font-medium">{network || 'Ethereum'}</span>
-                  </div>
-                  <span className="text-xs text-gray-500 mt-1 block">Chain ID: {chainId || 'N/A'}</span>
-                </div>
-
-                {/* Balance */}
-                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                  <span className="text-sm text-gray-400">Balance</span>
-                  <p className="text-white font-medium mt-2 text-lg">
-                    {balance ? `${parseFloat(balance).toFixed(4)} ${network?.split(' ')[0] || 'ETH'}` : 'Loading...'}
-                  </p>
-                  <span className="text-xs text-gray-500 mt-1 block">
-                    ≈ ${balance ? (parseFloat(balance) * 2000).toFixed(2) : '0.00'} USD
-                  </span>
+              {/* Network Information */}
+              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                <span className="text-sm text-gray-400">Network</span>
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-white font-medium">{network || 'Ethereum'}</span>
                 </div>
                 <span className="text-xs text-gray-500 mt-1 block">Connected</span>
               </div>
