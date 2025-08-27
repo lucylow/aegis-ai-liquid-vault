@@ -44,6 +44,7 @@ const Layout = () => {
   const navigation = [
     { name: 'Home', href: '/app', icon: Shield, current: location.pathname === '/app' },
     { name: 'Dashboard', href: '/app/dashboard', icon: Home, current: location.pathname === '/app/dashboard' },
+    { name: 'Multi-Chain', href: '/app/multi-chain', icon: Globe, current: location.pathname === '/app/multi-chain' },
     { name: 'Deposit', href: '/app/deposit', icon: Wallet, current: location.pathname === '/app/deposit' },
     { name: 'Borrow', href: '/app/borrow', icon: DollarSign, current: location.pathname === '/app/borrow' },
     { name: 'Loans', href: '/app/loans', icon: FileText, current: location.pathname === '/app/loans' },

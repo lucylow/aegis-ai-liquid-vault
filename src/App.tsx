@@ -6,6 +6,7 @@ import Layout from './components/Layout';
 import AppWelcome from './components/AppWelcome';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
+import MultiChainDashboard from './components/MultiChainDashboard';
 import Deposit from './pages/Deposit';
 import Borrow from './pages/Borrow';
 import Loans from './pages/Loans';
@@ -28,6 +29,7 @@ const App = () => {
             <Route path="/app" element={<Layout />}>
               <Route index element={<AppWelcome />} />
               <Route path="dashboard" element={<Dashboard />} />
+              <Route path="multi-chain" element={<MultiChainDashboard />} />
               <Route path="deposit" element={<Deposit />} />
               <Route path="borrow" element={<Borrow />} />
               <Route path="loans" element={<Loans />} />
