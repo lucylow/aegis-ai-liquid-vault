@@ -17,9 +17,13 @@ import {
   TrendingUp,
   CheckCircle,
   AlertCircle,
-  Info
+  Info,
+  Mic,
+  Volume2,
+  Brain
 } from 'lucide-react';
 import { GeminiCoPilot, CoPilotContext, CoPilotResponse } from '../services/GeminiCoPilot';
+import VoiceCommandInput from './VoiceCommandInput';
 
 interface GeminiCoPilotProps {
   apiKey?: string;
@@ -32,6 +36,12 @@ const GeminiCoPilotComponent: React.FC<GeminiCoPilotProps> = ({ apiKey }) => {
   const [response, setResponse] = useState<CoPilotResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [conversationHistory, setConversationHistory] = useState<Array<{
+    type: 'user' | 'ai';
+    content: string;
+    timestamp: string;
+    taskType?: string;
+  }>>([]);
   
   // Context state
   const [context, setContext] = useState<CoPilotContext>({
@@ -57,7 +67,7 @@ const GeminiCoPilotComponent: React.FC<GeminiCoPilotProps> = ({ apiKey }) => {
     }
   }, [apiKey]);
 
-  const handleTaskExecution = async (taskType: string) => {
+  const handleTaskExecution = async (taskType: string, customInput?: string) => {
     if (!copilot) {
       setError('Gemini AI Co-Pilot not available. Please check your API key.');
       return;
@@ -69,24 +79,28 @@ const GeminiCoPilotComponent: React.FC<GeminiCoPilotProps> = ({ apiKey }) => {
 
     try {
       let result: CoPilotResponse;
+      let userInput = customInput || '';
 
       switch (taskType) {
         case 'code-review':
+          userInput = customInput || codeInput || '// Sample code for review';
           result = await copilot.reviewCode(
-            codeInput || '// Sample code for review',
+            userInput,
             context.preferredLanguage,
             context.currentTask
           );
           break;
 
         case 'security-analysis':
+          userInput = customInput || codeInput || '// Sample smart contract for security analysis';
           result = await copilot.analyzeSecurity(
-            codeInput || '// Sample smart contract for security analysis',
+            userInput,
             context
           );
           break;
 
         case 'cross-chain-strategy':
+          userInput = customInput || 'Develop cross-chain DeFi strategy';
           result = await copilot.developCrossChainStrategy(
             { experience: context.userExperience, focus: context.focusArea },
             { market: 'bullish', volatility: 'medium' },
@@ -95,24 +109,27 @@ const GeminiCoPilotComponent: React.FC<GeminiCoPilotProps> = ({ apiKey }) => {
           break;
 
         case 'problem-solving':
+          userInput = customInput || problem || 'How to optimize cross-chain transaction costs?';
           result = await copilot.solveProblem(
-            problem || 'How to optimize cross-chain transaction costs?',
+            userInput,
             context,
             constraints
           );
           break;
 
         case 'documentation':
+          userInput = customInput || codeInput || '// Sample code for documentation';
           result = await copilot.generateDocumentation(
-            codeInput || '// Sample code for documentation',
+            userInput,
             `AEGIS ${context.projectType} project`,
             'technical'
           );
           break;
 
         case 'code-generation':
+          userInput = customInput || requirements || 'Create a secure DeFi lending function';
           result = await copilot.generateCode(
-            requirements || 'Create a secure DeFi lending function',
+            userInput,
             context.preferredLanguage,
             context
           );
@@ -125,6 +142,23 @@ const GeminiCoPilotComponent: React.FC<GeminiCoPilotProps> = ({ apiKey }) => {
       setResponse(result);
       setCurrentTask(`Completed: ${taskType.replace('-', ' ')}`);
       
+      // Add to conversation history
+      setConversationHistory(prev => [
+        ...prev,
+        {
+          type: 'user',
+          content: userInput,
+          timestamp: new Date().toISOString(),
+          taskType
+        },
+        {
+          type: 'ai',
+          content: result.solution,
+          timestamp: new Date().toISOString(),
+          taskType
+        }
+      ]);
+      
       // Scroll to response
       setTimeout(() => {
         copilotRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -135,6 +169,28 @@ const GeminiCoPilotComponent: React.FC<GeminiCoPilotProps> = ({ apiKey }) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Handle voice command submission
+  const handleVoiceCommand = async (command: string) => {
+    // Analyze the command to determine the task type
+    const lowerCommand = command.toLowerCase();
+    let taskType = 'problem-solving'; // Default
+    
+    if (lowerCommand.includes('code') || lowerCommand.includes('review') || lowerCommand.includes('improve')) {
+      taskType = 'code-review';
+    } else if (lowerCommand.includes('security') || lowerCommand.includes('vulnerability') || lowerCommand.includes('attack')) {
+      taskType = 'security-analysis';
+    } else if (lowerCommand.includes('strategy') || lowerCommand.includes('cross-chain') || lowerCommand.includes('portfolio')) {
+      taskType = 'cross-chain-strategy';
+    } else if (lowerCommand.includes('document') || lowerCommand.includes('write') || lowerCommand.includes('explain')) {
+      taskType = 'documentation';
+    } else if (lowerCommand.includes('generate') || lowerCommand.includes('create') || lowerCommand.includes('build')) {
+      taskType = 'code-generation';
+    }
+    
+    // Execute the task with the voice command
+    await handleTaskExecution(taskType, command);
   };
 
   const getStatusColor = (status: string) => {
@@ -208,6 +264,27 @@ const GeminiCoPilotComponent: React.FC<GeminiCoPilotProps> = ({ apiKey }) => {
             <Badge variant="outline">Capabilities: {status.capabilities.length}</Badge>
           </div>
         </CardHeader>
+      </Card>
+
+      {/* Voice Command Interface */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Mic className="h-5 w-5 text-purple-600" />
+            Voice Commands
+          </CardTitle>
+          <p className="text-sm text-gray-600">
+            Use natural language voice commands to interact with your AI Co-Pilot
+          </p>
+        </CardHeader>
+        <CardContent>
+          <VoiceCommandInput
+            onCommandSubmit={handleVoiceCommand}
+            placeholder="Try: 'Analyze this code for security vulnerabilities' or 'Generate a DeFi lending contract'"
+            showExamples={true}
+            autoSubmit={true}
+          />
+        </CardContent>
       </Card>
 
       {/* Main Interface */}
@@ -500,13 +577,58 @@ const GeminiCoPilotComponent: React.FC<GeminiCoPilotProps> = ({ apiKey }) => {
               ) : (
                 <div className="text-center py-8 text-gray-500">
                   <Bot className="h-12 w-12 mx-auto mb-4" />
-                  <p>Select a task to get started with your AI Co-Pilot</p>
+                  <p>Select a task or use voice commands to get started with your AI Co-Pilot</p>
                 </div>
               )}
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* Conversation History */}
+      {conversationHistory.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Conversation History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {conversationHistory.map((message, index) => (
+                <div
+                  key={index}
+                  className={`p-3 rounded-lg ${
+                    message.type === 'user' 
+                      ? 'bg-blue-50 border-l-4 border-blue-500' 
+                      : 'bg-green-50 border-l-4 border-green-500'
+                  }`}
+                >
+                  <div className="flex items-start gap-2">
+                    <div className={`w-2 h-2 rounded-full mt-2 ${
+                      message.type === 'user' ? 'bg-blue-500' : 'bg-green-500'
+                    }`} />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-medium">
+                          {message.type === 'user' ? 'You' : 'AI Co-Pilot'}
+                        </span>
+                        {message.taskType && (
+                          <Badge variant="outline" className="text-xs">
+                            {message.taskType.replace('-', ' ')}
+                          </Badge>
+                        )}
+                        <span className="text-xs text-gray-500">
+                          {new Date(message.timestamp).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700">{message.content}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Capabilities Summary */}
       <Card>
