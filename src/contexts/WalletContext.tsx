@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import { BlockchainConfig, getBlockchainByChainId, DEFAULT_BLOCKCHAIN } from '../config/blockchains';
 
 interface WalletContextType {
   address: string | null;
@@ -11,6 +12,8 @@ interface WalletContextType {
   isDemoMode: boolean;
   zetaNetwork: 'mainnet' | 'testnet';
   setZetaNetwork: (network: 'mainnet' | 'testnet') => void;
+  currentBlockchain: BlockchainConfig;
+  setCurrentBlockchain: (blockchain: BlockchainConfig) => void;
   connect: () => Promise<void>;
   disconnect: () => void;
   enableDemoMode: () => void;
@@ -20,6 +23,7 @@ interface WalletContextType {
   getAccountInfo: () => Promise<void>;
   refreshBalance: () => Promise<void>;
   switchNetwork: (chainId: number) => Promise<void>;
+  switchToBlockchain: (blockchain: BlockchainConfig) => Promise<void>;
   clearError: () => void;
 }
 
@@ -47,6 +51,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [zetaNetwork, setZetaNetwork] = useState<'mainnet' | 'testnet'>('mainnet');
+  const [currentBlockchain, setCurrentBlockchain] = useState<BlockchainConfig>(DEFAULT_BLOCKCHAIN);
 
   // Check if MetaMask is installed
   const isMetaMaskInstalled = useCallback(() => {
@@ -257,6 +262,29 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
   }, [isConnected, getMetaMaskProvider, getAccountInfo]);
 
+  // Switch to specific blockchain
+  const switchToBlockchain = useCallback(async (blockchain: BlockchainConfig) => {
+    if (!isConnected) {
+      // If not connected, just update the current blockchain
+      setCurrentBlockchain(blockchain);
+      return;
+    }
+
+    try {
+      // For EVM chains, use MetaMask switching
+      if (blockchain.id !== 'solana' && blockchain.id !== 'bitcoin') {
+        await switchNetwork(blockchain.chainId);
+        setCurrentBlockchain(blockchain);
+      } else {
+        // For non-EVM chains, show instructions
+        setConnectionError(`${blockchain.name} requires a different wallet connection method.`);
+      }
+    } catch (error: any) {
+      console.error('Error switching to blockchain:', error);
+      setConnectionError(`Failed to switch to ${blockchain.name}`);
+    }
+  }, [isConnected, switchNetwork]);
+
   // Enable demo mode
   const enableDemoMode = useCallback(() => {
     setIsDemoMode(true);
@@ -367,6 +395,10 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     balance,
     connectionError,
     isDemoMode,
+    zetaNetwork,
+    setZetaNetwork,
+    currentBlockchain,
+    setCurrentBlockchain,
     connect,
     disconnect,
     enableDemoMode,
@@ -376,6 +408,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     getAccountInfo,
     refreshBalance,
     switchNetwork,
+    switchToBlockchain,
     clearError,
   };
 

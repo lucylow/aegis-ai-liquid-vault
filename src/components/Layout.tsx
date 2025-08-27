@@ -26,7 +26,9 @@ import {
 import WalletConnect from './WalletConnect';
 import WalletConnectionModal from './WalletConnectionModal';
 import NotificationPanel from './NotificationPanel';
+import BlockchainSwitcher from './BlockchainSwitcher';
 import { useWallet } from '../contexts/WalletContext';
+import { getBlockchainByChainId } from '../config/blockchains';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -37,7 +39,7 @@ const Layout = () => {
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { isConnected, address, network, isDemoMode } = useWallet();
+  const { isConnected, address, network, isDemoMode, currentBlockchain, chainId } = useWallet();
 
   const navigation = [
     { name: 'Home', href: '/app', icon: Shield, current: location.pathname === '/app' },
@@ -131,20 +133,12 @@ const Layout = () => {
           </button>
         </div>
         
-        {/* Network Indicator */}
-        <div className="px-6 py-3 border-b border-white/10">
-          <div className="flex items-center gap-2">
-            <Network size={16} className="text-gray-400" />
-            <span className="text-sm text-gray-400">ZetaChain</span>
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-              zetaNetwork === 'mainnet' 
-                ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' 
-                : 'bg-orange-600/20 text-orange-400 border border-orange-500/30'
-            }`}>
-              {zetaNetwork === 'mainnet' ? 'Mainnet' : 'Testnet'}
-            </span>
-          </div>
-        </div>
+        {/* Blockchain Switcher */}
+        <BlockchainSwitcher 
+          currentBlockchain={currentBlockchain}
+          variant="sidebar"
+          showTestnets={true}
+        />
 
         <nav className="mt-6 px-3">
           <div className="space-y-1">
@@ -224,37 +218,13 @@ const Layout = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* ZetaChain Network Switcher */}
-            <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg p-1 border border-gray-700">
-              <button
-                onClick={() => setZetaNetwork('mainnet')}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                  zetaNetwork === 'mainnet'
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Network size={14} />
-                  <span>Mainnet</span>
-                  {zetaNetwork === 'mainnet' && <CheckCircle size={14} />}
-                </div>
-              </button>
-              <button
-                onClick={() => setZetaNetwork('testnet')}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                  zetaNetwork === 'testnet'
-                    ? 'bg-orange-600 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Network size={14} />
-                  <span>Testnet</span>
-                  {zetaNetwork === 'testnet' && <CheckCircle size={14} />}
-                </div>
-              </button>
-            </div>
+            {/* Blockchain Switcher */}
+            <BlockchainSwitcher 
+              currentBlockchain={currentBlockchain}
+              variant="dropdown"
+              showTestnets={false}
+              className="hidden md:block"
+            />
 
             {/* Notifications */}
             <button 
@@ -346,25 +316,12 @@ const Layout = () => {
                 <span className="text-xs text-gray-500 mt-1 block">Connected</span>
               </div>
 
-              {/* ZetaChain Network Status */}
-              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm text-gray-400">ZetaChain Network</span>
-                  <Network size={16} className="text-blue-400" />
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-                    zetaNetwork === 'mainnet' 
-                      ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' 
-                      : 'bg-orange-600/20 text-orange-400 border border-orange-500/30'
-                  }`}>
-                    {zetaNetwork === 'mainnet' ? 'Mainnet' : 'Testnet'}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {zetaNetwork === 'mainnet' ? 'Production Network' : 'Test Network'}
-                  </span>
-                </div>
-              </div>
+              {/* Blockchain Switcher */}
+              <BlockchainSwitcher 
+                currentBlockchain={currentBlockchain}
+                variant="modal"
+                showTestnets={true}
+              />
 
               {/* Quick Actions */}
               <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
@@ -374,7 +331,13 @@ const Layout = () => {
                     <RefreshCw size={14} />
                     Refresh Balance
                   </button>
-                  <button className="px-3 py-2 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-colors text-sm flex items-center gap-2 justify-center">
+                  <button 
+                    onClick={() => {
+                      // This will be handled by the blockchain switcher above
+                      console.log('Use the blockchain switcher above to change networks');
+                    }}
+                    className="px-3 py-2 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-colors text-sm flex items-center gap-2 justify-center"
+                  >
                     <Globe size={14} />
                     Switch Network
                   </button>
