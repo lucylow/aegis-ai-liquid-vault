@@ -1,13 +1,17 @@
 import express from 'express';
 import axios from 'axios';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Gemini API Configuration
-const GEMINI_API_KEY = 'AIzaSyBJjAgF21V44hb-lTNiWKoWWfo9U4cyjkE';
+// Gemini API Configuration from environment variables
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBJjAgF21V44hb-lTNiWKoWWfo9U4cyjkE';
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 // Supported Gemini models
@@ -19,10 +23,13 @@ const GEMINI_MODELS = {
 
 // Health check endpoint
 app.get('/api/gemini/health', (req, res) => {
+  const isHealthy = !!GEMINI_API_KEY && GEMINI_API_KEY !== 'your_gemini_api_key_here';
+  
   res.json({ 
-    status: 'healthy', 
+    status: isHealthy ? 'healthy' : 'unhealthy',
     service: 'Gemini AI Service',
     models: Object.keys(GEMINI_MODELS),
+    apiKeyConfigured: !!GEMINI_API_KEY && GEMINI_API_KEY !== 'your_gemini_api_key_here',
     timestamp: new Date().toISOString()
   });
 });
@@ -39,6 +46,12 @@ app.post('/api/gemini/generate', async (req, res) => {
     return res.status(400).json({ 
       error: 'Invalid model. Supported models:', 
       models: Object.keys(GEMINI_MODELS) 
+    });
+  }
+
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
+    return res.status(500).json({ 
+      error: 'Gemini API key not configured. Please set GEMINI_API_KEY environment variable.' 
     });
   }
 
@@ -132,6 +145,12 @@ app.post('/api/gemini/credit-score', async (req, res) => {
     return res.status(400).json({ error: 'Missing user address' });
   }
 
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
+    return res.status(500).json({ 
+      error: 'Gemini API key not configured. Please set GEMINI_API_KEY environment variable.' 
+    });
+  }
+
   const prompt = `Analyze the following DeFi lending profile and provide a credit score (0-100) with risk assessment:
 
 User Address: ${userAddress}
@@ -206,6 +225,12 @@ app.post('/api/gemini/risk-assessment', async (req, res) => {
   
   if (!portfolio) {
     return res.status(400).json({ error: 'Missing portfolio data' });
+  }
+
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
+    return res.status(500).json({ 
+      error: 'Gemini API key not configured. Please set GEMINI_API_KEY environment variable.' 
+    });
   }
 
   const prompt = `Analyze this DeFi portfolio for risk assessment:
@@ -285,6 +310,12 @@ app.post('/api/gemini/batch', async (req, res) => {
     return res.status(400).json({ error: 'Maximum 10 requests allowed per batch' });
   }
 
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
+    return res.status(500).json({ 
+      error: 'Gemini API key not configured. Please set GEMINI_API_KEY environment variable.' 
+    });
+  }
+
   const results = [];
   
   for (const request of requests) {
@@ -332,6 +363,18 @@ app.post('/api/gemini/batch', async (req, res) => {
   });
 });
 
+// Configuration endpoint
+app.get('/api/gemini/config', (req, res) => {
+  res.json({
+    models: Object.keys(GEMINI_MODELS),
+    defaultModel: 'gemini-2.0-flash',
+    maxTokens: 8192,
+    temperature: 0.7,
+    apiKeyConfigured: !!GEMINI_API_KEY && GEMINI_API_KEY !== 'your_gemini_api_key_here',
+    timestamp: new Date().toISOString()
+  });
+});
+
 const PORT = process.env.PORT || 4006;
 app.listen(PORT, () => {
   console.log(`🚀 Gemini AI Service running on port ${PORT}`);
@@ -340,4 +383,11 @@ app.listen(PORT, () => {
   console.log(`💳 Credit scoring: POST http://localhost:${PORT}/api/gemini/credit-score`);
   console.log(`⚠️  Risk assessment: POST http://localhost:${PORT}/api/gemini/risk-assessment`);
   console.log(`📦 Batch processing: POST http://localhost:${PORT}/api/gemini/batch`);
+  console.log(`⚙️  Configuration: GET http://localhost:${PORT}/api/gemini/config`);
+  
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
+    console.warn('⚠️  GEMINI_API_KEY not configured. Set environment variable for full functionality.');
+  } else {
+    console.log('✅ Gemini API key configured');
+  }
 });
