@@ -43,7 +43,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
     response: AIResponse;
   }>>([]);
   const [error, setError] = useState<string | null>(null);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showVoiceInterface, setShowVoiceInterface] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const responseRef = useRef<HTMLDivElement>(null);
@@ -132,6 +132,11 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  // Toggle voice interface
+  const toggleVoiceInterface = () => {
+    setShowVoiceInterface(!showVoiceInterface);
   };
 
   // Get task type icon
@@ -244,18 +249,18 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setShowSuggestions(!showSuggestions)}
+                  onClick={toggleVoiceInterface}
                   className="flex items-center gap-2"
                 >
                   <Mic className="h-4 w-4" />
                   Voice Command
-                </VoiceCommandInput>
+                </Button>
               </div>
             )}
           </form>
 
           {/* Voice Command Interface */}
-          {showVoiceCommands && (
+          {showVoiceCommands && showVoiceInterface && (
             <div className="mt-4">
               <VoiceCommandInput
                 onCommandSubmit={handleVoiceCommand}

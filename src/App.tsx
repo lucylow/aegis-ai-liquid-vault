@@ -13,6 +13,7 @@ import Loans from './pages/Loans';
 import NftCollateral from './pages/NftCollateral';
 import Analytics from './pages/Analytics';
 import Governance from './pages/Governance';
+import AITest from './pages/AITest';
 
 import NotFound from './pages/NotFound';
 
@@ -24,6 +25,9 @@ const App = () => {
           <Routes>
             {/* Landing page - no layout wrapper */}
             <Route path="/" element={<LandingPage />} />
+            
+            {/* AI Test Route */}
+            <Route path="/ai-test" element={<AITest />} />
             
             {/* Protected routes with layout wrapper */}
             <Route path="/app" element={<Layout />}>
