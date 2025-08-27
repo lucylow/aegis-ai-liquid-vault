@@ -219,6 +219,33 @@ const Analytics = () => {
     return `${value.toFixed(1)}%`;
   };
 
+  // Helper function to get chain colors for charts
+  const getChainColor = (chain: string) => {
+    switch (chain) {
+      case 'Ethereum': return '#3b82f6';
+      case 'Avalanche': return '#10b981';
+      case 'Solana': return '#f59e0b';
+      case 'Polygon': return '#8b5cf6';
+      case 'Base': return '#ef4444';
+      case 'ZetaChain': return '#06b6d4';
+      default: return '#6b7280';
+    }
+  };
+
+  // Generate mock liquidity trends data for the area chart
+  const generateLiquidityTrends = () => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    return months.map((month, index) => ({
+      month,
+      ethereum: 1500 + Math.random() * 200 - 100,
+      avalanche: 850 + Math.random() * 150 - 75,
+      solana: 500 + Math.random() * 100 - 50,
+      polygon: 420 + Math.random() * 80 - 40,
+      base: 300 + Math.random() * 60 - 30,
+      zetachain: 400 + Math.random() * 70 - 35
+    }));
+  };
+
   const filteredLiquidityStats = selectedChain === 'all' 
     ? liquidityStats 
     : liquidityStats.filter(stat => stat.chain === selectedChain);
@@ -468,11 +495,24 @@ const Analytics = () => {
                 <div className="bg-slate-800/50 rounded-lg p-4">
                   <h4 className="text-lg font-medium text-white mb-4">Credit Score & Liquidations</h4>
                   <div className="h-64 bg-slate-900/50 rounded p-4">
-                    <div className="text-center text-gray-400 py-16">
-                      <BarChart3 className="w-12 h-12 mx-auto mb-2" />
-                      <p>Chart visualization would go here</p>
-                      <p className="text-sm">Using Recharts or similar library</p>
-                    </div>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={riskModelData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
+                        <XAxis dataKey="month" stroke="#94a3b8" />
+                        <YAxis stroke="#94a3b8" />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: '#1e293b', 
+                            border: '1px solid #475569',
+                            borderRadius: '8px',
+                            color: '#f1f5f9'
+                          }}
+                        />
+                        <Legend />
+                        <Bar dataKey="avgCreditScore" fill="#10b981" name="Credit Score" />
+                        <Bar dataKey="liquidations" fill="#ef4444" name="Liquidations" />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
                 </div>
                 
@@ -527,6 +567,72 @@ const Analytics = () => {
                   </div>
                 </div>
               </div>
+              
+              {/* Additional Charts Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+                {/* Portfolio Distribution Pie Chart */}
+                <div className="bg-slate-800/50 rounded-lg p-4">
+                  <h4 className="text-lg font-medium text-white mb-4">Portfolio Distribution</h4>
+                  <div className="h-64 bg-slate-900/50 rounded p-4">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsPieChart>
+                        <Pie
+                          data={liquidityStats.map(stat => ({
+                            name: stat.chain,
+                            value: stat.liquidity,
+                            fill: getChainColor(stat.chain)
+                          }))}
+                          cx="50%"
+                          outerRadius={80}
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {liquidityStats.map((stat, index) => (
+                            <Cell key={`cell-${index}`} fill={getChainColor(stat.chain)} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: '#1e293b', 
+                            border: '1px solid #475569',
+                            borderRadius: '8px',
+                            color: '#f1f5f9'
+                          }}
+                        />
+                      </RechartsPieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                
+                {/* Liquidity Trends Area Chart */}
+                <div className="bg-slate-800/50 rounded-lg p-4">
+                  <h4 className="text-lg font-medium text-white mb-4">Liquidity Trends (6 Months)</h4>
+                  <div className="h-64 bg-slate-900/50 rounded p-4">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={generateLiquidityTrends()}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
+                        <XAxis dataKey="month" stroke="#94a3b8" />
+                        <YAxis stroke="#94a3b8" />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: '#1e293b', 
+                            border: '1px solid #475569',
+                            borderRadius: '8px',
+                            color: '#f1f5f9'
+                          }}
+                        />
+                        <Legend />
+                        <Area type="monotone" dataKey="ethereum" stackId="1" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} name="Ethereum" />
+                        <Area type="monotone" dataKey="avalanche" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.6} name="Avalanche" />
+                        <Area type="monotone" dataKey="solana" stackId="1" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.6} name="Solana" />
+                        <Area type="monotone" dataKey="polygon" stackId="1" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.6} name="Polygon" />
+                        <Area type="monotone" dataKey="base" stackId="1" stroke="#ef4444" fill="#ef4444" fillOpacity={0.6} name="Base" />
+                        <Area type="monotone" dataKey="zetachain" stackId="1" stroke="#06b6d4" fill="#06b6d4" fillOpacity={0.6} name="ZetaChain" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
             </section>
           </div>
         )}
@@ -560,12 +666,28 @@ const Analytics = () => {
               
               <div className="bg-slate-800/50 rounded-lg p-4">
                 <div className="h-80 bg-slate-900/50 rounded p-4">
-                  <div className="text-center text-gray-400 py-20">
-                    <TrendingUp className="w-16 h-16 mx-auto mb-4" />
-                    <p className="text-lg">Interest Rate Trends Chart</p>
-                    <p className="text-sm">Using Recharts or similar library</p>
-                    <p className="text-sm mt-2">Showing {selectedChain === 'all' ? 'all chains' : selectedChain} rates over {timeRange}</p>
-                  </div>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={interestRateTrends}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
+                      <XAxis dataKey="month" stroke="#94a3b8" />
+                      <YAxis stroke="#94a3b8" />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#1e293b', 
+                          border: '1px solid #475569',
+                          borderRadius: '8px',
+                          color: '#f1f5f9'
+                        }}
+                      />
+                      <Legend />
+                      <Line type="monotone" dataKey="ethereum" stroke="#3b82f6" strokeWidth={2} name="Ethereum" />
+                      <Line type="monotone" dataKey="avalanche" stroke="#10b981" strokeWidth={2} name="Avalanche" />
+                      <Line type="monotone" dataKey="solana" stroke="#f59e0b" strokeWidth={2} name="Solana" />
+                      <Line type="monotone" dataKey="polygon" stroke="#8b5cf6" strokeWidth={2} name="Polygon" />
+                      <Line type="monotone" dataKey="base" stroke="#ef4444" strokeWidth={2} name="Base" />
+                      <Line type="monotone" dataKey="zetachain" stroke="#06b6d4" strokeWidth={2} name="ZetaChain" />
+                    </LineChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
               

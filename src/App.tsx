@@ -15,6 +15,7 @@ import Analytics from './pages/Analytics';
 import Governance from './pages/Governance';
 import AITest from './pages/AITest';
 import SimpleAITest from './components/SimpleAITest';
+import IconTest from './components/IconTest';
 
 import NotFound from './pages/NotFound';
 
@@ -32,6 +33,9 @@ const App = () => {
             
             {/* AI Test Route */}
             <Route path="/ai-test" element={<AITest />} />
+            
+            {/* Icon Test Route */}
+            <Route path="/icon-test" element={<IconTest />} />
             
             {/* Protected routes with layout wrapper */}
             <Route path="/app" element={<Layout />}>
