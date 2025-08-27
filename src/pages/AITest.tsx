@@ -10,16 +10,18 @@ const AITest: React.FC = () => {
           Test the AI Assistant functionality - both buttons should work now!
         </p>
         
-        <AIAssistant 
-          showVoiceCommands={true}
-          initialContext={{
-            userProfile: {
-              experience: 'intermediate',
-              focus: 'defi',
-              chains: ['Ethereum', 'Polygon', 'Arbitrum']
-            }
-          }}
-        />
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <AIAssistant 
+            showVoiceCommands={true}
+            initialContext={{
+              userProfile: {
+                experience: 'intermediate',
+                focus: 'defi',
+                chains: ['Ethereum', 'Polygon', 'Arbitrum']
+              }
+            }}
+          />
+        </div>
       </div>
     </div>
   );

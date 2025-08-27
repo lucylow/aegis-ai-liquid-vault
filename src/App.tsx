@@ -14,6 +14,7 @@ import NftCollateral from './pages/NftCollateral';
 import Analytics from './pages/Analytics';
 import Governance from './pages/Governance';
 import AITest from './pages/AITest';
+import SimpleAITest from './components/SimpleAITest';
 
 import NotFound from './pages/NotFound';
 
@@ -25,6 +26,9 @@ const App = () => {
           <Routes>
             {/* Landing page - no layout wrapper */}
             <Route path="/" element={<LandingPage />} />
+            
+            {/* Simple Test Route */}
+            <Route path="/simple-test" element={<SimpleAITest />} />
             
             {/* AI Test Route */}
             <Route path="/ai-test" element={<AITest />} />
