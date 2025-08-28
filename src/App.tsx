@@ -16,6 +16,7 @@ import Governance from './pages/Governance';
 import AITest from './pages/AITest';
 import SimpleAITest from './components/SimpleAITest';
 import IconTest from './components/IconTest';
+import ChartTest from './components/ChartTest';
 
 import NotFound from './pages/NotFound';
 
@@ -36,6 +37,9 @@ const App = () => {
             
             {/* Icon Test Route */}
             <Route path="/icon-test" element={<IconTest />} />
+            
+            {/* Chart Test Route */}
+            <Route path="/chart-test" element={<ChartTest />} />
             
             {/* Protected routes with layout wrapper */}
             <Route path="/app" element={<Layout />}>
