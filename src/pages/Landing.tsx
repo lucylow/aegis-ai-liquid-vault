@@ -100,7 +100,7 @@ const Landing = () => {
     { name: "Avalanche", icon: "🔴", status: "active" },
     { name: "Base", icon: "🔵", status: "active" },
     { name: "Polygon", icon: "🟣", status: "active" },
-    { name: "ZetaChain", icon: "⚡", status: "active" }
+    { name: "Arbitrum", icon: "🔵", status: "active" }
   ];
 
   return (
@@ -154,7 +154,7 @@ const Landing = () => {
           <div className="max-w-5xl mx-auto">
             <div className="inline-flex items-center space-x-2 bg-blue-600/20 border border-blue-500/30 rounded-full px-4 py-2 mb-8">
               <Star className="w-4 h-4 text-yellow-400" />
-              <span className="text-sm">Powered by ZetaChain & AI</span>
+              <span className="text-sm">Powered by AI & Blockchain</span>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-extrabold mb-8 leading-tight">
@@ -167,7 +167,7 @@ const Landing = () => {
             
             <p className="text-xl md:text-2xl mb-12 max-w-4xl mx-auto text-gray-300 leading-relaxed">
               Unlock cross-chain DeFi lending with real-time AI credit scoring, predictive liquidation risk, 
-              and dynamic interest rates — all powered by ZetaChain's universal messaging.
+              and dynamic interest rates — all powered by advanced cross-chain technology.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">

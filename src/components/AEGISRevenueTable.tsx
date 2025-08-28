@@ -91,7 +91,7 @@ const AEGISRevenueTable: React.FC = () => {
             id: 'token-utility',
             stream: 'Token Fees & Governance',
             model: 'AEGIS token utility',
-            impact: 'Variable; launched post-hackathon',
+            impact: 'Variable; launched post-development',
             description: 'Token used for protocol fees, governance, and staking rewards',
             icon: <Users className="w-5 h-5" />,
             color: 'bg-indigo-500',
@@ -269,7 +269,7 @@ const AEGISRevenueTable: React.FC = () => {
         </div>
 
         <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-lg p-6 border border-blue-500/30">
-          <h3 className="text-lg font-semibold text-blue-400 mb-3">ZetaChain Aligned</h3>
+                          <h3 className="text-lg font-semibold text-blue-400 mb-3">Cross-Chain Aligned</h3>
           <p className="text-gray-300 text-sm">
             Leverages cross-chain transaction volume and universal contract usage
           </p>
