@@ -17,6 +17,7 @@ import AITest from './pages/AITest';
 import SimpleAITest from './components/SimpleAITest';
 import IconTest from './components/IconTest';
 import ChartTest from './components/ChartTest';
+import SimpleWalletTest from './components/SimpleWalletTest';
 
 import NotFound from './pages/NotFound';
 
@@ -40,6 +41,9 @@ const App = () => {
             
             {/* Chart Test Route */}
             <Route path="/chart-test" element={<ChartTest />} />
+            
+            {/* Wallet Test Route */}
+            <Route path="/wallet-test" element={<SimpleWalletTest />} />
             
             {/* Protected routes with layout wrapper */}
             <Route path="/app" element={<Layout />}>
