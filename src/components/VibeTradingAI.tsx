@@ -7,6 +7,9 @@ import OllamaTradingAssistant from './VibeTrading/OllamaTradingAssistant';
 import SystemStatusRow from './VibeTrading/SystemStatusRow';
 import TradeForm from './VibeTrading/TradeForm';
 import AegisSecurityDashboard from './VibeTrading/AegisSecurityDashboard';
+import AIEnhancedTradingAssistant from './VibeTrading/AIEnhancedTradingAssistant';
+import AIMarketAnalysisDashboard from './VibeTrading/AIMarketAnalysisDashboard';
+import AIErrorBoundary from './VibeTrading/AIErrorBoundary';
 
 interface TrendingData {
   analysis: {
@@ -35,6 +38,8 @@ export default function VibeTradingAI() {
   const [highlightedMentionIndex, setHighlightedMentionIndex] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [filteredMentions, setFilteredMentions] = useState<any[]>([]);
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   // Navigation functions for social mentions
   const nextMention = () => {
@@ -75,6 +80,8 @@ export default function VibeTradingAI() {
   const fetchTrendingTokens = async () => {
     try {
       setIsLoading(true);
+      setHasError(false);
+      setErrorMessage('');
       
       // For now, we'll use mock data until the backend is set up
       // In production, this would fetch from your AEGIS backend
@@ -115,6 +122,8 @@ export default function VibeTradingAI() {
       
     } catch (error) {
       console.error('Error fetching trending tokens:', error);
+      setHasError(true);
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to fetch trending tokens');
     } finally {
       setIsLoading(false);
     }
@@ -276,20 +285,37 @@ export default function VibeTradingAI() {
         </div>
       )}
 
-      {/* AI Trading Assistant */}
-      <div className="bg-gradient-to-br from-indigo-600/20 to-blue-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-        <OllamaTradingAssistant />
+      {/* Enhanced AI Trading Assistant */}
+      <div className="bg-gradient-to-br from-purple-600/20 to-blue-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+        <AIErrorBoundary>
+          <AIEnhancedTradingAssistant 
+            selectedToken={selectedToken || 'ETH'} 
+            currentPrice={2500}
+          />
+        </AIErrorBoundary>
+      </div>
+
+      {/* AI Market Analysis Dashboard */}
+      <div className="bg-gradient-to-br from-pink-600/20 to-purple-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+        <AIErrorBoundary>
+          <AIMarketAnalysisDashboard 
+            selectedToken={selectedToken || 'ETH'} 
+            currentPrice={2500}
+          />
+        </AIErrorBoundary>
       </div>
 
       {/* Security-Integrated Trading Form */}
       <div className="bg-gradient-to-br from-emerald-600/20 to-teal-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-        <TradeForm 
-          selectedToken={selectedToken || 'ETH'} 
-          onTradeExecute={(trade) => {
-            console.log('Trade executed with AEGIS security:', trade);
-            // Here you would integrate with Base chain trading
-          }}
-        />
+        <AIErrorBoundary>
+          <TradeForm 
+            selectedToken={selectedToken || 'ETH'} 
+            onTradeExecute={(trade) => {
+              console.log('Trade executed with AEGIS security:', trade);
+              // Here you would integrate with Base chain trading
+            }}
+          />
+        </AIErrorBoundary>
       </div>
 
       {/* AEGIS Security Dashboard */}

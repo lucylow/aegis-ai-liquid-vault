@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  Shield, 
-  Home, 
+  Shield,
   Wallet, 
   TrendingUp, 
   DollarSign, 
@@ -42,8 +41,6 @@ const Layout = () => {
   const { isConnected, address, network, isDemoMode, currentBlockchain, chainId } = useWallet();
 
   const navigation = [
-    { name: 'Home', href: '/app', icon: Shield, current: location.pathname === '/app' },
-    { name: 'Dashboard', href: '/app/dashboard', icon: Home, current: location.pathname === '/app/dashboard' },
     { name: 'Multi-Chain', href: '/app/multi-chain', icon: Globe, current: location.pathname === '/app/multi-chain' },
     { name: 'Deposit', href: '/app/deposit', icon: Wallet, current: location.pathname === '/app/deposit' },
     { name: 'Borrow', href: '/app/borrow', icon: DollarSign, current: location.pathname === '/app/borrow' },
@@ -51,6 +48,11 @@ const Layout = () => {
     { name: 'NFT Collateral', href: '/app/nft-collateral', icon: TrendingUp, current: location.pathname === '/app/nft-collateral' },
     { name: 'Analytics', href: '/app/analytics', icon: BarChart3, current: location.pathname === '/app/analytics' },
     { name: 'Governance', href: '/app/governance', icon: Settings, current: location.pathname === '/app/governance' },
+  ];
+
+  const aiNavigation = [
+    { name: 'Vibe Trading AI', href: '/vibe-trading', icon: Brain, current: location.pathname === '/vibe-trading' },
+    { name: 'Security Center', href: '/aegis-security', icon: AlertTriangle, current: location.pathname === '/aegis-security' },
   ];
 
   const handleNavigation = (href: string) => {
@@ -159,6 +161,29 @@ const Layout = () => {
             ))}
           </div>
         </nav>
+
+        {/* AI & Security Navigation */}
+        <div className="mt-8 px-3">
+          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
+            AI & Security
+          </div>
+          <div className="space-y-1">
+            {aiNavigation.map((item) => (
+              <button
+                key={item.name}
+                onClick={() => handleNavigation(item.href)}
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  item.current
+                    ? 'bg-primary/20 text-primary border border-primary/30'
+                    : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <item.icon size={20} />
+                {item.name}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* User section at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
