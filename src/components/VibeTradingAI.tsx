@@ -5,6 +5,8 @@ import TradingChart from './VibeTrading/TradingChart';
 import TokenSelector from './VibeTrading/TokenSelector';
 import OllamaTradingAssistant from './VibeTrading/OllamaTradingAssistant';
 import SystemStatusRow from './VibeTrading/SystemStatusRow';
+import TradeForm from './VibeTrading/TradeForm';
+import AegisSecurityDashboard from './VibeTrading/AegisSecurityDashboard';
 
 interface TrendingData {
   analysis: {
@@ -277,6 +279,22 @@ export default function VibeTradingAI() {
       {/* AI Trading Assistant */}
       <div className="bg-gradient-to-br from-indigo-600/20 to-blue-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
         <OllamaTradingAssistant />
+      </div>
+
+      {/* Security-Integrated Trading Form */}
+      <div className="bg-gradient-to-br from-emerald-600/20 to-teal-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+        <TradeForm 
+          selectedToken={selectedToken || 'ETH'} 
+          onTradeExecute={(trade) => {
+            console.log('Trade executed with AEGIS security:', trade);
+            // Here you would integrate with Base chain trading
+          }}
+        />
+      </div>
+
+      {/* AEGIS Security Dashboard */}
+      <div className="bg-gradient-to-br from-red-600/20 to-orange-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+        <AegisSecurityDashboard />
       </div>
 
       {/* System Status */}
