@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AegisSecurityProvider } from './contexts/AegisSecurityContext';
-import GlobalSecurityAlert from './components/GlobalSecurityAlert';
+import TransactionStatusBanner from './components/TransactionStatusBanner';
 import { WalletProvider } from './contexts/WalletContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import Layout from './components/Layout';
@@ -32,7 +32,7 @@ const App = () => {
       <WalletProvider>
         <NotificationProvider>
           <Router>
-            <GlobalSecurityAlert />
+            <TransactionStatusBanner />
             <Routes>
               {/* Landing page - no layout wrapper */}
               <Route path="/" element={<LandingPage />} />

@@ -20,7 +20,9 @@ import {
   CheckCircle,
   Copy,
   ExternalLink,
-  RefreshCw
+  RefreshCw,
+  ChevronRight,
+  ChevronLeft
 } from 'lucide-react';
 import WalletConnect from './WalletConnect';
 import WalletConnectionModal from './WalletConnectionModal';
@@ -31,6 +33,7 @@ import { getBlockchainByChainId } from '../config/blockchains';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [hasShownWalletModal, setHasShownWalletModal] = useState(false);
   const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
@@ -39,6 +42,34 @@ const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isConnected, address, network, isDemoMode, currentBlockchain, chainId } = useWallet();
+
+  // Load sidebar preference from localStorage
+  useEffect(() => {
+    const savedPreference = localStorage.getItem('aegis-sidebar-collapsed');
+    if (savedPreference !== null) {
+      setSidebarCollapsed(JSON.parse(savedPreference));
+    }
+  }, []);
+
+  // Save sidebar preference to localStorage
+  const toggleSidebar = () => {
+    const newState = !sidebarCollapsed;
+    setSidebarCollapsed(newState);
+    localStorage.setItem('aegis-sidebar-collapsed', JSON.stringify(newState));
+  };
+
+  // Keyboard shortcut to toggle sidebar (Ctrl+B or Cmd+B)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'b') {
+        event.preventDefault();
+        toggleSidebar();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [sidebarCollapsed]);
 
   const navigation = [
     { name: 'Multi-Chain', href: '/app/multi-chain', icon: Globe, current: location.pathname === '/app/multi-chain' },
@@ -109,8 +140,10 @@ const Layout = () => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-gray-900/95 via-gray-900/90 to-gray-800/95 backdrop-blur-xl border-r border-white/10 shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+      <div className={`fixed inset-y-0 left-0 z-50 bg-gradient-to-b from-gray-900/95 via-gray-900/90 to-gray-800/95 backdrop-blur-xl border-r border-white/10 shadow-2xl transform transition-all duration-300 ease-in-out ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      } ${
+        sidebarCollapsed ? 'w-16 lg:translate-x-0' : 'w-64 lg:translate-x-0'
       }`}>
         {/* Header */}
         <div className="flex items-center justify-between h-12 px-3 border-b border-white/10 bg-gradient-to-r from-gray-800/50 to-gray-700/50">
@@ -118,37 +151,56 @@ const Layout = () => {
             <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
               <Shield size={16} className="text-white" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-base font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                AEGIS
-              </span>
-              <span className="text-xs text-gray-400 font-medium tracking-wide">
-                Cross-Chain Lending
-              </span>
-            </div>
+            {!sidebarCollapsed && (
+              <div className="flex flex-col">
+                <span className="text-base font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  AEGIS
+                </span>
+                <span className="text-xs text-gray-400 font-medium tracking-wide">
+                  Cross-Chain Lending
+                </span>
+              </div>
+            )}
           </div>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-1 rounded-lg hover:bg-white/10 transition-colors"
-          >
-            <X size={16} className="text-gray-400" />
-          </button>
+          <div className="flex items-center gap-2">
+                          <button
+                onClick={toggleSidebar}
+                className="hidden lg:flex p-1 rounded-lg hover:bg-white/10 transition-colors"
+                title={`${sidebarCollapsed ? "Expand" : "Collapse"} Sidebar (Ctrl+B)`}
+              >
+              {sidebarCollapsed ? (
+                <ChevronRight size={16} className="text-gray-400" />
+              ) : (
+                <ChevronLeft size={16} className="text-gray-400" />
+              )}
+            </button>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-1 rounded-lg hover:bg-white/10 transition-colors"
+            >
+              <X size={16} className="text-gray-400" />
+            </button>
+          </div>
         </div>
         
         {/* Blockchain Switcher */}
-        <div className="px-3 py-1">
-          <BlockchainSwitcher 
-            currentBlockchain={currentBlockchain}
-            variant="sidebar"
-            showTestnets={true}
-          />
-        </div>
+        {!sidebarCollapsed && (
+          <div className="px-3 py-1">
+            <BlockchainSwitcher 
+              currentBlockchain={currentBlockchain}
+              variant="sidebar"
+              showTestnets={true}
+            />
+          </div>
+        )}
 
         {/* Main Navigation */}
         <div className="px-3 py-1">
-          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 px-2">
-            Core Features
-          </div>
+          {!sidebarCollapsed && (
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 px-2">
+              Core Features
+            </div>
+          )}
           <nav className="space-y-0.5">
             {navigation.map((item) => (
               <button
@@ -167,7 +219,7 @@ const Layout = () => {
                 }`}>
                   <item.icon size={14} />
                 </div>
-                {item.name}
+                {!sidebarCollapsed && item.name}
               </button>
             ))}
           </nav>
@@ -175,10 +227,12 @@ const Layout = () => {
 
         {/* AI & Security Navigation */}
         <div className="px-3 py-1 mt-1">
-          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 px-2 flex items-center gap-2">
-            <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
-            AI & Security
-          </div>
+          {!sidebarCollapsed && (
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 px-2 flex items-center gap-2">
+              <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
+              AI & Security
+            </div>
+          )}
           <nav className="space-y-0.5">
             {aiNavigation.map((item) => (
               <button
@@ -197,7 +251,7 @@ const Layout = () => {
                 }`}>
                   <item.icon size={14} />
                 </div>
-                {item.name}
+                {!sidebarCollapsed && item.name}
               </button>
             ))}
           </nav>
@@ -208,43 +262,53 @@ const Layout = () => {
           {!isConnected ? (
             <button 
               onClick={() => setWalletModalOpen(true)}
-              className="w-full flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-200 border border-blue-500/30 hover:border-blue-500/50"
+              className={`flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-200 border border-blue-500/30 hover:border-blue-500/50 ${
+                sidebarCollapsed ? 'justify-center w-full' : 'w-full'
+              }`}
             >
               <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
                 <Wallet size={14} className="text-white" />
               </div>
-              <div className="flex-1 min-w-0 text-left">
-                <p className="text-sm font-medium text-white truncate">
-                  Connect Wallet
-                </p>
-                <p className="text-xs text-blue-200 truncate">
-                  Click to connect your wallet
-                </p>
-              </div>
+              {!sidebarCollapsed && (
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium text-white truncate">
+                    Connect Wallet
+                  </p>
+                  <p className="text-xs text-blue-200 truncate">
+                    Click to connect your wallet
+                  </p>
+                </div>
+              )}
             </button>
           ) : (
             <button 
               onClick={() => setWalletInfoOpen(true)}
-              className="w-full flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-200 border border-green-500/30 hover:border-green-500/50"
+              className={`flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-200 border border-green-500/30 hover:border-green-500/50 ${
+                sidebarCollapsed ? 'justify-center w-full' : 'w-full'
+              }`}
             >
               <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
                 <Wallet size={14} className="text-white" />
               </div>
-              <div className="flex-1 min-w-0 text-left">
-                <p className="text-sm font-medium text-white truncate">
-                  {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Connected Wallet'}
-                </p>
-                <p className="text-xs text-green-200 truncate">
-                  {network || 'Ethereum'} • Connected
+              {!sidebarCollapsed && (
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium text-white truncate">
+                    {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Connected Wallet'}
+                  </p>
+                  <p className="text-xs text-green-200 truncate">
+                    {network || 'Ethereum'} • Connected
                 </p>
               </div>
+            )}
             </button>
           )}
         </div>
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className={`transition-all duration-300 ease-in-out ${
+        sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64'
+      }`}>
         {/* Top bar */}
         <div className="sticky top-0 z-30 bg-gray-900/80 backdrop-blur-xl border-b border-white/10">
           <div className="flex items-center justify-between h-16 px-6">
@@ -254,6 +318,17 @@ const Layout = () => {
                 className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
               >
                 <Menu size={20} />
+              </button>
+              <button
+                onClick={toggleSidebar}
+                className="hidden lg:flex p-2 rounded-lg hover:bg-white/10 transition-colors"
+                title={`${sidebarCollapsed ? "Expand" : "Collapse"} Sidebar (Ctrl+B)`}
+              >
+                {sidebarCollapsed ? (
+                  <ChevronRight size={20} />
+                ) : (
+                  <ChevronLeft size={20} />
+                )}
               </button>
               <div className="hidden lg:block">
                 <h1 className="text-lg font-semibold text-white">
