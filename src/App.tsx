@@ -1,5 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AegisSecurityProvider } from './contexts/AegisSecurityContext';
+import GlobalSecurityAlert from './components/GlobalSecurityAlert';
+import SecurityNavigation from './components/SecurityNavigation';
 import { WalletProvider } from './contexts/WalletContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import Layout from './components/Layout';
@@ -20,15 +23,19 @@ import ChartTest from './components/ChartTest';
 import SimpleWalletTest from './components/SimpleWalletTest';
 import RevenueDashboard from './pages/RevenueDashboard';
 import VibeTradingAIPage from './pages/VibeTradingAI';
+import AegisSecurityPage from './pages/AegisSecurity';
 
 import NotFound from './pages/NotFound';
 
 const App = () => {
   return (
-    <WalletProvider>
-      <NotificationProvider>
-        <Router>
-          <Routes>
+    <AegisSecurityProvider>
+      <WalletProvider>
+        <NotificationProvider>
+          <Router>
+            <GlobalSecurityAlert />
+            <SecurityNavigation />
+            <Routes>
             {/* Landing page - no layout wrapper */}
             <Route path="/" element={<LandingPage />} />
             
@@ -50,8 +57,11 @@ const App = () => {
             {/* Revenue Dashboard Route */}
             <Route path="/revenue" element={<RevenueDashboard />} />
             
-            {/* Vibe Trading AI Route */}
-            <Route path="/vibe-trading" element={<VibeTradingAIPage />} />
+                {/* Vibe Trading AI Route */}
+    <Route path="/vibe-trading" element={<VibeTradingAIPage />} />
+    
+    {/* AEGIS Security Route */}
+    <Route path="/aegis-security" element={<AegisSecurityPage />} />
             
             {/* Protected routes with layout wrapper */}
             <Route path="/app" element={<Layout />}>
@@ -73,6 +83,7 @@ const App = () => {
         </Router>
       </NotificationProvider>
     </WalletProvider>
+    </AegisSecurityProvider>
   );
 };
 

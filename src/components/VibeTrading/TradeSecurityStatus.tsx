@@ -36,7 +36,8 @@ export default function TradeSecurityStatus({ trade, onSecurityChange }: TradeSe
       setIsLoading(true);
       setError(null);
       
-      const response = await fetch('/api/aegis/check-trade', {
+      // Use the main trade API endpoint for security checks
+      const response = await fetch('/api/trade', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,11 +45,46 @@ export default function TradeSecurityStatus({ trade, onSecurityChange }: TradeSe
         body: JSON.stringify(trade),
       });
 
+      if (response.status === 403) {
+        // Trade blocked by AEGIS - this is expected for security threats
+        const blockedTrade = await response.json();
+        setStatus({
+          block: true,
+          threatLevel: 'critical',
+          warnings: [blockedTrade.error],
+          recommendations: ['Review trade parameters', 'Contact support if needed'],
+          securityScore: 0,
+          timestamp: new Date().toISOString()
+        });
+        
+        if (onSecurityChange) {
+          onSecurityChange({
+            block: true,
+            threatLevel: 'critical',
+            warnings: [blockedTrade.error],
+            recommendations: ['Review trade parameters', 'Contact support if needed'],
+            securityScore: 0,
+            timestamp: new Date().toISOString()
+          });
+        }
+        return;
+      }
+
       if (!response.ok) {
         throw new Error('Security check failed');
       }
 
-      const securityStatus = await response.json();
+      // Trade passed security checks
+      const tradeResult = await response.json();
+      const securityStatus = {
+        block: false,
+        threatLevel: 'low',
+        warnings: [],
+        recommendations: ['Trade approved by AEGIS security system'],
+        securityScore: tradeResult.securityScore || 100,
+        timestamp: new Date().toISOString()
+      };
+      
       setStatus(securityStatus);
       
       // Notify parent component
