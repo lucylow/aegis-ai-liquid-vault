@@ -19,6 +19,7 @@ import IconTest from './components/IconTest';
 import ChartTest from './components/ChartTest';
 import SimpleWalletTest from './components/SimpleWalletTest';
 import RevenueDashboard from './pages/RevenueDashboard';
+import VibeTradingAIPage from './pages/VibeTradingAI';
 
 import NotFound from './pages/NotFound';
 
@@ -48,6 +49,9 @@ const App = () => {
             
             {/* Revenue Dashboard Route */}
             <Route path="/revenue" element={<RevenueDashboard />} />
+            
+            {/* Vibe Trading AI Route */}
+            <Route path="/vibe-trading" element={<VibeTradingAIPage />} />
             
             {/* Protected routes with layout wrapper */}
             <Route path="/app" element={<Layout />}>
