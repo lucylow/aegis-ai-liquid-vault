@@ -67,8 +67,6 @@ const Layout = () => {
     }
   }, [isConnected, walletModalOpen]);
 
-
-
   if (!isConnected && !isDemoMode) {
     return (
       <>
@@ -111,95 +109,117 @@ const Layout = () => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900/95 backdrop-blur-sm border-r border-white/10 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+      <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-gray-900/95 via-gray-900/90 to-gray-800/95 backdrop-blur-xl border-r border-white/10 shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <div className="flex items-center justify-between h-20 px-6 border-b border-white/10">
-          <div className="flex flex-col gap-1">
+        {/* Header */}
+        <div className="flex items-center justify-between h-24 px-6 border-b border-white/10 bg-gradient-to-r from-gray-800/50 to-gray-700/50">
+          <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <Shield size={20} className="text-white" />
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Shield size={24} className="text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                AEGIS
-              </span>
+              <div className="flex flex-col">
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  AEGIS
+                </span>
+                <span className="text-xs text-gray-400 font-medium tracking-wide">
+                  Cross-Chain Lending
+                </span>
+              </div>
             </div>
-            <span className="text-xs text-gray-400 ml-11">
-              Cross-Chain Lending
-            </span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-1 rounded-lg hover:bg-white/10"
+            className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
           >
-            <X size={20} />
+            <X size={20} className="text-gray-400" />
           </button>
         </div>
         
         {/* Blockchain Switcher */}
-        <BlockchainSwitcher 
-          currentBlockchain={currentBlockchain}
-          variant="sidebar"
-          showTestnets={true}
-        />
+        <div className="px-4 py-4">
+          <BlockchainSwitcher 
+            currentBlockchain={currentBlockchain}
+            variant="sidebar"
+            showTestnets={true}
+          />
+        </div>
 
-        <nav className="mt-6 px-3">
-          <div className="space-y-1">
+        {/* Main Navigation */}
+        <div className="px-4 py-2">
+          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
+            Core Features
+          </div>
+          <nav className="space-y-2">
             {navigation.map((item) => (
               <button
                 key={item.name}
                 onClick={() => handleNavigation(item.href)}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   item.current
-                    ? 'bg-primary/20 text-primary border border-primary/30'
-                    : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white border border-blue-500/30 shadow-lg'
+                    : 'text-gray-300 hover:bg-white/10 hover:text-white hover:shadow-md'
                 }`}
               >
-                <item.icon size={20} />
+                <div className={`p-2 rounded-lg ${
+                  item.current 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' 
+                    : 'bg-gray-700/50 text-gray-400'
+                }`}>
+                  <item.icon size={18} />
+                </div>
                 {item.name}
               </button>
             ))}
-          </div>
-        </nav>
+          </nav>
+        </div>
 
         {/* AI & Security Navigation */}
-        <div className="mt-8 px-3">
-          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
+        <div className="px-4 py-4 mt-4">
+          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3 flex items-center gap-2">
+            <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
             AI & Security
           </div>
-          <div className="space-y-1">
+          <nav className="space-y-2">
             {aiNavigation.map((item) => (
               <button
                 key={item.name}
                 onClick={() => handleNavigation(item.href)}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   item.current
-                    ? 'bg-primary/20 text-primary border border-primary/30'
-                    : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white border border-purple-500/30 shadow-lg'
+                    : 'text-gray-300 hover:bg-white/10 hover:text-white hover:shadow-md'
                 }`}
               >
-                <item.icon size={20} />
+                <div className={`p-2 rounded-lg ${
+                  item.current 
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' 
+                    : 'bg-gray-700/50 text-gray-400'
+                }`}>
+                  <item.icon size={18} />
+                </div>
                 {item.name}
               </button>
             ))}
-          </div>
+          </nav>
         </div>
 
         {/* User section at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 bg-gradient-to-r from-gray-800/50 to-gray-700/50">
           {!isConnected ? (
             <button 
               onClick={() => setWalletModalOpen(true)}
-              className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              className="w-full flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-200 border border-blue-500/30 hover:border-blue-500/50"
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
-                <Wallet size={16} className="text-white" />
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+                <Wallet size={18} className="text-white" />
               </div>
               <div className="flex-1 min-w-0 text-left">
                 <p className="text-sm font-medium text-white truncate">
                   Connect Wallet
                 </p>
-                <p className="text-xs text-gray-400 truncate">
+                <p className="text-xs text-blue-200 truncate">
                   Click to connect your wallet
                 </p>
               </div>
@@ -207,16 +227,16 @@ const Layout = () => {
           ) : (
             <button 
               onClick={() => setWalletInfoOpen(true)}
-              className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              className="w-full flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-200 border border-green-500/30 hover:border-green-500/50"
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
-                <Wallet size={16} className="text-white" />
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
+                <Wallet size={18} className="text-white" />
               </div>
               <div className="flex-1 min-w-0 text-left">
                 <p className="text-sm font-medium text-white truncate">
                   {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Connected Wallet'}
                 </p>
-                <p className="text-xs text-gray-400 truncate">
+                <p className="text-xs text-green-200 truncate">
                   {network || 'Ethereum'} • Connected
                 </p>
               </div>
@@ -226,45 +246,44 @@ const Layout = () => {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top header */}
-        <header className="bg-gray-900/50 backdrop-blur-sm border-b border-white/10 h-16 flex items-center justify-between px-6">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-lg hover:bg-white/10"
-            >
-              <Menu size={20} />
-            </button>
-            <div className="hidden sm:block">
-              <h1 className="text-lg font-semibold">
-                {navigation.find(item => item.current)?.name || 'Aegis'}
-              </h1>
+      <div className="lg:pl-72">
+        {/* Top bar */}
+        <div className="sticky top-0 z-30 bg-gray-900/80 backdrop-blur-xl border-b border-white/10">
+          <div className="flex items-center justify-between h-16 px-6">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+              >
+                <Menu size={20} />
+              </button>
+              <div className="hidden lg:block">
+                <h1 className="text-lg font-semibold text-white">
+                  {location.pathname === '/app' && 'Welcome'}
+                  {location.pathname === '/app/dashboard' && 'Dashboard'}
+                  {location.pathname === '/app/multi-chain' && 'Multi-Chain Dashboard'}
+                  {location.pathname === '/app/deposit' && 'Deposit'}
+                  {location.pathname === '/app/borrow' && 'Borrow'}
+                  {location.pathname === '/app/loans' && 'Loans'}
+                  {location.pathname === '/app/nft-collateral' && 'NFT Collateral'}
+                  {location.pathname === '/app/analytics' && 'Analytics'}
+                  {location.pathname === '/app/governance' && 'Governance'}
+                </h1>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <WalletConnect />
+              <button
+                onClick={() => setNotificationPanelOpen(true)}
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors relative"
+              >
+                <Bell size={20} />
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+              </button>
             </div>
           </div>
-
-          <div className="flex items-center gap-4">
-            {/* Blockchain Switcher */}
-            <BlockchainSwitcher 
-              currentBlockchain={currentBlockchain}
-              variant="dropdown"
-              showTestnets={false}
-              className="hidden md:block"
-            />
-
-            {/* Notifications */}
-            <button 
-              onClick={() => setNotificationPanelOpen(!notificationPanelOpen)}
-              className="p-2 rounded-lg hover:bg-white/10 relative transition-colors"
-            >
-              <Bell size={20} />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
-            </button>
-
-            {/* Wallet connection */}
-            <WalletConnect />
-          </div>
-        </header>
+        </div>
 
         {/* Page content */}
         <main className="p-6">
@@ -272,154 +291,16 @@ const Layout = () => {
         </main>
       </div>
 
-      {/* Notification Panel */}
+      {/* Modals */}
+      <WalletConnectionModal 
+        isOpen={walletModalOpen} 
+        onClose={() => setWalletModalOpen(false)} 
+      />
+      
       <NotificationPanel 
         isOpen={notificationPanelOpen}
         onClose={() => setNotificationPanelOpen(false)}
       />
-
-      {/* Wallet Info Popup */}
-      {walletInfoOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setWalletInfoOpen(false)} />
-          <div className="relative bg-gray-900 border border-gray-700 rounded-xl p-6 w-[500px] max-w-[90vw]">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Wallet size={20} className="text-primary" />
-                Wallet Dashboard
-              </h3>
-              <button
-                onClick={() => setWalletInfoOpen(false)}
-                className="p-1 rounded-lg hover:bg-white/10 transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {/* Wallet Address with Copy & Explorer */}
-              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm text-gray-400">Wallet Address</span>
-                  <div className="flex items-center gap-2">
-                    <button 
-                      onClick={() => {
-                        if (address) {
-                          navigator.clipboard.writeText(address);
-                          // You could add a toast notification here
-                        }
-                      }}
-                      className="p-2 hover:bg-white/10 rounded transition-colors text-blue-400 hover:text-blue-300"
-                      title="Copy Address"
-                    >
-                      <Copy size={14} />
-                    </button>
-                    {address && (
-                      <a
-                        href={`https://etherscan.io/address/${address}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 hover:bg-white/10 rounded transition-colors text-green-400 hover:text-green-300"
-                        title="View on Etherscan"
-                      >
-                        <ExternalLink size={14} />
-                      </a>
-                    )}
-                  </div>
-                </div>
-                <p className="text-white font-mono text-sm break-all">
-                  {address || 'Not connected'}
-                </p>
-              </div>
-
-              {/* Network Information */}
-              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                <span className="text-sm text-gray-400">Network</span>
-                <div className="flex items-center gap-2 mt-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-white font-medium">{network || 'Ethereum'}</span>
-                </div>
-                <span className="text-xs text-gray-500 mt-1 block">Connected</span>
-              </div>
-
-              {/* Blockchain Switcher */}
-              <BlockchainSwitcher 
-                currentBlockchain={currentBlockchain}
-                variant="modal"
-                showTestnets={true}
-              />
-
-              {/* Quick Actions */}
-              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                <span className="text-sm text-gray-400 mb-3 block">Quick Actions</span>
-                <div className="grid grid-cols-2 gap-3">
-                  <button className="px-3 py-2 bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors text-sm flex items-center gap-2 justify-center">
-                    <RefreshCw size={14} />
-                    Refresh Balance
-                  </button>
-                  <button 
-                    onClick={() => {
-                      // This will be handled by the blockchain switcher above
-                      console.log('Use the blockchain switcher above to change networks');
-                    }}
-                    className="px-3 py-2 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-colors text-sm flex items-center gap-2 justify-center"
-                  >
-                    <Globe size={14} />
-                    Switch Network
-                  </button>
-                </div>
-              </div>
-
-              {/* Connection Health */}
-              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                <span className="text-sm text-gray-400 mb-3 block">Connection Health</span>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-300">Wallet Status</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-green-400 text-sm">Connected</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-300">ZetaChain</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="text-blue-400 text-sm">Active</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-300">Cross-Chain Ready</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-green-400 text-sm">Ready</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => {
-                    setWalletInfoOpen(false);
-                    // Add disconnect logic here if needed
-                  }}
-                  className="flex-1 px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
-                >
-                  Disconnect Wallet
-                </button>
-                <button
-                  onClick={() => setWalletInfoOpen(false)}
-                  className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
