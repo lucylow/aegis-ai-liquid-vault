@@ -20,7 +20,7 @@ interface WalletOption {
 }
 
 const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) => {
-  const { connect, isConnecting, connectionError, clearError, isMetaMaskInstalled, enableDemoMode } = useWallet();
+  const { connect, isConnecting, connectionError, clearError, isMetaMaskInstalled, isKeplrInstalled, isPhantomInstalled, isCoinbaseWalletInstalled, isBraveWalletInstalled, enableDemoMode } = useWallet();
   const navigate = useNavigate();
   const [selectedWalletType, setSelectedWalletType] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -44,7 +44,7 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
       icon: '👻',
       description: 'Solana & Solana-based chains',
       type: 'solana',
-      status: 'available',
+      status: isPhantomInstalled() ? 'installed' : 'not-installed',
       chains: ['Solana', 'Devnet', 'Testnet'],
       features: ['NFT Support', 'Staking', 'Multi-account']
     },
@@ -54,7 +54,7 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
       icon: '🔮',
       description: 'Cosmos ecosystem chains',
       type: 'cosmos',
-      status: 'available',
+      status: isKeplrInstalled() ? 'installed' : 'not-installed',
       chains: ['Cosmos Hub', 'Osmosis', 'Juno', 'Stargaze'],
       features: ['Staking', 'Governance', 'IBC Transfers']
     },
@@ -74,7 +74,7 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
       icon: '🪙',
       description: 'Multi-chain support',
       type: 'evm',
-      status: 'available',
+      status: isCoinbaseWalletInstalled() ? 'installed' : 'not-installed',
       chains: ['Ethereum', 'Polygon', 'BSC', 'Arbitrum'],
       features: ['Fiat Onramp', 'DApp Browser', 'Social Recovery']
     },
@@ -84,7 +84,7 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
       icon: '🦁',
       description: 'Built-in browser wallet',
       type: 'evm',
-      status: 'available',
+      status: isBraveWalletInstalled() ? 'installed' : 'not-installed',
       chains: ['Ethereum', 'Polygon', 'BSC', 'Arbitrum'],
       features: ['Privacy Focused', 'Built-in Browser', 'Shield Rewards']
     },
@@ -113,7 +113,7 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
   const handleConnect = async (walletId: string) => {
     try {
       clearError();
-      await connect();
+      await connect(walletId);
       onClose();
       // Navigate to the main app interface after successful connection
       navigate('/app');

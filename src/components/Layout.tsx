@@ -109,36 +109,34 @@ const Layout = () => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-gray-900/95 via-gray-900/90 to-gray-800/95 backdrop-blur-xl border-r border-white/10 shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-gray-900/95 via-gray-900/90 to-gray-800/95 backdrop-blur-xl border-r border-white/10 shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         {/* Header */}
-        <div className="flex items-center justify-between h-24 px-6 border-b border-white/10 bg-gradient-to-r from-gray-800/50 to-gray-700/50">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Shield size={24} className="text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  AEGIS
-                </span>
-                <span className="text-xs text-gray-400 font-medium tracking-wide">
-                  Cross-Chain Lending
-                </span>
-              </div>
+        <div className="flex items-center justify-between h-16 px-4 border-b border-white/10 bg-gradient-to-r from-gray-800/50 to-gray-700/50">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+              <Shield size={20} className="text-white" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                AEGIS
+              </span>
+              <span className="text-xs text-gray-400 font-medium tracking-wide">
+                Cross-Chain Lending
+              </span>
             </div>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+            className="lg:hidden p-1.5 rounded-lg hover:bg-white/10 transition-colors"
           >
-            <X size={20} className="text-gray-400" />
+            <X size={18} className="text-gray-400" />
           </button>
         </div>
         
         {/* Blockchain Switcher */}
-        <div className="px-4 py-4">
+        <div className="px-3 py-2">
           <BlockchainSwitcher 
             currentBlockchain={currentBlockchain}
             variant="sidebar"
@@ -147,27 +145,27 @@ const Layout = () => {
         </div>
 
         {/* Main Navigation */}
-        <div className="px-4 py-2">
-          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
+        <div className="px-3 py-1">
+          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
             Core Features
           </div>
-          <nav className="space-y-2">
+          <nav className="space-y-1">
             {navigation.map((item) => (
               <button
                 key={item.name}
                 onClick={() => handleNavigation(item.href)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   item.current
                     ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white border border-blue-500/30 shadow-lg'
                     : 'text-gray-300 hover:bg-white/10 hover:text-white hover:shadow-md'
                 }`}
               >
-                <div className={`p-2 rounded-lg ${
+                <div className={`p-1.5 rounded-lg ${
                   item.current 
                     ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' 
                     : 'bg-gray-700/50 text-gray-400'
                 }`}>
-                  <item.icon size={18} />
+                  <item.icon size={16} />
                 </div>
                 {item.name}
               </button>
@@ -176,28 +174,28 @@ const Layout = () => {
         </div>
 
         {/* AI & Security Navigation */}
-        <div className="px-4 py-4 mt-4">
-          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3 flex items-center gap-2">
+        <div className="px-3 py-2 mt-2">
+          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
             <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
             AI & Security
           </div>
-          <nav className="space-y-2">
+          <nav className="space-y-1">
             {aiNavigation.map((item) => (
               <button
                 key={item.name}
                 onClick={() => handleNavigation(item.href)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   item.current
                     ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white border border-purple-500/30 shadow-lg'
                     : 'text-gray-300 hover:bg-white/10 hover:text-white hover:shadow-md'
                 }`}
               >
-                <div className={`p-2 rounded-lg ${
+                <div className={`p-1.5 rounded-lg ${
                   item.current 
                     ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' 
                     : 'bg-gray-700/50 text-gray-400'
                 }`}>
-                  <item.icon size={18} />
+                  <item.icon size={16} />
                 </div>
                 {item.name}
               </button>
@@ -206,14 +204,14 @@ const Layout = () => {
         </div>
 
         {/* User section at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 bg-gradient-to-r from-gray-800/50 to-gray-700/50">
+        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-white/10 bg-gradient-to-r from-gray-800/50 to-gray-700/50">
           {!isConnected ? (
             <button 
               onClick={() => setWalletModalOpen(true)}
-              className="w-full flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-200 border border-blue-500/30 hover:border-blue-500/50"
+              className="w-full flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-200 border border-blue-500/30 hover:border-blue-500/50"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
-                <Wallet size={18} className="text-white" />
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+                <Wallet size={16} className="text-white" />
               </div>
               <div className="flex-1 min-w-0 text-left">
                 <p className="text-sm font-medium text-white truncate">
@@ -227,10 +225,10 @@ const Layout = () => {
           ) : (
             <button 
               onClick={() => setWalletInfoOpen(true)}
-              className="w-full flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-200 border border-green-500/30 hover:border-green-500/50"
+              className="w-full flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-200 border border-green-500/30 hover:border-green-500/50"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
-                <Wallet size={18} className="text-white" />
+              <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
+                <Wallet size={16} className="text-white" />
               </div>
               <div className="flex-1 min-w-0 text-left">
                 <p className="text-sm font-medium text-white truncate">
@@ -246,7 +244,7 @@ const Layout = () => {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-72">
+      <div className="lg:pl-64">
         {/* Top bar */}
         <div className="sticky top-0 z-30 bg-gray-900/80 backdrop-blur-xl border-b border-white/10">
           <div className="flex items-center justify-between h-16 px-6">

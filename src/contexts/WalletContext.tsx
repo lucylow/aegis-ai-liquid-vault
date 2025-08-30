@@ -14,10 +14,14 @@ interface WalletContextType {
   setZetaNetwork: (network: 'mainnet' | 'testnet') => void;
   currentBlockchain: BlockchainConfig;
   setCurrentBlockchain: (blockchain: BlockchainConfig) => void;
-  connect: () => Promise<void>;
+  connect: (walletType?: string) => Promise<void>;
   disconnect: () => void;
   enableDemoMode: () => void;
   isMetaMaskInstalled: () => boolean;
+  isKeplrInstalled: () => boolean;
+  isPhantomInstalled: () => boolean;
+  isCoinbaseWalletInstalled: () => boolean;
+  isBraveWalletInstalled: () => boolean;
   isMetaMaskUnlocked: () => Promise<boolean>;
   getMetaMaskProvider: () => any;
   getAccountInfo: () => Promise<void>;
@@ -59,7 +63,43 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     
     // Check for MetaMask specifically, not just any ethereum provider
     const ethereum = (window as any).ethereum;
-    return ethereum && ethereum.isMetaMask === true;
+    const isInstalled = ethereum && ethereum.isMetaMask === true;
+    console.log('MetaMask installed check:', isInstalled);
+    return isInstalled;
+  }, []);
+
+  // Check if Keplr is installed
+  const isKeplrInstalled = useCallback(() => {
+    if (typeof window === 'undefined') return false;
+    const isInstalled = !!(window as any).keplr;
+    console.log('Keplr installed check:', isInstalled);
+    return isInstalled;
+  }, []);
+
+  // Check if Phantom is installed
+  const isPhantomInstalled = useCallback(() => {
+    if (typeof window === 'undefined') return false;
+    const isInstalled = !!(window as any).solana?.isPhantom;
+    console.log('Phantom installed check:', isInstalled);
+    return isInstalled;
+  }, []);
+
+  // Check if Coinbase Wallet is installed
+  const isCoinbaseWalletInstalled = useCallback(() => {
+    if (typeof window === 'undefined') return false;
+    const ethereum = (window as any).ethereum;
+    const isInstalled = ethereum && ethereum.isCoinbaseWallet === true;
+    console.log('Coinbase Wallet installed check:', isInstalled);
+    return isInstalled;
+  }, []);
+
+  // Check if Brave Wallet is installed
+  const isBraveWalletInstalled = useCallback(() => {
+    if (typeof window === 'undefined') return false;
+    const ethereum = (window as any).ethereum;
+    const isInstalled = ethereum && ethereum.isBraveWallet === true;
+    console.log('Brave Wallet installed check:', isInstalled);
+    return isInstalled;
   }, []);
 
   // Check if MetaMask is unlocked
@@ -94,6 +134,206 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     
     return null;
   }, []);
+
+  // Connect to MetaMask
+  const connectMetaMask = useCallback(async () => {
+    if (!isMetaMaskInstalled()) {
+      throw new Error('MetaMask is not installed. Please install MetaMask to continue.');
+    }
+
+    const provider = getMetaMaskProvider();
+    if (!provider) {
+      throw new Error('MetaMask provider not found');
+    }
+
+    // Request accounts (this will trigger the popup)
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    
+    if (accounts && accounts.length > 0) {
+      const account = accounts[0];
+      setAddress(account);
+      setIsConnected(true);
+      
+      // Get chain ID
+      const chainId = await provider.request({ method: 'eth_chainId' });
+      setChainId(parseInt(chainId, 16));
+      
+      // Get balance
+      const balance = await provider.request({ 
+        method: 'eth_getBalance', 
+        params: [account, 'latest'] 
+      });
+      setBalance((parseInt(balance, 16) / 1e18).toFixed(4));
+      
+      // Set network name
+      const networkNames: { [key: number]: string } = {
+        1: 'Ethereum Mainnet',
+        137: 'Polygon',
+        56: 'Binance Smart Chain',
+        42161: 'Arbitrum',
+        10: 'Optimism',
+        8453: 'Base',
+        59144: 'Linea'
+      };
+      setNetwork(networkNames[parseInt(chainId, 16)] || `Chain ID: ${parseInt(chainId, 16)}`);
+      
+      console.log('MetaMask connected successfully:', account);
+    }
+  }, [isMetaMaskInstalled, getMetaMaskProvider]);
+
+  // Connect to Keplr
+  const connectKeplr = useCallback(async () => {
+    if (!isKeplrInstalled()) {
+      throw new Error('Keplr is not installed. Please install Keplr to continue.');
+    }
+
+    try {
+      const keplr = (window as any).keplr;
+      
+      // Enable Keplr
+      await keplr.enable('cosmoshub-4'); // You can change this to your preferred chain
+      
+      // Get account info
+      const offlineSigner = keplr.getOfflineSigner('cosmoshub-4');
+      const accounts = await offlineSigner.getAccounts();
+      
+      if (accounts && accounts.length > 0) {
+        const account = accounts[0];
+        setAddress(account.address);
+        setIsConnected(true);
+        setChainId(4); // Cosmoshub-4
+        setNetwork('Cosmos Hub');
+        setBalance('0'); // You would need to implement balance fetching for Cosmos
+        
+        console.log('Keplr connected successfully:', account.address);
+      }
+    } catch (error: any) {
+      console.error('Keplr connection error:', error);
+      throw new Error(error.message || 'Failed to connect Keplr');
+    }
+  }, [isKeplrInstalled]);
+
+  // Connect to Phantom
+  const connectPhantom = useCallback(async () => {
+    if (!isPhantomInstalled()) {
+      throw new Error('Phantom is not installed. Please install Phantom to continue.');
+    }
+
+    try {
+      const solana = (window as any).solana;
+      
+      // Connect to Phantom
+      const response = await solana.connect();
+      const publicKey = response.publicKey.toString();
+      
+      setAddress(publicKey);
+      setIsConnected(true);
+      setChainId(101); // Solana mainnet
+      setNetwork('Solana');
+      setBalance('0'); // You would need to implement balance fetching for Solana
+      
+      console.log('Phantom connected successfully:', publicKey);
+    } catch (error: any) {
+      console.error('Phantom connection error:', error);
+      throw new Error(error.message || 'Failed to connect Phantom');
+    }
+  }, [isPhantomInstalled]);
+
+  // Connect to Coinbase Wallet
+  const connectCoinbaseWallet = useCallback(async () => {
+    if (!isCoinbaseWalletInstalled()) {
+      throw new Error('Coinbase Wallet is not installed. Please install Coinbase Wallet to continue.');
+    }
+
+    try {
+      const ethereum = (window as any).ethereum;
+      
+      // Request accounts (this will trigger the popup)
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+      
+      if (accounts && accounts.length > 0) {
+        const account = accounts[0];
+        setAddress(account);
+        setIsConnected(true);
+        
+        // Get chain ID
+        const chainId = await ethereum.request({ method: 'eth_chainId' });
+        setChainId(parseInt(chainId, 16));
+        
+        // Get balance
+        const balance = await ethereum.request({ 
+          method: 'eth_getBalance', 
+          params: [account, 'latest'] 
+        });
+        setBalance((parseInt(balance, 16) / 1e18).toFixed(4));
+        
+        // Set network name
+        const networkNames: { [key: number]: string } = {
+          1: 'Ethereum Mainnet',
+          137: 'Polygon',
+          56: 'Binance Smart Chain',
+          42161: 'Arbitrum',
+          10: 'Optimism',
+          8453: 'Base',
+          59144: 'Linea'
+        };
+        setNetwork(networkNames[parseInt(chainId, 16)] || `Chain ID: ${parseInt(chainId, 16)}`);
+        
+        console.log('Coinbase Wallet connected successfully:', account);
+      }
+    } catch (error: any) {
+      console.error('Coinbase Wallet connection error:', error);
+      throw new Error(error.message || 'Failed to connect Coinbase Wallet');
+    }
+  }, [isCoinbaseWalletInstalled]);
+
+  // Connect to Brave Wallet
+  const connectBraveWallet = useCallback(async () => {
+    if (!isBraveWalletInstalled()) {
+      throw new Error('Brave Wallet is not installed. Please install Brave Wallet to continue.');
+    }
+
+    try {
+      const ethereum = (window as any).ethereum;
+      
+      // Request accounts (this will trigger the popup)
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+      
+      if (accounts && accounts.length > 0) {
+        const account = accounts[0];
+        setAddress(account);
+        setIsConnected(true);
+        
+        // Get chain ID
+        const chainId = await ethereum.request({ method: 'eth_chainId' });
+        setChainId(parseInt(chainId, 16));
+        
+        // Get balance
+        const balance = await ethereum.request({ 
+          method: 'eth_getBalance', 
+          params: [account, 'latest'] 
+        });
+        setBalance((parseInt(balance, 16) / 1e18).toFixed(4));
+        
+        // Set network name
+        const networkNames: { [key: number]: string } = {
+          1: 'Ethereum Mainnet',
+          137: 'Polygon',
+          56: 'Binance Smart Chain',
+          42161: 'Arbitrum',
+          10: 'Optimism',
+          8453: 'Base',
+          59144: 'Linea'
+        };
+        setNetwork(networkNames[parseInt(chainId, 16)] || `Chain ID: ${parseInt(chainId, 16)}`);
+        
+        console.log('Brave Wallet connected successfully:', account);
+      }
+    } catch (error: any) {
+      console.error('Brave Wallet connection error:', error);
+      throw new Error(error.message || 'Failed to connect Brave Wallet');
+    }
+  }, [isBraveWalletInstalled]);
 
   // Get account info without triggering popups
   const getAccountInfo = useCallback(async () => {
@@ -142,69 +382,54 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
   }, [getMetaMaskProvider]);
 
-  // Connect wallet with minimal popup
-  const connect = useCallback(async () => {
-    if (!isMetaMaskInstalled()) {
-      setConnectionError('MetaMask is not installed. Please install MetaMask to continue.');
-      return;
-    }
-
+  // Connect wallet with support for multiple wallet types
+  const connect = useCallback(async (walletType: string = 'metamask') => {
+    console.log('Attempting to connect wallet:', walletType);
     setIsConnecting(true);
     setConnectionError(null);
 
     try {
-      const provider = getMetaMaskProvider();
-      if (!provider) {
-        throw new Error('MetaMask provider not found');
+      switch (walletType.toLowerCase()) {
+        case 'metamask':
+          console.log('Connecting to MetaMask...');
+          await connectMetaMask();
+          break;
+        case 'keplr':
+          console.log('Connecting to Keplr...');
+          await connectKeplr();
+          break;
+        case 'phantom':
+          console.log('Connecting to Phantom...');
+          await connectPhantom();
+          break;
+        case 'coinbase':
+          console.log('Connecting to Coinbase Wallet...');
+          await connectCoinbaseWallet();
+          break;
+        case 'brave':
+          console.log('Connecting to Brave Wallet...');
+          await connectBraveWallet();
+          break;
+        default:
+          console.error('Unsupported wallet type:', walletType);
+          throw new Error(`Unsupported wallet type: ${walletType}`);
       }
-
-      // Request accounts (this will trigger the popup)
-      const accounts = await provider.request({ method: 'eth_requestAccounts' });
-      
-      if (accounts && accounts.length > 0) {
-        const account = accounts[0];
-        setAddress(account);
-        setIsConnected(true);
-        
-        // Get chain ID
-        const chainId = await provider.request({ method: 'eth_chainId' });
-        setChainId(parseInt(chainId, 16));
-        
-        // Get balance
-        const balance = await provider.request({ 
-          method: 'eth_getBalance', 
-          params: [account, 'latest'] 
-        });
-        setBalance((parseInt(balance, 16) / 1e18).toFixed(4));
-        
-        // Set network name
-        const networkNames: { [key: number]: string } = {
-          1: 'Ethereum Mainnet',
-          137: 'Polygon',
-          56: 'Binance Smart Chain',
-          42161: 'Arbitrum',
-          10: 'Optimism',
-          8453: 'Base',
-          59144: 'Linea'
-        };
-        setNetwork(networkNames[parseInt(chainId, 16)] || `Chain ID: ${parseInt(chainId, 16)}`);
-        
-        console.log('Wallet connected successfully:', account);
-      }
+      console.log('Wallet connection successful:', walletType);
     } catch (error: any) {
       console.error('Connection error:', error);
       
       if (error.code === 4001) {
         setConnectionError('User rejected the connection request');
       } else if (error.code === -32002) {
-        setConnectionError('MetaMask is already processing a request. Please check MetaMask and try again.');
+        setConnectionError('Wallet is already processing a request. Please check your wallet and try again.');
       } else {
         setConnectionError(error.message || 'Failed to connect wallet');
       }
+      throw error;
     } finally {
       setIsConnecting(false);
     }
-  }, [isMetaMaskInstalled, getMetaMaskProvider]);
+  }, [connectMetaMask, connectKeplr, connectPhantom, connectCoinbaseWallet, connectBraveWallet]);
 
   // Disconnect wallet
   const disconnect = useCallback(() => {
@@ -403,6 +628,10 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     disconnect,
     enableDemoMode,
     isMetaMaskInstalled,
+    isKeplrInstalled,
+    isPhantomInstalled,
+    isCoinbaseWalletInstalled,
+    isBraveWalletInstalled,
     isMetaMaskUnlocked,
     getMetaMaskProvider,
     getAccountInfo,
