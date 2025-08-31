@@ -586,16 +586,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Base Chain**: For Layer 2 infrastructure
 - **Farcaster**: For social sentiment data
 
-## 📞 Support
-
-- **Documentation**: [docs.aegis.finance](https://docs.aegis.finance)
-- **Discord**: [discord.gg/aegis](https://discord.gg/aegis)
-- **Twitter**: [@aegis_finance](https://twitter.com/aegis_finance)
-- **Email**: support@aegis.finance
-
 ## 🏆 Hackathon Submission
 
-This project was built for the **ZetaChain Cross-Chain Lending Track** hackathon, demonstrating:
+This project was built for the hackathon, demonstrating:
 
 - **True cross-chain interoperability** across 5 blockchains
 - **AI-powered risk assessment** using Google Gemini
