@@ -198,7 +198,8 @@ const BlockchainSwitcher: React.FC<BlockchainSwitcherProps> = ({
         
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+          className="w-full flex items-center justify-between p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors border border-white/20"
+          disabled={isSwitching}
         >
           <div className="flex items-center gap-3">
             <div 
@@ -208,18 +209,46 @@ const BlockchainSwitcher: React.FC<BlockchainSwitcherProps> = ({
               {currentChain.icon}
             </div>
             <span className="text-sm font-medium text-white">
-              {currentChain.name}
+              {isSwitching ? 'Switching...' : currentChain.name}
             </span>
           </div>
-          <ChevronDown size={16} className="text-gray-400" />
+          <ChevronDown size={16} className={`text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
         {/* Dropdown */}
         {isOpen && (
-          <div className="mt-2 p-2 bg-gray-800/50 rounded-lg border border-gray-700 max-h-64 overflow-y-auto">
-            <div className="space-y-2">
-              {mainnetBlockchains.map(blockchain => 
-                renderBlockchainItem(blockchain, true)
+          <div className="mt-2 p-2 bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-600 max-h-64 overflow-y-auto shadow-xl z-50">
+            <div className="space-y-1">
+              {/* Mainnet Networks */}
+              <div className="mb-3">
+                <div className="text-xs font-medium text-gray-400 mb-2 px-2">Mainnet Networks</div>
+                {mainnetBlockchains.map(blockchain => (
+                  <button
+                    key={blockchain.id}
+                    onClick={() => handleBlockchainSwitch(blockchain)}
+                    className="w-full text-left"
+                    disabled={isSwitching}
+                  >
+                    {renderBlockchainItem(blockchain, true)}
+                  </button>
+                ))}
+              </div>
+              
+              {/* Testnet Networks */}
+              {showTestnets && (
+                <div>
+                  <div className="text-xs font-medium text-gray-400 mb-2 px-2">Testnet Networks</div>
+                  {testnetBlockchains.map(blockchain => (
+                    <button
+                      key={blockchain.id}
+                      onClick={() => handleBlockchainSwitch(blockchain)}
+                      className="w-full text-left"
+                      disabled={isSwitching}
+                    >
+                      {renderBlockchainItem(blockchain, true)}
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
           </div>
@@ -306,6 +335,7 @@ const BlockchainSwitcher: React.FC<BlockchainSwitcherProps> = ({
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-3 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-colors"
+        disabled={isSwitching}
       >
         <div 
           className="w-5 h-5 rounded-full flex items-center justify-center text-sm"
@@ -314,7 +344,7 @@ const BlockchainSwitcher: React.FC<BlockchainSwitcherProps> = ({
           {currentChain.icon}
         </div>
         <span className="text-sm font-medium text-white">
-          {currentChain.name}
+          {isSwitching ? 'Switching...' : currentChain.name}
         </span>
         <ChevronDown size={16} className="text-gray-400" />
       </button>

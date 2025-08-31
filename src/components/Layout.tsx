@@ -41,7 +41,7 @@ const Layout = () => {
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { isConnected, address, network, isDemoMode, currentBlockchain, chainId } = useWallet();
+  const { isConnected, address, network, isDemoMode, currentBlockchain, chainId, switchToBlockchain } = useWallet();
 
   // Load sidebar preference from localStorage
   useEffect(() => {
@@ -79,9 +79,6 @@ const Layout = () => {
     { name: 'NFT Collateral', href: '/app/nft-collateral', icon: TrendingUp, current: location.pathname === '/app/nft-collateral' },
     { name: 'Analytics', href: '/app/analytics', icon: BarChart3, current: location.pathname === '/app/analytics' },
     { name: 'Governance', href: '/app/governance', icon: Settings, current: location.pathname === '/app/governance' },
-  ];
-
-  const aiNavigation = [
     { name: 'Vibe Trading AI', href: '/vibe-trading', icon: Brain, current: location.pathname === '/vibe-trading' },
     { name: 'Security Center', href: '/aegis-security', icon: AlertTriangle, current: location.pathname === '/aegis-security' },
   ];
@@ -188,6 +185,7 @@ const Layout = () => {
           <div className="px-3 py-1">
             <BlockchainSwitcher 
               currentBlockchain={currentBlockchain}
+              onBlockchainChange={switchToBlockchain}
               variant="sidebar"
               showTestnets={true}
             />
@@ -196,11 +194,6 @@ const Layout = () => {
 
         {/* Main Navigation */}
         <div className="px-3 py-1">
-          {!sidebarCollapsed && (
-            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 px-2">
-              Core Features
-            </div>
-          )}
           <nav className="space-y-0.5">
             {navigation.map((item) => (
               <button
@@ -223,68 +216,6 @@ const Layout = () => {
               </button>
             ))}
           </nav>
-        </div>
-
-        {/* AI & Security Navigation */}
-        <div className="px-3 py-1 mt-1">
-          {!sidebarCollapsed && (
-            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 px-2 flex items-center gap-2">
-              <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
-              AI & Security
-            </div>
-          )}
-          <nav className="space-y-0.5">
-            {aiNavigation.map((item) => (
-              <button
-                key={item.name}
-                onClick={() => handleNavigation(item.href)}
-                className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  item.current
-                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white border border-purple-500/30 shadow-lg'
-                    : 'text-gray-300 hover:bg-white/10 hover:text-white hover:shadow-md'
-                }`}
-              >
-                <div className={`p-1 rounded-lg ${
-                  item.current 
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' 
-                    : 'bg-gray-700/50 text-gray-400'
-                }`}>
-                  <item.icon size={14} />
-                </div>
-                {!sidebarCollapsed && item.name}
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        {/* Demo Mode & Testing */}
-        <div className="px-3 py-1 mt-1">
-          {!sidebarCollapsed && (
-            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 px-2 flex items-center gap-2">
-              <div className="w-2 h-2 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full"></div>
-              Testing & Demo
-            </div>
-          )}
-          <div className="space-y-0.5">
-            <button
-              onClick={() => window.open('/simple-wallet-test', '_blank')}
-              className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white hover:shadow-md"
-            >
-              <div className="p-1 rounded-lg bg-gray-700/50 text-gray-400">
-                🧪
-              </div>
-              {!sidebarCollapsed && 'Wallet Test'}
-            </button>
-            <button
-              onClick={() => window.open('/wallet-test', '_blank')}
-              className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white hover:shadow-md"
-            >
-              <div className="p-1 rounded-lg bg-gray-700/50 text-gray-400">
-                🔧
-              </div>
-              {!sidebarCollapsed && 'Advanced Test'}
-            </button>
-          </div>
         </div>
 
         {/* User section at bottom */}

@@ -573,14 +573,14 @@ const Borrow = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Loan Duration</label>
+                  <label className="block text-sm font-medium mb-2 text-white">Loan Duration</label>
                   <select
                     value={loanDuration}
                     onChange={(e) => setLoanDuration(Number(e.target.value))}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   >
                     {durationOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
+                      <option key={option.value} value={option.value} className="bg-gray-800 text-white">
                         {option.label}
                       </option>
                     ))}

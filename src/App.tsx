@@ -15,12 +15,6 @@ import Loans from './pages/Loans';
 import NftCollateral from './pages/NftCollateral';
 import Analytics from './pages/Analytics';
 import Governance from './pages/Governance';
-import AITest from './pages/AITest';
-import SimpleAITest from './components/SimpleAITest';
-import IconTest from './components/IconTest';
-import ChartTest from './components/ChartTest';
-import WalletTest from './components/WalletTest';
-import SimpleWalletTest from './components/SimpleWalletTest';
 import RevenueDashboard from './pages/RevenueDashboard';
 import VibeTradingAIPage from './pages/VibeTradingAI';
 import AegisSecurityPage from './pages/AegisSecurity';
@@ -93,22 +87,6 @@ const AppRoutes = () => {
       <Routes>
         {/* Landing page - no layout wrapper */}
         <Route path="/" element={<LandingPage />} />
-        
-        {/* Simple Test Route */}
-        <Route path="/simple-test" element={<SimpleAITest />} />
-        
-        {/* AI Test Route */}
-        <Route path="/ai-test" element={<AITest />} />
-        
-        {/* Icon Test Route */}
-        <Route path="/icon-test" element={<IconTest />} />
-        
-        {/* Chart Test Route */}
-        <Route path="/chart-test" element={<ChartTest />} />
-        
-        {/* Wallet Test Route */}
-        <Route path="/wallet-test" element={<WalletTest />} />
-        <Route path="/simple-wallet-test" element={<SimpleWalletTest />} />
         
         {/* Revenue Dashboard Route */}
         <Route path="/revenue" element={<RevenueDashboard />} />
