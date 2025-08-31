@@ -377,13 +377,13 @@ export default function AegisDashboard() {
                   <select
                     value={threatFilter}
                     onChange={(e) => setThreatFilter(e.target.value as any)}
-                    className="px-3 py-1 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-3 py-1 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   >
-                    <option value="all">All Threats</option>
-                    <option value="critical">Critical</option>
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
+                    <option value="all" className="bg-gray-800 text-white">All Threats</option>
+                    <option value="critical" className="bg-gray-800 text-white">Critical</option>
+                    <option value="high" className="bg-gray-800 text-white">High</option>
+                    <option value="medium" className="bg-gray-800 text-white">Medium</option>
+                    <option value="low" className="bg-gray-800 text-white">Low</option>
                   </select>
                 </div>
               </div>
@@ -450,7 +450,7 @@ export default function AegisDashboard() {
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder="Ask AEGIS a question or give a command..."
-                    className="flex-1 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="flex-1 px-4 py-2 rounded-full bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <button onClick={handleSendMessage} className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary/90">
                     <Bot size={16} />

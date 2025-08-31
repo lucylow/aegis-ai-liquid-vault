@@ -753,8 +753,8 @@ const Deposit = () => {
                       placeholder="0.00"
                       max={selectedAsset.balance}
                       step={selectedAsset.type === 'nft' ? '1' : 'any'}
-                      className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary ${
-                        validationError ? 'border-red-500' : 'border-white/20'
+                      className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary ${
+                        validationError ? 'border-red-500' : 'border-gray-600'
                       }`}
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">

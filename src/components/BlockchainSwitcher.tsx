@@ -218,6 +218,22 @@ const BlockchainSwitcher: React.FC<BlockchainSwitcherProps> = ({
         {/* Dropdown */}
         {isOpen && (
           <div className="mt-2 p-2 bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-600 max-h-64 overflow-y-auto shadow-xl z-50">
+            {/* Error Display */}
+            {error && (
+              <div className="mb-3 p-2 bg-red-500/20 border border-red-500/30 rounded-lg">
+                <div className="flex items-center gap-2 text-red-400 text-xs">
+                  <AlertTriangle size={12} />
+                  {error}
+                </div>
+                <button
+                  onClick={() => setError(null)}
+                  className="mt-1 text-xs text-red-300 hover:text-red-200 underline"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+            
             <div className="space-y-1">
               {/* Mainnet Networks */}
               <div className="mb-3">
