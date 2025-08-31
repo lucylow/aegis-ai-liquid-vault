@@ -2,6 +2,8 @@
 
 > **"Aegis turns five separate blockchains — ZetaChain, Solana, Bitcoin, Base, and Avalanche — into one seamless lending market, with ZetaChain as the brain, chain-specific vaults as arms, and AI-powered security as the intelligent heart."**
 
+![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/14.jpg?raw=true)
+
 ## 🎯 Overview
 
 AEGIS is a revolutionary **AI-powered cross-chain lending platform** that unites liquidity across multiple blockchains using ZetaChain's Universal Smart Contracts, advanced AI security systems, and cutting-edge trading intelligence. This platform enables users to:
@@ -29,6 +31,9 @@ AEGIS is a revolutionary **AI-powered cross-chain lending platform** that unites
 - **Cross-chain Alerts**: Unified security monitoring across all blockchains
 - **Pre-trade Security**: Security checks before executing any transaction
 - **Global Security Context**: Comprehensive security overview and management
+
+
+![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/11.jpg?raw=true)
 
 ## 🌐 Supported Blockchains
 
@@ -59,54 +64,9 @@ AEGIS is a revolutionary **AI-powered cross-chain lending platform** that unites
 
 ## 🏗️ Architecture
 
-```
-                    ┌─────────────────────────────────────┐
-                    │         AEGIS Security Hub          │
-                    │      (Global Threat Monitoring)     │
-                    └─────────────────┬───────────────────┘
-                                      │
-                    ┌─────────────────▼─────────────────┐
-                    │         Vibe Trading AI           │
-                    │      (AI-Powered Trading)         │
-                    └─────────────────┬─────────────────┘
-                                      │
-                    ┌─────────────────▼─────────────────┐
-                    │         Gemini AI                 │
-                    │      Risk Assessment              │
-                    └─────────────────┬─────────────────┘
-                                      │
-                    ┌─────────────────▼─────────────────┐
-                    │         ZetaChain                 │
-                    │        (Hub/Brain)                │
-                    │                                  │
-                    │     UniversalLending             │
-                    │       Contract                   │
-                    └─────────────────┬─────────────────┘
-                                      │
-        ┌─────────────────────────────┼─────────────────────────────┐
-        │                             │                             │
-┌───────▼──────┐            ┌────────▼────────┐            ┌──────▼──────┐
-│   Solana     │            │    Bitcoin      │            │    Base     │
-│   Vault      │            │   Integration   │            │    Vault    │
-│ (Rust/Anchor)│            │ (ZetaChain BTC)│            │  (Solidity) │
-└──────────────┘            └─────────────────┘            └─────────────┘
-        │                             │                             │
-        │                             │                             │
-┌───────▼──────┐            ┌────────▼────────┐            ┌──────▼──────┐
-│   Solana     │            │    Bitcoin      │            │   Network   │
-│   Network    │            │    Network      │            │             │
-└──────────────┘            └─────────────────┘            └─────────────┘
+![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/17.jpg?raw=true)
 
-        ┌─────────────────────────────────────────────────────────────┐
-        │              Avalanche Vault                               │
-        │              (Solidity)                                    │
-        └─────────────────┬──────────────────────────────────────────┘
-                          │
-                  ┌───────▼──────┐
-                  │  Avalanche   │
-                  │   Network    │
-                  └──────────────┘
-```
+![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/13.jpg?raw=true)
 
 ## 🚀 Key Features
 
