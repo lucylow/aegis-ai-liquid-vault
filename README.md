@@ -2,7 +2,6 @@
 
 > **"Aegis turns five separate blockchains — ZetaChain, Solana, Bitcoin, Base, and Avalanche — into one seamless lending market, with ZetaChain as the brain, chain-specific vaults as arms, and AI-powered security as the intelligent heart."**
 ![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/4.jpg?raw=true)
- ![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/6.jpg?raw=true)
 ![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/7.jpg?raw=true)
  
 
@@ -430,6 +429,9 @@ const status = orchestrator.getStatus();
 ```
 
 ## 🔒 Security Features
+
+ ![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/6.jpg?raw=true)
+
 
 ### **AEGIS Security Center**
 - **Real-time Threat Detection**: Monitor security across all chains
