@@ -257,6 +257,36 @@ const Layout = () => {
           </nav>
         </div>
 
+        {/* Demo Mode & Testing */}
+        <div className="px-3 py-1 mt-1">
+          {!sidebarCollapsed && (
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 px-2 flex items-center gap-2">
+              <div className="w-2 h-2 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full"></div>
+              Testing & Demo
+            </div>
+          )}
+          <div className="space-y-0.5">
+            <button
+              onClick={() => window.open('/simple-wallet-test', '_blank')}
+              className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white hover:shadow-md"
+            >
+              <div className="p-1 rounded-lg bg-gray-700/50 text-gray-400">
+                🧪
+              </div>
+              {!sidebarCollapsed && 'Wallet Test'}
+            </button>
+            <button
+              onClick={() => window.open('/wallet-test', '_blank')}
+              className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white hover:shadow-md"
+            >
+              <div className="p-1 rounded-lg bg-gray-700/50 text-gray-400">
+                🔧
+              </div>
+              {!sidebarCollapsed && 'Advanced Test'}
+            </button>
+          </div>
+        </div>
+
         {/* User section at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-2 border-t border-white/10 bg-gradient-to-r from-gray-800/50 to-gray-700/50">
           {!isConnected ? (

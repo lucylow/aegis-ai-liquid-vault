@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Wallet, ExternalLink, ChevronRight, Globe, Brain, Zap, Shield, Activity, CreditCard, Target } from 'lucide-react';
+import { X, Wallet, ExternalLink, ChevronRight, Globe, Brain, Zap, Shield, Activity, CreditCard, Target, AlertTriangle } from 'lucide-react';
 import { useWallet } from '../contexts/WalletContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -119,7 +119,14 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
       navigate('/app');
     } catch (error) {
       console.error('Connection failed:', error);
+      // Error is handled by the context, just log it here
     }
+  };
+
+  const handleDemoMode = () => {
+    enableDemoMode();
+    onClose();
+    navigate('/app');
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -181,6 +188,25 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
             <X size={24} className="text-gray-400" />
           </button>
         </div>
+
+        {/* Error Display */}
+        {connectionError && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+            <div className="flex items-start gap-3">
+              <AlertTriangle size={20} className="text-red-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h4 className="font-medium text-red-400 mb-1">Connection Error</h4>
+                <p className="text-sm text-red-300 mb-3">{connectionError}</p>
+                <button
+                  onClick={clearError}
+                  className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
+                >
+                  Clear Error
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Supported Networks */}
         <div className="mb-8">
@@ -441,11 +467,7 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
                 </div>
                 <div className="pt-3 border-t border-gray-600">
                   <button
-                    onClick={() => {
-                      enableDemoMode();
-                      onClose();
-                      navigate('/app');
-                    }}
+                    onClick={handleDemoMode}
                     className="w-full px-4 py-3 bg-orange-500/10 border border-orange-500/20 rounded-lg text-orange-400 hover:bg-orange-500/20 transition-colors text-sm font-medium"
                   >
                     🚀 Hackathon Demo - Enter Without Wallet
@@ -457,25 +479,7 @@ const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) 
         </div>
 
         {/* Connection Error */}
-        {connectionError && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center">
-                <X size={16} className="text-red-400" />
-              </div>
-              <div>
-                <h4 className="font-medium text-red-400">Connection Failed</h4>
-                <p className="text-red-300 text-sm">{connectionError}</p>
-              </div>
-              <button
-                onClick={clearError}
-                className="ml-auto text-red-400 hover:text-red-300 transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-          </div>
-        )}
+        {/* This section is now handled by the new error display */}
 
         {/* Footer */}
         <div className="pt-6 border-t border-gray-700">

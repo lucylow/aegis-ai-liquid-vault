@@ -19,6 +19,7 @@ import AITest from './pages/AITest';
 import SimpleAITest from './components/SimpleAITest';
 import IconTest from './components/IconTest';
 import ChartTest from './components/ChartTest';
+import WalletTest from './components/WalletTest';
 import SimpleWalletTest from './components/SimpleWalletTest';
 import RevenueDashboard from './pages/RevenueDashboard';
 import VibeTradingAIPage from './pages/VibeTradingAI';
@@ -105,7 +106,8 @@ const AppRoutes = () => {
         <Route path="/chart-test" element={<ChartTest />} />
         
         {/* Wallet Test Route */}
-        <Route path="/wallet-test" element={<SimpleWalletTest />} />
+        <Route path="/wallet-test" element={<WalletTest />} />
+        <Route path="/simple-wallet-test" element={<SimpleWalletTest />} />
         
         {/* Revenue Dashboard Route */}
         <Route path="/revenue" element={<RevenueDashboard />} />

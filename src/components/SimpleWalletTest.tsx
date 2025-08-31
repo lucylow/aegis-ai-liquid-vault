@@ -1,210 +1,206 @@
-import React, { useState } from 'react';
-import { Wallet, Network, CheckCircle, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { useWallet } from '../contexts/WalletContext';
-import { SUPPORTED_BLOCKCHAINS } from '../config/blockchains';
 
-const SimpleWalletTest: React.FC = () => {
+const SimpleWalletTest = () => {
   const { 
-    address, 
-    isConnected, 
-    isConnecting, 
-    chainId, 
-    network, 
-    balance, 
-    connectionError, 
-    currentBlockchain,
     connect, 
     disconnect, 
-    switchToBlockchain,
-    clearError 
+    isConnected, 
+    address, 
+    chainId, 
+    network, 
+    balance,
+    isConnecting,
+    connectionError,
+    clearError,
+    enableDemoMode,
+    isDemoMode,
+    isMetaMaskInstalled,
+    isPhantomInstalled,
+    isKeplrInstalled,
+    isCoinbaseWalletInstalled,
+    isBraveWalletInstalled
   } = useWallet();
 
-  const [isSwitching, setIsSwitching] = useState(false);
-  const [switchError, setSwitchError] = useState<string | null>(null);
+  const [testResults, setTestResults] = useState<any>({});
+  const [lastConnectionAttempt, setLastConnectionAttempt] = useState<string>('');
 
-  const testZetaChainConnection = async () => {
-    if (!isConnected) {
-      setSwitchError('Please connect wallet first');
-      return;
-    }
+  useEffect(() => {
+    // Test wallet detection
+    const results = {
+      metamask: isMetaMaskInstalled(),
+      phantom: isPhantomInstalled(),
+      keplr: isKeplrInstalled(),
+      coinbase: isCoinbaseWalletInstalled(),
+      brave: isBraveWalletInstalled(),
+      windowEthereum: typeof window !== 'undefined' && !!(window as any).ethereum,
+      windowSolana: typeof window !== 'undefined' && !!(window as any).solana,
+      windowKeplr: typeof window !== 'undefined' && !!(window as any).keplr,
+    };
+    setTestResults(results);
+    console.log('Wallet detection results:', results);
+  }, [isMetaMaskInstalled, isPhantomInstalled, isKeplrInstalled, isCoinbaseWalletInstalled, isBraveWalletInstalled]);
 
-    setIsSwitching(true);
-    setSwitchError(null);
-
+  const handleConnect = async (walletType: string) => {
     try {
-      const zetaChain = SUPPORTED_BLOCKCHAINS.find(chain => chain.id === 'zetachain');
-      if (zetaChain) {
-        await switchToBlockchain(zetaChain);
-        console.log('Successfully connected to ZetaChain');
-      }
-    } catch (error: any) {
-      console.error('ZetaChain connection failed:', error);
-      setSwitchError(error.message || 'Failed to connect to ZetaChain');
-    } finally {
-      setIsSwitching(false);
+      clearError();
+      setLastConnectionAttempt(walletType);
+      console.log(`Attempting to connect ${walletType}...`);
+      await connect(walletType);
+      console.log(`${walletType} connected successfully!`);
+    } catch (error) {
+      console.error(`Failed to connect ${walletType}:`, error);
     }
   };
 
-  const testNetworkSwitch = async (blockchain: any) => {
-    if (!isConnected) {
-      setSwitchError('Please connect wallet first');
-      return;
-    }
+  const handleDisconnect = () => {
+    disconnect();
+    setLastConnectionAttempt('');
+  };
 
-    setIsSwitching(true);
-    setSwitchError(null);
-
-    try {
-      await switchToBlockchain(blockchain);
-      console.log(`Successfully switched to ${blockchain.name}`);
-    } catch (error: any) {
-      console.error('Network switch failed:', error);
-      setSwitchError(error.message || 'Failed to switch network');
-    } finally {
-      setIsSwitching(false);
-    }
+  const handleDemoMode = () => {
+    enableDemoMode();
+    setLastConnectionAttempt('demo');
   };
 
   return (
-    <div className="p-8 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-center mb-8">Wallet Connection Test</h1>
+    <div className="p-6 bg-gray-900 text-white min-h-screen">
+      <h2 className="text-2xl font-bold mb-6">Simple Wallet Connection Test</h2>
       
       {/* Current Status */}
-      <div className="bg-gray-50 rounded-lg p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <Wallet className="w-6 h-6" />
-          Current Status
-        </h2>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
-              {isConnected ? '✅' : '❌'}
-            </div>
-            <div className="text-sm text-gray-600">Connected</div>
-          </div>
-          
-          <div className="text-center">
-            <div className="text-lg font-semibold text-gray-800">
-              {chainId ? `Chain ${chainId}` : 'N/A'}
-            </div>
-            <div className="text-sm text-gray-600">Chain ID</div>
-          </div>
-          
-          <div className="text-center">
-            <div className="text-lg font-semibold text-gray-800">
-              {network || 'N/A'}
-            </div>
-            <div className="text-sm text-gray-600">Network</div>
-          </div>
-          
-          <div className="text-center">
-            <div className="text-lg font-semibold text-gray-800">
-              {balance ? `${balance} ETH` : 'N/A'}
-            </div>
-            <div className="text-sm text-gray-600">Balance</div>
-          </div>
+      <div className="mb-6 p-4 bg-gray-800 rounded-lg">
+        <h3 className="text-lg font-semibold mb-2">Current Status</h3>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>Connected: <span className={isConnected ? 'text-green-400' : 'text-red-400'}>{isConnected ? 'Yes' : 'No'}</span></div>
+          <div>Connecting: <span className={isConnecting ? 'text-yellow-400' : 'text-gray-400'}>{isConnecting ? 'Yes' : 'No'}</span></div>
+          <div>Address: <span className="font-mono">{address || 'None'}</span></div>
+          <div>Chain ID: <span>{chainId || 'None'}</span></div>
+          <div>Network: <span>{network || 'None'}</span></div>
+          <div>Balance: <span>{balance || 'None'}</span></div>
+          <div>Demo Mode: <span className={isDemoMode ? 'text-blue-400' : 'text-gray-400'}>{isDemoMode ? 'Yes' : 'No'}</span></div>
+          <div>Last Attempt: <span className="text-yellow-400">{lastConnectionAttempt || 'None'}</span></div>
         </div>
-
-        {address && (
-          <div className="mt-4 text-center">
-            <div className="text-sm text-gray-600">Address:</div>
-            <div className="font-mono text-sm bg-gray-100 p-2 rounded">
-              {address}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Controls */}
-      <div className="flex flex-wrap gap-4 mb-8 justify-center">
-        {!isConnected ? (
-          <button
-            onClick={connect}
-            disabled={isConnecting}
-            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium disabled:opacity-50 flex items-center gap-2"
-          >
-            <Wallet className="w-5 h-5" />
-            {isConnecting ? 'Connecting...' : 'Connect Wallet'}
-          </button>
-        ) : (
-          <button
-            onClick={disconnect}
-            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium flex items-center gap-2"
-          >
-            <Wallet className="w-5 h-5" />
-            Disconnect
-          </button>
-        )}
-
-        <button
-          onClick={testZetaChainConnection}
-          disabled={!isConnected || isSwitching}
-          className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium disabled:opacity-50 flex items-center gap-2"
-        >
-          <Network className="w-5 h-5" />
-          Connect to ZetaChain
-        </button>
-      </div>
-
-      {/* Network List */}
-      <div className="bg-gray-50 rounded-lg p-6">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Network className="w-6 h-6" />
-          Available Networks
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {SUPPORTED_BLOCKCHAINS.slice(0, 6).map((blockchain) => (
-            <button
-              key={blockchain.id}
-              onClick={() => testNetworkSwitch(blockchain)}
-              disabled={!isConnected || isSwitching}
-              className={`p-4 rounded-lg border transition-colors text-left ${
-                currentBlockchain?.id === blockchain.id
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
+        {connectionError && (
+          <div className="mt-2 p-2 bg-red-500/20 border border-red-500/30 rounded text-red-400">
+            <div className="font-semibold">Connection Error:</div>
+            <div>{connectionError}</div>
+            <button 
+              onClick={clearError}
+              className="mt-2 px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs"
             >
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">{blockchain.icon}</div>
-                <div className="flex-1">
-                  <div className="font-medium">{blockchain.name}</div>
-                  <div className="text-sm text-gray-600">
-                    Chain ID: {blockchain.chainId} • {blockchain.nativeCurrency.symbol}
-                  </div>
-                </div>
-                {currentBlockchain?.id === blockchain.id && (
-                  <CheckCircle className="w-5 h-5 text-blue-500" />
-                )}
-              </div>
+              Clear Error
             </button>
-          ))}
+          </div>
+        )}
+      </div>
+
+      {/* Wallet Detection Test */}
+      <div className="mb-6 p-4 bg-gray-800 rounded-lg">
+        <h3 className="text-lg font-semibold mb-2">Wallet Detection Test</h3>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>MetaMask: <span className={testResults.metamask ? 'text-green-400' : 'text-red-400'}>{testResults.metamask ? 'Detected' : 'Not Detected'}</span></div>
+          <div>Phantom: <span className={testResults.phantom ? 'text-green-400' : 'text-red-400'}>{testResults.phantom ? 'Detected' : 'Not Detected'}</span></div>
+          <div>Keplr: <span className={testResults.keplr ? 'text-green-400' : 'text-red-400'}>{testResults.keplr ? 'Detected' : 'Not Detected'}</span></div>
+          <div>Coinbase: <span className={testResults.coinbase ? 'text-green-400' : 'text-red-400'}>{testResults.coinbase ? 'Detected' : 'Not Detected'}</span></div>
+          <div>Brave: <span className={testResults.brave ? 'text-green-400' : 'text-red-400'}>{testResults.brave ? 'Detected' : 'Not Detected'}</span></div>
+          <div>Window.ethereum: <span className={testResults.windowEthereum ? 'text-green-400' : 'text-red-400'}>{testResults.windowEthereum ? 'Available' : 'Not Available'}</span></div>
+          <div>Window.solana: <span className={testResults.windowSolana ? 'text-green-400' : 'text-red-400'}>{testResults.windowSolana ? 'Available' : 'Not Available'}</span></div>
+          <div>Window.keplr: <span className={testResults.windowKeplr ? 'text-green-400' : 'text-red-400'}>{testResults.windowKeplr ? 'Available' : 'Not Available'}</span></div>
         </div>
       </div>
 
-      {/* Error Display */}
-      {(connectionError || switchError) && (
-        <div className="mt-8 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <h3 className="font-medium text-red-800 mb-2">Errors:</h3>
-          {connectionError && (
-            <div className="text-red-700 mb-2">
-              <strong>Connection Error:</strong> {connectionError}
-            </div>
-          )}
-          {switchError && (
-            <div className="text-red-700 mb-2">
-              <strong>Switch Error:</strong> {switchError}
-            </div>
-          )}
+      {/* Connection Buttons */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-2">Test Connections</h3>
+        <div className="flex flex-wrap gap-2 mb-4">
           <button
-            onClick={() => { clearError(); setSwitchError(null); }}
-            className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+            onClick={() => handleConnect('metamask')}
+            disabled={isConnecting}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg transition-colors"
           >
-            Clear Errors
+            Connect MetaMask
+          </button>
+          <button
+            onClick={() => handleConnect('phantom')}
+            disabled={isConnecting}
+            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 rounded-lg transition-colors"
+          >
+            Connect Phantom
+          </button>
+          <button
+            onClick={() => handleConnect('keplr')}
+            disabled={isConnecting}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 rounded-lg transition-colors"
+          >
+            Connect Keplr
+          </button>
+          <button
+            onClick={() => handleConnect('coinbase')}
+            disabled={isConnecting}
+            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 rounded-lg transition-colors"
+          >
+            Connect Coinbase
+          </button>
+          <button
+            onClick={() => handleConnect('brave')}
+            disabled={isConnecting}
+            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 rounded-lg transition-colors"
+          >
+            Connect Brave
+          </button>
+        </div>
+        
+        {/* Demo Mode Button */}
+        <div className="border-t border-gray-700 pt-4">
+          <button
+            onClick={handleDemoMode}
+            disabled={isConnecting}
+            className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-600 rounded-lg transition-colors"
+          >
+            Enable Demo Mode
+          </button>
+          <p className="text-xs text-gray-400 mt-1">
+            Use demo mode to test the app without connecting a real wallet
+          </p>
+        </div>
+      </div>
+
+      {/* Disconnect Button */}
+      {isConnected && (
+        <div className="mb-6">
+          <button
+            onClick={handleDisconnect}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+          >
+            Disconnect Wallet
           </button>
         </div>
       )}
+
+      {/* Debug Info */}
+      <div className="p-4 bg-gray-800 rounded-lg">
+        <h3 className="text-lg font-semibold mb-2">Debug Information</h3>
+        <div className="text-xs font-mono bg-gray-900 p-2 rounded overflow-auto">
+          <div>User Agent: {navigator.userAgent}</div>
+          <div>Platform: {navigator.platform}</div>
+          <div>Language: {navigator.language}</div>
+          <div>Cookies Enabled: {navigator.cookieEnabled ? 'Yes' : 'No'}</div>
+          <div>Online: {navigator.onLine ? 'Yes' : 'No'}</div>
+        </div>
+      </div>
+
+      {/* Instructions */}
+      <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+        <h4 className="font-medium text-blue-400 mb-2">Troubleshooting Steps</h4>
+        <ol className="text-sm text-blue-300 space-y-1 list-decimal list-inside">
+          <li>Click "Test Wallet Detection" to see which wallets are detected</li>
+          <li>Make sure you have a wallet extension installed (MetaMask, Keplr, etc.)</li>
+          <li>Ensure the wallet extension is unlocked and not processing other requests</li>
+          <li>Check the browser console for detailed error messages</li>
+          <li>Try refreshing the page and testing again</li>
+          <li>Make sure you're not in an incognito/private browsing mode</li>
+        </ol>
+      </div>
     </div>
   );
 };

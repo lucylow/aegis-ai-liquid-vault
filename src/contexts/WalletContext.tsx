@@ -61,45 +61,116 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const isMetaMaskInstalled = useCallback(() => {
     if (typeof window === 'undefined') return false;
     
-    // Check for MetaMask specifically, not just any ethereum provider
-    const ethereum = (window as any).ethereum;
-    const isInstalled = ethereum && ethereum.isMetaMask === true;
-    console.log('MetaMask installed check:', isInstalled);
-    return isInstalled;
+    try {
+      const ethereum = (window as any).ethereum;
+      
+      if (!ethereum) {
+        console.log('No ethereum provider found');
+        return false;
+      }
+      
+      // Check if there are multiple providers
+      if (ethereum.providers && Array.isArray(ethereum.providers)) {
+        const hasMetaMask = ethereum.providers.some((provider: any) => provider.isMetaMask);
+        console.log('MetaMask installed check (providers):', hasMetaMask);
+        return hasMetaMask;
+      }
+      
+      // Check the main ethereum object
+      const isInstalled = ethereum.isMetaMask === true;
+      console.log('MetaMask installed check (main):', isInstalled);
+      return isInstalled;
+    } catch (error) {
+      console.error('Error checking MetaMask installation:', error);
+      return false;
+    }
   }, []);
 
   // Check if Keplr is installed
   const isKeplrInstalled = useCallback(() => {
     if (typeof window === 'undefined') return false;
-    const isInstalled = !!(window as any).keplr;
-    console.log('Keplr installed check:', isInstalled);
-    return isInstalled;
+    
+    try {
+      const isInstalled = !!(window as any).keplr && typeof (window as any).keplr.enable === 'function';
+      console.log('Keplr installed check:', isInstalled);
+      return isInstalled;
+    } catch (error) {
+      console.error('Error checking Keplr installation:', error);
+      return false;
+    }
   }, []);
 
   // Check if Phantom is installed
   const isPhantomInstalled = useCallback(() => {
     if (typeof window === 'undefined') return false;
-    const isInstalled = !!(window as any).solana?.isPhantom;
-    console.log('Phantom installed check:', isInstalled);
-    return isInstalled;
+    
+    try {
+      const solana = (window as any).solana;
+      const isInstalled = solana && solana.isPhantom === true && typeof solana.connect === 'function';
+      console.log('Phantom installed check:', isInstalled);
+      return isInstalled;
+    } catch (error) {
+      console.error('Error checking Phantom installation:', error);
+      return false;
+    }
   }, []);
 
   // Check if Coinbase Wallet is installed
   const isCoinbaseWalletInstalled = useCallback(() => {
     if (typeof window === 'undefined') return false;
-    const ethereum = (window as any).ethereum;
-    const isInstalled = ethereum && ethereum.isCoinbaseWallet === true;
-    console.log('Coinbase Wallet installed check:', isInstalled);
-    return isInstalled;
+    
+    try {
+      const ethereum = (window as any).ethereum;
+      
+      if (!ethereum) {
+        console.log('No ethereum provider found for Coinbase');
+        return false;
+      }
+      
+      // Check if there are multiple providers
+      if (ethereum.providers && Array.isArray(ethereum.providers)) {
+        const hasCoinbase = ethereum.providers.some((provider: any) => provider.isCoinbaseWallet);
+        console.log('Coinbase Wallet installed check (providers):', hasCoinbase);
+        return hasCoinbase;
+      }
+      
+      // Check the main ethereum object
+      const isInstalled = ethereum.isCoinbaseWallet === true;
+      console.log('Coinbase Wallet installed check (main):', isInstalled);
+      return isInstalled;
+    } catch (error) {
+      console.error('Error checking Coinbase Wallet installation:', error);
+      return false;
+    }
   }, []);
 
   // Check if Brave Wallet is installed
   const isBraveWalletInstalled = useCallback(() => {
     if (typeof window === 'undefined') return false;
-    const ethereum = (window as any).ethereum;
-    const isInstalled = ethereum && ethereum.isBraveWallet === true;
-    console.log('Brave Wallet installed check:', isInstalled);
-    return isInstalled;
+    
+    try {
+      const ethereum = (window as any).ethereum;
+      
+      if (!ethereum) {
+        console.log('No ethereum provider found for Brave');
+        return false;
+      }
+      
+      // Check if there are multiple providers
+      if (ethereum.providers && Array.isArray(ethereum.providers)) {
+        const hasBrave = ethereum.providers.some((provider: any) => provider.isBraveWallet);
+        console.log('Brave Wallet installed check (providers):', hasBrave);
+        return hasBrave;
+      }
+      
+      // Check the main ethereum object
+      const isInstalled = ethereum.isBraveWallet === true;
+      console.log('Brave Wallet installed check (main):', isInstalled);
+      return isInstalled;
+    } catch (error) {
+      console.error('Error checking Brave Wallet installation:', error);
+      return false;
+    }
   }, []);
 
   // Check if MetaMask is unlocked
@@ -119,67 +190,171 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const getMetaMaskProvider = useCallback(() => {
     if (typeof window === 'undefined') return null;
     
-    const ethereum = (window as any).ethereum;
-    
-    // Check if there are multiple providers and find MetaMask
-    if (ethereum && ethereum.providers) {
-      const metaMaskProvider = ethereum.providers.find((provider: any) => provider.isMetaMask);
-      if (metaMaskProvider) return metaMaskProvider;
+    try {
+      const ethereum = (window as any).ethereum;
+      
+      if (!ethereum) {
+        console.log('No ethereum provider found');
+        return null;
+      }
+      
+      // Check if there are multiple providers and find MetaMask
+      if (ethereum.providers && Array.isArray(ethereum.providers)) {
+        const metaMaskProvider = ethereum.providers.find((provider: any) => provider.isMetaMask);
+        if (metaMaskProvider) {
+          console.log('Found MetaMask provider in providers array');
+          return metaMaskProvider;
+        }
+      }
+      
+      // Return the main ethereum object if it's MetaMask
+      if (ethereum.isMetaMask) {
+        console.log('Using main ethereum object as MetaMask provider');
+        return ethereum;
+      }
+      
+      console.log('No MetaMask provider found');
+      return null;
+    } catch (error) {
+      console.error('Error getting MetaMask provider:', error);
+      return null;
     }
+  }, []);
+
+  // Get the correct Coinbase Wallet provider
+  const getCoinbaseProvider = useCallback(() => {
+    if (typeof window === 'undefined') return null;
     
-    // Return the main ethereum object if it's MetaMask
-    if (ethereum && ethereum.isMetaMask) {
-      return ethereum;
+    try {
+      const ethereum = (window as any).ethereum;
+      
+      if (!ethereum) {
+        console.log('No ethereum provider found for Coinbase');
+        return null;
+      }
+      
+      // Check if there are multiple providers and find Coinbase
+      if (ethereum.providers && Array.isArray(ethereum.providers)) {
+        const coinbaseProvider = ethereum.providers.find((provider: any) => provider.isCoinbaseWallet);
+        if (coinbaseProvider) {
+          console.log('Found Coinbase provider in providers array');
+          return coinbaseProvider;
+        }
+      }
+      
+      // Return the main ethereum object if it's Coinbase
+      if (ethereum.isCoinbaseWallet) {
+        console.log('Using main ethereum object as Coinbase provider');
+        return ethereum;
+      }
+      
+      console.log('No Coinbase provider found');
+      return null;
+    } catch (error) {
+      console.error('Error getting Coinbase provider:', error);
+      return null;
     }
+  }, []);
+
+  // Get the correct Brave Wallet provider
+  const getBraveProvider = useCallback(() => {
+    if (typeof window === 'undefined') return null;
     
-    return null;
+    try {
+      const ethereum = (window as any).ethereum;
+      
+      if (!ethereum) {
+        console.log('No ethereum provider found for Brave');
+        return null;
+      }
+      
+      // Check if there are multiple providers and find Brave
+      if (ethereum.providers && Array.isArray(ethereum.providers)) {
+        const braveProvider = ethereum.providers.find((provider: any) => provider.isBraveWallet);
+        if (braveProvider) {
+          console.log('Found Brave provider in providers array');
+          return braveProvider;
+        }
+      }
+      
+      // Return the main ethereum object if it's Brave
+      if (ethereum.isBraveWallet) {
+        console.log('Using main ethereum object as Brave provider');
+        return ethereum;
+      }
+      
+      console.log('No Brave provider found');
+      return null;
+    } catch (error) {
+      console.error('Error getting Brave provider:', error);
+      return null;
+    }
   }, []);
 
   // Connect to MetaMask
   const connectMetaMask = useCallback(async () => {
-    if (!isMetaMaskInstalled()) {
-      throw new Error('MetaMask is not installed. Please install MetaMask to continue.');
-    }
-
-    const provider = getMetaMaskProvider();
-    if (!provider) {
-      throw new Error('MetaMask provider not found');
-    }
-
-    // Request accounts (this will trigger the popup)
-    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    console.log('Starting MetaMask connection...');
     
-    if (accounts && accounts.length > 0) {
-      const account = accounts[0];
-      setAddress(account);
-      setIsConnected(true);
+    try {
+      // Try to get provider first
+      let provider = getMetaMaskProvider();
       
-      // Get chain ID
-      const chainId = await provider.request({ method: 'eth_chainId' });
-      setChainId(parseInt(chainId, 16));
+      // If no provider found, wait a bit and try again (wallet might be loading)
+      if (!provider) {
+        console.log('No MetaMask provider found, waiting and retrying...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        provider = getMetaMaskProvider();
+      }
       
-      // Get balance
-      const balance = await provider.request({ 
-        method: 'eth_getBalance', 
-        params: [account, 'latest'] 
-      });
-      setBalance((parseInt(balance, 16) / 1e18).toFixed(4));
+      if (!provider) {
+        throw new Error('MetaMask is not installed or not accessible. Please install MetaMask extension.');
+      }
+
+      console.log('MetaMask provider found, requesting accounts...');
       
-      // Set network name
-      const networkNames: { [key: number]: string } = {
-        1: 'Ethereum Mainnet',
-        137: 'Polygon',
-        56: 'Binance Smart Chain',
-        42161: 'Arbitrum',
-        10: 'Optimism',
-        8453: 'Base',
-        59144: 'Linea'
-      };
-      setNetwork(networkNames[parseInt(chainId, 16)] || `Chain ID: ${parseInt(chainId, 16)}`);
+      // Request accounts (this will trigger the popup)
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
       
-      console.log('MetaMask connected successfully:', account);
+      if (accounts && accounts.length > 0) {
+        const account = accounts[0];
+        console.log('Account received:', account);
+        
+        setAddress(account);
+        setIsConnected(true);
+        
+        // Get chain ID
+        const chainId = await provider.request({ method: 'eth_chainId' });
+        setChainId(parseInt(chainId, 16));
+        
+        // Get balance
+        const balance = await provider.request({ 
+          method: 'eth_getBalance', 
+          params: [account, 'latest'] 
+        });
+        setBalance((parseInt(balance, 16) / 1e18).toFixed(4));
+        
+        // Set network name
+        const networkNames: { [key: number]: string } = {
+          1: 'Ethereum Mainnet',
+          137: 'Polygon',
+          56: 'Binance Smart Chain',
+          42161: 'Arbitrum',
+          10: 'Optimism',
+          8453: 'Base',
+          59144: 'Linea'
+        };
+        setNetwork(networkNames[parseInt(chainId, 16)] || `Chain ID: ${parseInt(chainId, 16)}`);
+        
+        console.log('MetaMask connected successfully:', account);
+      } else {
+        console.log('No accounts received');
+        throw new Error('No accounts found. Please unlock your MetaMask wallet and try again.');
+      }
+    } catch (error) {
+      console.error('Error during MetaMask connection:', error);
+      throw error;
     }
-  }, [isMetaMaskInstalled, getMetaMaskProvider]);
+  }, [getMetaMaskProvider]);
 
   // Connect to Keplr
   const connectKeplr = useCallback(async () => {
@@ -215,29 +390,44 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
 
   // Connect to Phantom
   const connectPhantom = useCallback(async () => {
-    if (!isPhantomInstalled()) {
-      throw new Error('Phantom is not installed. Please install Phantom to continue.');
-    }
+    console.log('Starting Phantom connection...');
 
     try {
-      const solana = (window as any).solana;
+      // Try to get Solana provider
+      let solana = (window as any).solana;
+      
+      // If no provider found, wait a bit and try again (wallet might be loading)
+      if (!solana || !solana.isPhantom) {
+        console.log('No Phantom provider found, waiting and retrying...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        solana = (window as any).solana;
+      }
+      
+      if (!solana || !solana.isPhantom) {
+        throw new Error('Phantom is not installed or not accessible. Please install Phantom extension.');
+      }
+
+      console.log('Phantom provider found, requesting connection...');
       
       // Connect to Phantom
       const response = await solana.connect();
+      if (!response || !response.publicKey) {
+        throw new Error('Failed to get public key from Phantom. Please try again.');
+      }
+      
       const publicKey = response.publicKey.toString();
+      console.log('Phantom connected successfully:', publicKey);
       
       setAddress(publicKey);
       setIsConnected(true);
       setChainId(101); // Solana mainnet
       setNetwork('Solana');
       setBalance('0'); // You would need to implement balance fetching for Solana
-      
-      console.log('Phantom connected successfully:', publicKey);
     } catch (error: any) {
       console.error('Phantom connection error:', error);
       throw new Error(error.message || 'Failed to connect Phantom');
     }
-  }, [isPhantomInstalled]);
+  }, []);
 
   // Connect to Coinbase Wallet
   const connectCoinbaseWallet = useCallback(async () => {
@@ -246,10 +436,13 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
 
     try {
-      const ethereum = (window as any).ethereum;
+      const provider = getCoinbaseProvider();
+      if (!provider) {
+        throw new Error('Coinbase Wallet provider not found');
+      }
       
       // Request accounts (this will trigger the popup)
-      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
       
       if (accounts && accounts.length > 0) {
         const account = accounts[0];
@@ -257,11 +450,11 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         setIsConnected(true);
         
         // Get chain ID
-        const chainId = await ethereum.request({ method: 'eth_chainId' });
+        const chainId = await provider.request({ method: 'eth_chainId' });
         setChainId(parseInt(chainId, 16));
         
         // Get balance
-        const balance = await ethereum.request({ 
+        const balance = await provider.request({ 
           method: 'eth_getBalance', 
           params: [account, 'latest'] 
         });
@@ -285,7 +478,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       console.error('Coinbase Wallet connection error:', error);
       throw new Error(error.message || 'Failed to connect Coinbase Wallet');
     }
-  }, [isCoinbaseWalletInstalled]);
+  }, [isCoinbaseWalletInstalled, getCoinbaseProvider]);
 
   // Connect to Brave Wallet
   const connectBraveWallet = useCallback(async () => {
@@ -294,10 +487,13 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
 
     try {
-      const ethereum = (window as any).ethereum;
+      const provider = getBraveProvider();
+      if (!provider) {
+        throw new Error('Brave Wallet provider not found');
+      }
       
       // Request accounts (this will trigger the popup)
-      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
       
       if (accounts && accounts.length > 0) {
         const account = accounts[0];
@@ -305,11 +501,11 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         setIsConnected(true);
         
         // Get chain ID
-        const chainId = await ethereum.request({ method: 'eth_chainId' });
+        const chainId = await provider.request({ method: 'eth_chainId' });
         setChainId(parseInt(chainId, 16));
         
         // Get balance
-        const balance = await ethereum.request({ 
+        const balance = await provider.request({ 
           method: 'eth_getBalance', 
           params: [account, 'latest'] 
         });
@@ -333,7 +529,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       console.error('Brave Wallet connection error:', error);
       throw new Error(error.message || 'Failed to connect Brave Wallet');
     }
-  }, [isBraveWalletInstalled]);
+  }, [isBraveWalletInstalled, getBraveProvider]);
 
   // Get account info without triggering popups
   const getAccountInfo = useCallback(async () => {
@@ -389,6 +585,20 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     setConnectionError(null);
 
     try {
+      // Check if wallet is installed before attempting connection
+      const walletChecks = {
+        metamask: isMetaMaskInstalled,
+        keplr: isKeplrInstalled,
+        phantom: isPhantomInstalled,
+        coinbase: isCoinbaseWalletInstalled,
+        brave: isBraveWalletInstalled
+      };
+
+      const checkWallet = walletChecks[walletType.toLowerCase() as keyof typeof walletChecks];
+      if (checkWallet && !checkWallet()) {
+        throw new Error(`${walletType} is not installed. Please install ${walletType} extension first.`);
+      }
+
       switch (walletType.toLowerCase()) {
         case 'metamask':
           console.log('Connecting to MetaMask...');
@@ -412,24 +622,31 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           break;
         default:
           console.error('Unsupported wallet type:', walletType);
-          throw new Error(`Unsupported wallet type: ${walletType}`);
+          throw new Error(`Unsupported wallet type: ${walletType}. Supported wallets: MetaMask, Keplr, Phantom, Coinbase, Brave`);
       }
       console.log('Wallet connection successful:', walletType);
     } catch (error: any) {
       console.error('Connection error:', error);
       
+      // Handle specific error codes
       if (error.code === 4001) {
-        setConnectionError('User rejected the connection request');
+        setConnectionError('User rejected the connection request. Please try again and approve the connection.');
       } else if (error.code === -32002) {
-        setConnectionError('Wallet is already processing a request. Please check your wallet and try again.');
+        setConnectionError('Wallet is already processing a request. Please check your wallet extension and try again.');
+      } else if (error.code === -32603) {
+        setConnectionError('Internal wallet error. Please try refreshing the page and connecting again.');
+      } else if (error.message.includes('not installed')) {
+        setConnectionError(error.message);
+      } else if (error.message.includes('not found')) {
+        setConnectionError(`${walletType} wallet provider not found. Please make sure the extension is enabled.`);
       } else {
-        setConnectionError(error.message || 'Failed to connect wallet');
+        setConnectionError(error.message || `Failed to connect ${walletType}. Please try again.`);
       }
       throw error;
     } finally {
       setIsConnecting(false);
     }
-  }, [connectMetaMask, connectKeplr, connectPhantom, connectCoinbaseWallet, connectBraveWallet]);
+  }, [connectMetaMask, connectKeplr, connectPhantom, connectCoinbaseWallet, connectBraveWallet, isMetaMaskInstalled, isKeplrInstalled, isPhantomInstalled, isCoinbaseWalletInstalled, isBraveWalletInstalled]);
 
   // Disconnect wallet
   const disconnect = useCallback(() => {
@@ -510,13 +727,15 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
   }, [isConnected, switchNetwork]);
 
-  // Enable demo mode
+  // Enable demo mode for testing
   const enableDemoMode = useCallback(() => {
+    setAddress('0x742d35Cc6634C0532925a3b8D0b4E5C8bae8d114');
+    setIsConnected(true);
     setIsDemoMode(true);
-    setAddress('0x742d35Cc6634C0532925a3b8D16C09025A2f3c2E'); // Demo address
     setChainId(1);
-    setNetwork('Demo Mode');
-    setBalance('1.0000');
+    setNetwork('Ethereum Mainnet (Demo)');
+    setBalance('1.2345');
+    setConnectionError(null);
     console.log('Demo mode enabled');
   }, []);
 
