@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AegisSecurityProvider } from './contexts/AegisSecurityContext';
 import TransactionStatusBanner from './components/TransactionStatusBanner';
-import { WalletProvider } from './contexts/WalletContext';
+import { WalletProvider, useWallet } from './contexts/WalletContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import Layout from './components/Layout';
 import AppWelcome from './components/AppWelcome';
@@ -83,11 +83,12 @@ class GlobalErrorBoundary extends React.Component<
 // App Routes component that can access router context
 const AppRoutes = () => {
   const location = useLocation();
+  const { isConnected, isDemoMode } = useWallet();
   
   return (
     <>
-      {/* Only show TransactionStatusBanner when NOT on landing page */}
-      {location.pathname !== '/' && <TransactionStatusBanner />}
+      {/* Only show TransactionStatusBanner when connected and NOT on landing page */}
+      {isConnected && location.pathname !== '/' && <TransactionStatusBanner />}
       
       <Routes>
         {/* Landing page - no layout wrapper */}

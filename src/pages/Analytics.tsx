@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Wallet, 
   TrendingUp, 
@@ -37,6 +37,7 @@ import {
   Legend, 
   ResponsiveContainer,
   PieChart as RechartsPieChart,
+  Pie,
   Cell
 } from 'recharts';
 
@@ -234,7 +235,7 @@ const Analytics = () => {
   };
 
   // Generate mock liquidity trends data for the area chart
-  const generateLiquidityTrends = () => {
+  const generateLiquidityTrends = useMemo(() => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
     return months.map((month, index) => ({
       month,
@@ -245,7 +246,7 @@ const Analytics = () => {
       base: 300 + Math.random() * 60 - 30,
       zetachain: 400 + Math.random() * 70 - 35
     }));
-  };
+  }, []);
 
   const filteredLiquidityStats = selectedChain === 'all' 
     ? liquidityStats 
@@ -264,7 +265,22 @@ const Analytics = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+    <ErrorBoundary fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-red-400" />
+          <h2 className="text-xl font-semibold mb-2 text-white">Analytics Page Error</h2>
+          <p className="text-gray-400 mb-4">Something went wrong while loading the analytics page</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+          >
+            Reload Page
+          </button>
+        </div>
+      </div>
+    }>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -389,7 +405,7 @@ const Analytics = () => {
                 </h3>
                 <div className="text-right">
                   <p className="text-2xl font-bold text-white">
-                    {formatCurrency(filteredLiquidityStats.reduce((sum, stat) => sum + stat.liquidity, 0))}
+                    {formatCurrency(filteredLiquidityStats?.reduce((sum, stat) => sum + stat.liquidity, 0) || 0)}
                   </p>
                   <p className="text-sm text-gray-400">Total Liquidity</p>
                 </div>
@@ -504,7 +520,7 @@ const Analytics = () => {
                       </div>
                     }>
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={riskModelData}>
+                        <BarChart data={riskModelData || []}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
                           <XAxis dataKey="month" stroke="#94a3b8" />
                           <YAxis stroke="#94a3b8" />
@@ -533,25 +549,25 @@ const Analytics = () => {
                       <div className="flex justify-between">
                         <span className="text-gray-400">Avg Credit Score:</span>
                         <span className="text-white font-semibold">
-                          {riskModelData[riskModelData.length - 1]?.avgCreditScore || 0}
+                          {riskModelData?.[riskModelData.length - 1]?.avgCreditScore || 0}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Total Liquidations:</span>
                         <span className="text-red-400 font-semibold">
-                          {riskModelData.reduce((sum, data) => sum + data.liquidations, 0)}
+                          {riskModelData?.reduce((sum, data) => sum + data.liquidations, 0) || 0}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Avg Default Rate:</span>
                         <span className="text-yellow-400 font-semibold">
-                          {(riskModelData.reduce((sum, data) => sum + data.defaultRate, 0) / riskModelData.length).toFixed(1)}%
+                          {(riskModelData?.reduce((sum, data) => sum + data.defaultRate, 0) / (riskModelData?.length || 1)).toFixed(1)}%
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Market Volatility:</span>
                         <span className="text-blue-400 font-semibold">
-                          {(riskModelData.reduce((sum, data) => sum + data.marketVolatility, 0) / riskModelData.length).toFixed(1)}%
+                          {(riskModelData?.reduce((sum, data) => sum + data.marketVolatility, 0) / (riskModelData?.length || 1)).toFixed(1)}%
                         </span>
                       </div>
                     </div>
@@ -593,19 +609,19 @@ const Analytics = () => {
                       <ResponsiveContainer width="100%" height="100%">
                         <RechartsPieChart>
                           <Pie
-                            data={liquidityStats.map(stat => ({
+                            data={liquidityStats?.map(stat => ({
                               name: stat.chain,
                               value: stat.liquidity,
                               fill: getChainColor(stat.chain)
-                            }))}
+                            })) || []}
                             cx="50%"
                             outerRadius={80}
                             dataKey="value"
                             label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                           >
-                            {liquidityStats.map((stat, index) => (
+                            {liquidityStats?.map((stat, index) => (
                               <Cell key={`cell-${index}`} fill={getChainColor(stat.chain)} />
-                            ))}
+                            )) || []}
                           </Pie>
                           <Tooltip 
                             contentStyle={{ 
@@ -633,7 +649,7 @@ const Analytics = () => {
                       </div>
                     }>
                       <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={generateLiquidityTrends()}>
+                        <AreaChart data={generateLiquidityTrends}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
                           <XAxis dataKey="month" stroke="#94a3b8" />
                           <YAxis stroke="#94a3b8" />
@@ -699,7 +715,7 @@ const Analytics = () => {
                     </div>
                   }>
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={interestRateTrends}>
+                      <LineChart data={interestRateTrends || []}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
                         <XAxis dataKey="month" stroke="#94a3b8" />
                         <YAxis stroke="#94a3b8" />
@@ -729,7 +745,7 @@ const Analytics = () => {
                 <h4 className="text-lg font-medium text-white mb-4">Current Interest Rates</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                   {['Ethereum', 'Avalanche', 'Solana', 'Polygon', 'Base', 'ZetaChain'].map((chain) => {
-                    const latestRate = interestRateTrends[interestRateTrends.length - 1];
+                    const latestRate = interestRateTrends?.[interestRateTrends.length - 1];
                     const chainKey = chain.toLowerCase() as 'ethereum' | 'avalanche' | 'solana' | 'polygon' | 'base' | 'zetachain';
                     const rate = latestRate ? latestRate[chainKey] : 0;
                     return (
@@ -906,6 +922,7 @@ const Analytics = () => {
         )}
       </div>
     </div>
+    </ErrorBoundary>
   );
 };
 

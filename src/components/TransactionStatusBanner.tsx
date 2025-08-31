@@ -40,27 +40,33 @@ const TransactionStatusBanner: React.FC<TransactionStatusBannerProps> = ({
   };
 
   return (
-    <div className={`sticky top-0 z-40 border-b ${getStatusColor()} text-white`}>
-      <div className="container mx-auto px-4 py-3">
+    <div className={`sticky top-0 z-[60] border-b ${getStatusColor()} text-white shadow-lg`}>
+      <div className="container mx-auto px-4 py-2 sm:py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {getStatusIcon()}
             <div>
-              <div className="font-semibold text-sm">
+              <div className="font-semibold text-xs sm:text-sm">
                 Transaction Status
               </div>
-              <div className="text-xs opacity-90">
+              <div className="text-xs opacity-90 hidden sm:block">
                 {getStatusText()} on {chain} chain
+              </div>
+              <div className="text-xs opacity-90 sm:hidden">
+                {getStatusText()}
               </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Active transactions counter */}
-            <div className="flex items-center gap-2 text-xs opacity-90">
-              <Activity className="w-4 h-4" />
-              <span>
+            <div className="flex items-center gap-1 sm:gap-2 text-xs opacity-90">
+              <Activity className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">
                 {activeTransactions} active
+              </span>
+              <span className="sm:hidden">
+                {activeTransactions}
               </span>
             </div>
             
@@ -69,7 +75,7 @@ const TransactionStatusBanner: React.FC<TransactionStatusBannerProps> = ({
               onClick={handleClose}
               className="p-1 hover:bg-white/20 rounded transition-colors"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
           </div>
         </div>

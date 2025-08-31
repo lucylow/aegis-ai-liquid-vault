@@ -44,6 +44,25 @@ export function AegisSecurityProvider({ children }: AegisSecurityProviderProps) 
   const [lastThreat, setLastThreat] = useState<SecurityThreat | null>(null);
   const [activeThreats, setActiveThreats] = useState<SecurityThreat[]>([]);
   const [securityStatus, setSecurityStatus] = useState<'secure' | 'warning' | 'critical'>('secure');
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Initialize security context
+  useEffect(() => {
+    try {
+      // Load any saved security state from localStorage
+      const savedThreats = localStorage.getItem('aegis-security-threats');
+      if (savedThreats) {
+        const parsed = JSON.parse(savedThreats);
+        if (Array.isArray(parsed)) {
+          setActiveThreats(parsed);
+        }
+      }
+      setIsInitialized(true);
+    } catch (error) {
+      console.error('Failed to initialize security context:', error);
+      setIsInitialized(true); // Continue anyway
+    }
+  }, []);
 
   // Update security status based on active threats
   useEffect(() => {

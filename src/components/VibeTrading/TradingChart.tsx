@@ -4,8 +4,11 @@ import React, { useState, useEffect } from 'react';
 
 interface TradingChartProps {
   selectedToken: string;
-  timeRange: '1h' | '24h' | '7d';
-  onTimeRangeChange?: (range: '1h' | '24h' | '7d') => void;
+  timeRange: '1h' | '24h' | '7d' | '30d' | '90d';
+  onTimeRangeChange?: (range: '1h' | '24h' | '7d' | '30d' | '90d') => void;
+  onMentionSelect?: (index: number) => void;
+  currentMentionIndex?: number;
+  highlightedMentionIndex?: number;
 }
 
 export default function TradingChart({ 
@@ -63,7 +66,7 @@ export default function TradingChart({
       {onTimeRangeChange && (
         <div className="flex items-center justify-center gap-2">
           <span className="text-sm text-gray-400">Time Range:</span>
-          {(['1h', '24h', '7d'] as const).map((range) => (
+          {(['1h', '24h', '7d', '30d', '90d'] as const).map((range) => (
             <button
               key={range}
               onClick={() => onTimeRangeChange(range)}

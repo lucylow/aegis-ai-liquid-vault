@@ -62,11 +62,32 @@ export default function VibeTradingAI() {
 
   // Function to handle mention selection from chart
   const handleMentionSelect = (index: number) => {
-    setCurrentMentionIndex(index);
-    setHighlightedMentionIndex(index);
+    if (index >= 0 && index < filteredMentions.length) {
+      setCurrentMentionIndex(index);
+      setHighlightedMentionIndex(index);
+    }
   };
 
   useEffect(() => {
+    // Check if required dependencies are available
+    const checkDependencies = () => {
+      const missingDeps = [];
+      
+      // Check if Chart.js is available
+      if (typeof window !== 'undefined' && !(window as any).Chart) {
+        missingDeps.push('Chart.js');
+      }
+      
+      // Check if Ollama endpoint is accessible
+      fetch('http://localhost:11434/api/tags')
+        .catch(() => missingDeps.push('Ollama AI'));
+      
+      if (missingDeps.length > 0) {
+        console.warn('Missing dependencies:', missingDeps);
+      }
+    };
+    
+    checkDependencies();
     fetchTrendingTokens();
   }, []);
 
@@ -130,7 +151,9 @@ export default function VibeTradingAI() {
   };
 
   const handleTokenSelect = (token: string) => {
-    setSelectedToken(token);
+    if (token && typeof token === 'string') {
+      setSelectedToken(token);
+    }
   };
 
   // Open Base Mini App trade interface
@@ -150,32 +173,63 @@ export default function VibeTradingAI() {
     }
   };
 
+  // Error fallback component
+  const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
+    <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center shadow-sm">
+      <h3 className="text-lg font-semibold text-red-800 mb-2">Component Error</h3>
+      <p className="text-red-600 mb-4">{error.message}</p>
+      <button
+        onClick={resetErrorBoundary}
+        className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+      >
+        Retry
+      </button>
+    </div>
+  );
+
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200 shadow-sm">
         <div className="flex items-center justify-center h-32">
           <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
-        <p className="text-center text-blue-200">Analyzing Base chain for trending tokens...</p>
+        <p className="text-center text-blue-700 font-medium">Analyzing Base chain for trending tokens...</p>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-6 border border-red-200 shadow-sm">
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-red-800 mb-2">Error Loading Data</h3>
+          <p className="text-red-600 mb-4">{errorMessage}</p>
+          <button
+            onClick={fetchTrendingTokens}
+            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
 
   if (!trendingData) {
     return (
-      <div className="bg-gradient-to-br from-red-600/20 to-pink-600/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-        <p className="text-center text-red-200">Failed to load trending data</p>
+      <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-6 border border-red-200 shadow-sm">
+        <p className="text-center text-red-600 font-medium">Failed to load trending data</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-gray-50 min-h-screen p-4">
       {/* Unified Trending & Controls Panel - Mobile-First Design */}
-      <div className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-200 shadow-sm">
         {/* Compact Title */}
         <div className="text-center mb-3">
-          <h2 className="text-lg md:text-xl font-bold text-white">🔥 Trending $ETH mentions on Farcaster</h2>
+          <h2 className="text-lg md:text-xl font-bold text-gray-800">🔥 Trending $ETH mentions on Farcaster</h2>
         </div>
         
         {/* Inline Controls - Single Row */}
@@ -184,7 +238,7 @@ export default function VibeTradingAI() {
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value as any)}
-            className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm min-h-[40px] min-w-[60px]"
+            className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-700 text-sm min-h-[40px] min-w-[60px] shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="1h">1H</option>
             <option value="24h">24H</option>
@@ -204,7 +258,7 @@ export default function VibeTradingAI() {
           <button
             onClick={() => selectedToken && openBaseTrade(selectedToken)}
             disabled={!selectedToken}
-            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:from-gray-500 disabled:to-gray-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 disabled:cursor-not-allowed"
+            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 disabled:cursor-not-allowed shadow-sm"
           >
             Trade {selectedToken || 'Token'}
           </button>
@@ -212,23 +266,23 @@ export default function VibeTradingAI() {
 
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="bg-white/5 rounded-lg p-3">
-            <div className="text-2xl font-bold text-blue-300">{trendingData.analysis.totalCasts}</div>
-            <div className="text-xs text-blue-200">Total Casts</div>
+          <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+            <div className="text-2xl font-bold text-blue-600">{trendingData.analysis.totalCasts}</div>
+            <div className="text-xs text-gray-600 font-medium">Total Casts</div>
           </div>
-          <div className="bg-white/5 rounded-lg p-3">
-            <div className="text-2xl font-bold text-green-300">{trendingData.analysis.totalTokenMentions}</div>
-            <div className="text-xs text-green-200">Mentions</div>
+          <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+            <div className="text-2xl font-bold text-green-600">{trendingData.analysis.totalTokenMentions}</div>
+            <div className="text-xs text-gray-600 font-medium">Mentions</div>
           </div>
-          <div className="bg-white/5 rounded-lg p-3">
-            <div className="text-2xl font-bold text-purple-300">{trendingData.analysis.channelsAnalyzed}</div>
-            <div className="text-xs text-purple-200">Channels</div>
+          <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+            <div className="text-2xl font-bold text-purple-600">{trendingData.analysis.channelsAnalyzed}</div>
+            <div className="text-xs text-gray-600 font-medium">Channels</div>
           </div>
         </div>
       </div>
 
       {/* Trading Chart */}
-      <div className="bg-gradient-to-br from-gray-800/20 to-gray-900/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+      <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
         <TradingChart
           selectedToken={selectedToken || 'ETH'}
           timeRange={timeRange}
@@ -241,22 +295,22 @@ export default function VibeTradingAI() {
 
       {/* Social Mentions Panel */}
       {filteredMentions.length > 0 && (
-        <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-200 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-white">Social Sentiment Analysis</h3>
+            <h3 className="text-lg font-bold text-gray-800">Social Sentiment Analysis</h3>
             <div className="flex items-center gap-2">
               <button
                 onClick={prevMention}
-                className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-lg transition-colors"
+                className="bg-white hover:bg-gray-50 text-gray-700 p-2 rounded-lg transition-colors border border-gray-300 shadow-sm"
               >
                 ←
               </button>
-              <span className="text-white text-sm">
+              <span className="text-gray-700 text-sm font-medium">
                 {currentMentionIndex + 1} / {filteredMentions.length}
               </span>
               <button
                 onClick={nextMention}
-                className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-lg transition-colors"
+                className="bg-white hover:bg-gray-50 text-gray-700 p-2 rounded-lg transition-colors border border-gray-300 shadow-sm"
               >
                 →
               </button>
@@ -264,20 +318,20 @@ export default function VibeTradingAI() {
           </div>
 
           {filteredMentions[currentMentionIndex] && (
-            <div className="bg-white/5 rounded-lg p-4">
+            <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-3 mb-3">
                 <div className={`w-3 h-3 rounded-full ${
-                  filteredMentions[currentMentionIndex].sentiment === 'positive' ? 'bg-green-400' :
-                  filteredMentions[currentMentionIndex].sentiment === 'negative' ? 'bg-red-400' : 'bg-gray-400'
+                  filteredMentions[currentMentionIndex].sentiment === 'positive' ? 'bg-green-500' :
+                  filteredMentions[currentMentionIndex].sentiment === 'negative' ? 'bg-red-500' : 'bg-gray-500'
                 }`}></div>
-                <span className="text-white text-sm capitalize">
+                <span className="text-gray-700 text-sm capitalize font-medium">
                   {filteredMentions[currentMentionIndex].sentiment} sentiment
                 </span>
-                <span className="text-gray-400 text-xs">
+                <span className="text-gray-500 text-xs">
                   {filteredMentions[currentMentionIndex].timestamp.toLocaleTimeString()}
                 </span>
               </div>
-              <p className="text-white text-lg">
+              <p className="text-gray-800 text-lg">
                 "{filteredMentions[currentMentionIndex].text}"
               </p>
             </div>
@@ -286,7 +340,7 @@ export default function VibeTradingAI() {
       )}
 
       {/* Enhanced AI Trading Assistant */}
-      <div className="bg-gradient-to-br from-purple-600/20 to-blue-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+      <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-4 border border-purple-200 shadow-sm">
         <AIErrorBoundary>
           <AIEnhancedTradingAssistant 
             selectedToken={selectedToken || 'ETH'} 
@@ -296,7 +350,7 @@ export default function VibeTradingAI() {
       </div>
 
       {/* AI Market Analysis Dashboard */}
-      <div className="bg-gradient-to-br from-pink-600/20 to-purple-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+      <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-4 border border-pink-200 shadow-sm">
         <AIErrorBoundary>
           <AIMarketAnalysisDashboard 
             selectedToken={selectedToken || 'ETH'} 
@@ -306,7 +360,7 @@ export default function VibeTradingAI() {
       </div>
 
       {/* Security-Integrated Trading Form */}
-      <div className="bg-gradient-to-br from-emerald-600/20 to-teal-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+      <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-4 border border-emerald-200 shadow-sm">
         <AIErrorBoundary>
           <TradeForm 
             selectedToken={selectedToken || 'ETH'} 
@@ -319,12 +373,14 @@ export default function VibeTradingAI() {
       </div>
 
       {/* AEGIS Security Dashboard */}
-      <div className="bg-gradient-to-br from-red-600/20 to-orange-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-        <AegisSecurityDashboard />
+      <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl p-4 border border-red-200 shadow-sm">
+        <AIErrorBoundary>
+          <AegisSecurityDashboard />
+        </AIErrorBoundary>
       </div>
 
       {/* System Status */}
-      <div className="bg-gradient-to-br from-gray-700/20 to-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+      <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl p-4 border border-gray-200 shadow-sm">
         <SystemStatusRow />
       </div>
     </div>
