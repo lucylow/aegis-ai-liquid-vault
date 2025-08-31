@@ -13,7 +13,7 @@ AEGIS is a revolutionary **AI-powered cross-chain lending platform** that unites
 - **Monitor security threats** in real-time with AEGIS Security Center
 - **Access competitive rates** based on cross-chain diversification
 
-## 🌟 **NEW: Vibe Trading AI & Security Center**
+## 🌟 Vibe Trading AI & Security Center**
 
 ### 🔥 **Vibe Trading AI - Base Mini App**
 - **AI-Powered Trading Signals**: Real-time sentiment analysis using Ollama AI
