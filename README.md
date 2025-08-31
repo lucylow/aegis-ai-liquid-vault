@@ -15,6 +15,10 @@ AEGIS is a revolutionary **AI-powered cross-chain lending platform** that unites
 - **Monitor security threats** in real-time with AEGIS Security Center
 - **Access competitive rates** based on cross-chain diversification
 
+![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/34.jpg?raw=true)
+
+![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/33.jpg?raw=true)
+
 ## 🌟 Vibe Trading AI & Security Center**
 
 ### 🔥 **Vibe Trading AI - Base Mini App**
@@ -81,6 +85,8 @@ AEGIS is a revolutionary **AI-powered cross-chain lending platform** that unites
 - Dynamic interest rate adjustment
 - Real-time risk monitoring
 
+![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/20.jpg?raw=true)
+
 ### 🔥 **Vibe Trading AI (NEW)**
 - **Real-time Sentiment Analysis**: Farcaster social sentiment for trading decisions
 - **AI Trading Signals**: Ollama AI-powered market intelligence
@@ -88,6 +94,8 @@ AEGIS is a revolutionary **AI-powered cross-chain lending platform** that unites
 - **Portfolio Optimization**: AI-driven investment recommendations
 - **Market Analysis Dashboard**: Comprehensive market insights
 - **Trading Security**: AEGIS security integration for safe trading
+
+![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/23.jpg?raw=true)
 
 ### 🛡️ **AEGIS Security Center (NEW)**
 - **Global Threat Monitoring**: Real-time security across all chains
