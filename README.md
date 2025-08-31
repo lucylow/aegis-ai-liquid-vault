@@ -1,8 +1,10 @@
 # 🛡️ AEGIS AI - Intelligent Security & Cross-Chain Management System
 
 > **"Aegis turns five separate blockchains — ZetaChain, Solana, Bitcoin, Base, and Avalanche — into one seamless lending market, with ZetaChain as the brain, chain-specific vaults as arms, and AI-powered security as the intelligent heart."**
-
-![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/14.jpg?raw=true)
+![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/4.jpg?raw=true)
+ ![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/6.jpg?raw=true)
+![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/7.jpg?raw=true)
+ 
 
 ## 🎯 Overview
 
@@ -174,6 +176,8 @@ aegis-ai-liquid-vault/
 
 ## 🛠️ Technology Stack
 
+![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/8.jpg?raw=true)
+
 ### **Frontend**
 - **React 18**: Modern React with hooks and context
 - **TypeScript**: Type-safe development
@@ -212,6 +216,9 @@ aegis-ai-liquid-vault/
 - **Coinbase Wallet**: Multi-chain wallet
 - **Brave Wallet**: Privacy-focused wallet
 - **Demo Mode**: Testing without real wallets
+
+![](https://github.com/lucylow/aegis-ai-liquid-vault/blob/main/docs/14.jpg?raw=true)
+
 
 ## 🚀 Quick Start
 
@@ -266,6 +273,8 @@ BTC_VAULT_ADDRESS=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
 FARCASTER_HUB_URL=https://hub.farcaster.xyz
 FARCASTER_NEYNAR_API_KEY=your_neynar_api_key_here
 ```
+
+
 
 ### 3. **Database Setup (Vibe Trading AI)**
 ```bash
